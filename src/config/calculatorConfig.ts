@@ -1,4 +1,4 @@
-import heroArtwork from '../assets/artwork/01_cc-image.webp'
+import heroArtwork from '../assets/artwork/01_cc-image.png'
 import launchLicenseArtwork from '../assets/artwork/license-launch.svg'
 import growthLicenseArtwork from '../assets/artwork/license-growth.svg'
 import investorVisaArtwork from '../assets/artwork/visa-investor.svg'

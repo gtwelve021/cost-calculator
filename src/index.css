@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -33,7 +33,7 @@ body {
   color: var(--ink);
      background-color: #f5f5f8;
     min-height: 50vh;
-  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  font-family: 'Roboto', sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -44,7 +44,7 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-family: 'Sora', 'Manrope', sans-serif;
+  font-family: 'Aloevera', 'Roboto', sans-serif;
 }
 
 button,
@@ -55,4 +55,58 @@ textarea {
 
 a {
   color: inherit;
+}
+
+.mfz-phone-field .react-tel-input {
+  width: 100%;
+}
+
+.mfz-phone-field .mfz-phone-input {
+  width: 100% !important;
+  height: 58px !important;
+  border: 0 !important;
+  border-radius: 0.75rem !important;
+  background: transparent !important;
+  color: #171d29 !important;
+  font-size: 0.875rem !important;
+  padding-left: 118px !important;
+  padding-right: 12px !important;
+}
+
+.mfz-phone-field .mfz-phone-input:focus {
+  box-shadow: none !important;
+}
+
+.mfz-phone-field .mfz-phone-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.mfz-phone-field .mfz-phone-button {
+  width: 110px !important;
+  border: 0 !important;
+  border-right: 1px solid #d8dfeb !important;
+  border-radius: 0.75rem 0 0 0.75rem !important;
+  background: #e4ebf5 !important;
+}
+
+.mfz-phone-field .mfz-phone-button:hover,
+.mfz-phone-field .mfz-phone-button:focus {
+  background: #dce5f2 !important;
+}
+
+.mfz-phone-field .mfz-phone-dropdown {
+  width: 100% !important;
+  margin-top: 0.5rem !important;
+  border: 1px solid #d6deed !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 18px 40px rgba(15, 20, 35, 0.14) !important;
+}
+
+.mfz-phone-field .mfz-phone-search {
+  width: calc(100% - 1rem) !important;
+  height: 42px !important;
+  margin: 0.5rem !important;
+  border: 1px solid #d6deed !important;
+  border-radius: 0.75rem !important;
+  font-size: 0.875rem !important;
 }
