@@ -1,11 +1,10 @@
 import type { CalculatorState, LeadFormData } from '../types/calculator'
-
-const phonePattern = /^[+]?\d[\d\s()-]{7,20}$/
+import { isValidLeadPhoneNumber } from './phone'
 
 export function isLeadFormComplete(data: LeadFormData): boolean {
-  const fullNameValid = data.fullName.trim().length >= 2
-  const phoneValid = phonePattern.test(data.phone.trim())
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())
+  const fullNameValid = data.fullName.trim().length > 0
+  const phoneValid = isValidLeadPhoneNumber(data.phone)
+  const emailValid = data.email.trim().length > 0
 
   return fullNameValid && phoneValid && emailValid && data.consent
 }

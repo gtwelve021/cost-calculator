@@ -239,10 +239,10 @@ export const defaultLeadForm: LeadFormData = {
 
 export const defaultCalculatorState: CalculatorState = {
   leadForm: defaultLeadForm,
-  selectedLicenseId: licenseOptions[0]?.id ?? null,
-  durationYears: 1,
-  shareholderCount: 1,
+  selectedLicenseId: null,
+  durationYears: 0,
+  shareholderCount: 0,
   selectedActivityIds: [],
-  selectedVisaId: visaOptions[0]?.id ?? null,
+  selectedVisaId: null,
   selectedAddOnIds: [],
 }

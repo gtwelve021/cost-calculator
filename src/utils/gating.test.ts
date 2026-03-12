@@ -6,9 +6,9 @@ describe('isLeadFormComplete', () => {
   it('returns false for incomplete lead form', () => {
     expect(
       isLeadFormComplete({
-        fullName: 'A',
-        phone: '123',
-        email: 'invalid-email',
+        fullName: '',
+        phone: '',
+        email: '',
         consent: false,
       }),
     ).toBe(false)
@@ -23,6 +23,17 @@ describe('isLeadFormComplete', () => {
         consent: true,
       }),
     ).toBe(true)
+  })
+
+  it('returns true when required fields are filled even if values are not format-validated', () => {
+    expect(
+      isLeadFormComplete({
+        fullName: 'Ali123',
+        phone: '123',
+        email: 'not-an-email',
+        consent: true,
+      }),
+    ).toBe(false)
   })
 })
 
@@ -60,6 +71,8 @@ describe('getSubmissionIssues', () => {
           email: 'ali@example.com',
           consent: true,
         },
+        selectedLicenseId: 'launch-license',
+        selectedVisaId: 'no-visa',
         selectedActivityIds: ['act-001'],
       },
       1,

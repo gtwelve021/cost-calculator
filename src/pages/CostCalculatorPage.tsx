@@ -7,9 +7,8 @@ import {
   Minus,
   Phone,
   Plus,
-  RotateCcw,
   Search,
-  ShieldCheck,
+  Share2,
   Sparkles,
   X,
 } from 'lucide-react'
@@ -35,22 +34,43 @@ import { calculateQuote } from '../utils/calculations'
 import { cn } from '../utils/cn'
 import { formatAed } from '../utils/currency'
 import { getSubmissionIssues, isLeadFormComplete } from '../utils/gating'
+import { sanitizeLeadFullNameInput } from '../utils/lead'
+import {
+  getLockedPhonePrefixLength,
+  getPhoneDialCode,
+  isValidLeadPhoneNumber,
+  normalizePhoneNumber,
+  shouldPreventPhonePrefixEdit,
+} from '../utils/phone'
 import { CALCULATOR_STATE_KEY, loadCalculatorState, saveCalculatorState } from '../utils/persistence'
 
 const BRAND_LOGO_URL = 'https://g12.ae/wp-content/uploads/2024/12/G12-Final-Logo-Update-01.svg'
 const BRAND_SITE_URL = 'https://g12.ae/'
 const CONTACT_NUMBER = '+971 4 570 6451'
 const CONTACT_TEL = '+97145706451'
+const DEFAULT_PHONE_DIAL_CODE = '92'
 
 const leadFormSchema = z.object({
-  fullName: z.string().trim().min(2, 'Full name is required.'),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^[+]?\d[\d\s()-]{7,20}$/, 'Enter a valid phone number.'),
-  email: z.string().trim().email('Enter a valid email address.'),
+  fullName: z.string().trim().min(1, 'Full name is required.'),
+  phone: z.string().trim().superRefine((value, ctx) => {
+    if (!value) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Phone number is required.',
+      })
+      return
+    }
+
+    if (!isValidLeadPhoneNumber(value)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Please enter a valid phone number.',
+      })
+    }
+  }),
+  email: z.string().trim().min(1, 'Email address is required.'),
   consent: z.boolean().refine((value) => value, {
-    message: 'This consent is required to continue.',
+    message: 'This field is required.',
   }),
 })
 
@@ -96,6 +116,7 @@ export function CostCalculatorPage() {
   })
 
   const watchedLead = useWatch({ control })
+  const fullNameField = register('fullName')
 
   const leadForm: LeadFormData = useMemo(
     () => ({
@@ -120,6 +141,7 @@ export function CostCalculatorPage() {
 
   const licenseSectionRef = useRef<HTMLElement | null>(null)
   const finalizeSectionRef = useRef<HTMLElement | null>(null)
+  const phoneDialCodeRef = useRef(DEFAULT_PHONE_DIAL_CODE)
 
   const state: CalculatorState = useMemo(
     () => ({
@@ -157,14 +179,12 @@ export function CostCalculatorPage() {
 
   const leadReady = isLeadFormComplete(leadForm)
   const calculatorUnlocked = quoteStarted && leadReady
-  const companySetupTotal = quote.licenseBase + quote.durationDelta + quote.shareholderDelta
 
   const submissionIssues = useMemo(() => {
     return getSubmissionIssues(state, pricingConfig.minimumActivities)
   }, [state])
 
   const selectedLicense = licenseOptions.find((item) => item.id === selectedLicenseId)
-  const selectedVisa = visaOptions.find((item) => item.id === selectedVisaId)
 
   const estimateId = useMemo(() => {
     const licensePrefix = selectedLicense?.name.slice(0, 2).toUpperCase() ?? 'NA'
@@ -212,6 +232,41 @@ export function CostCalculatorPage() {
     })
   }
 
+  const syncPhoneDialCode = (countryData?: { dialCode?: string } | null) => {
+    phoneDialCodeRef.current = getPhoneDialCode(countryData, phoneDialCodeRef.current)
+  }
+
+  const keepPhoneCursorAfterPrefix = (input: HTMLInputElement) => {
+    window.setTimeout(() => {
+      const prefixLength = getLockedPhonePrefixLength(phoneDialCodeRef.current)
+      const selectionStart = input.selectionStart ?? prefixLength
+      const selectionEnd = input.selectionEnd ?? prefixLength
+
+      if (selectionStart < prefixLength || selectionEnd < prefixLength) {
+        input.setSelectionRange(prefixLength, prefixLength)
+      }
+    }, 0)
+  }
+
+  const handlePhoneKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const prefixLength = getLockedPhonePrefixLength(phoneDialCodeRef.current)
+
+    if (
+      !shouldPreventPhonePrefixEdit({
+        key: event.key,
+        selectionStart: event.currentTarget.selectionStart,
+        selectionEnd: event.currentTarget.selectionEnd,
+        prefixLength,
+        hasModifier: event.ctrlKey || event.metaKey || event.altKey,
+      })
+    ) {
+      return
+    }
+
+    event.preventDefault()
+    event.currentTarget.setSelectionRange(prefixLength, prefixLength)
+  }
+
   const handleContinue = async () => {
     const valid = await trigger()
 
@@ -251,6 +306,36 @@ export function CostCalculatorPage() {
     finalizeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  const handleShareEstimate = async () => {
+    const shareText = `My G12 business setup estimate is ${formatAed(quote.total)}.`
+
+    if (typeof navigator !== 'undefined' && typeof window !== 'undefined') {
+      if (typeof navigator.share === 'function') {
+        try {
+          await navigator.share({
+            title: 'G12 Business Setup Estimate',
+            text: shareText,
+            url: window.location.href,
+          })
+          return
+        } catch {
+          // Fall back to copy/summary when native share is unavailable or dismissed.
+        }
+      }
+
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(`${shareText} ${window.location.href}`)
+          return
+        } catch {
+          // Fall through to the summary section if clipboard is unavailable.
+        }
+      }
+    }
+
+    handleViewSummary()
+  }
+
   return (
     <main className="pb-28 md:pb-20">
       <header className="sticky top-0 z-40 mx-auto max-w-[1276px] px-4 pt-3 md:px-8 md:pt-4">
@@ -273,23 +358,18 @@ export function CostCalculatorPage() {
         </div>
       </header>
 
-      <AnimatedSection className="mx-auto max-w-[1276px] overflow-hidden px-4 pb-12 pt-8 md:px-8 md:pt-12">
-        <div className="grid gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-center">
-          <div className="max-w-[510px] space-y-6">
+      <section className="mx-auto max-w-[1276px] overflow-hidden px-4 pb-12 pt-8 md:px-8 md:pt-12">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,36%)_minmax(0,48%)] lg:gap-[16%]">
+          <div className="space-y-6 lg:max-w-none lg:pt-[30%]">
             <div className="space-y-4">
-              <p className="inline-flex items-center gap-2 rounded-full border border-[#e1d0b0] bg-[#fbf6eb] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
-                <ShieldCheck size={14} />
-                Smart Setup Assistant
-              </p>
-              <h1 className="text-[2.1rem] leading-tight md:text-[3.25rem]">
+              <h1 className="text-[2.1rem] font-bold leading-tight md:text-[3.25rem]">
                 Business Setup
                 <span className="block text-[#ab8134]">Cost Calculator</span>
               </h1>
-              <p className="max-w-[470px] text-[1.05rem] font-semibold text-[#171d29]">
-                Estimate your business launch cost with clear pricing logic across licenses, activities,
-                visas, and operational add-ons.
+              <p className="text-[1.5rem] font-regular text-[#171d29] lg:max-w-[34rem]">
+                Get an Estimate of Your Business Setup Costs Effortlessly
               </p>
-              <p className="max-w-[470px] text-sm leading-relaxed text-slate-600 md:text-[0.98rem]">
+              <p className="text-sm leading-relaxed text-slate-600 md:text-[0.98rem] lg:max-w-[34rem]">
                 This interactive estimator gives a transparent cost breakdown with real-time updates. No
                 vague ranges, no hidden conditions, just a practical quote you can use to plan your next
                 move.
@@ -297,25 +377,19 @@ export function CostCalculatorPage() {
             </div>
           </div>
 
-          <motion.figure
-            initial={{ opacity: 0, x: 28 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="relative mx-auto flex h-[420px] w-full max-w-[500px] items-end justify-center overflow-hidden sm:h-[500px] lg:h-[620px]"
-          >
+          <figure className="relative mx-auto flex w-full items-end justify-center overflow-hidden lg:ml-auto">
             <img
               src={heroImage}
               alt="Professional using tablet"
               className="block h-full w-full object-contain object-bottom"
             />
-          </motion.figure>
+          </figure>
         </div>
-      </AnimatedSection>
+      </section>
 
-      <section id="MFZ-NewCostCalForm" className="mt-2">
+      <section id="MFZ-NewCostCalForm" className="-mt-80">
         <div className="form-sections-container mx-auto max-w-[1276px] px-4 md:px-8">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+          <div className="grid gap-16 lg:grid-cols-[minmax(0,1fr)_450px] lg:items-start">
           <form
             id="multiStepForm"
             className="min-w-0 space-y-8"
@@ -327,7 +401,7 @@ export function CostCalculatorPage() {
           id="personal-details-section"
           className="form-section contact-form-section relative z-10"
         >
-          <article className="rounded-3xl border border-[#e9dfcc] bg-[#fffbf5]/95 p-6 shadow-soft md:p-8">
+          <article className="lead-glass-card p-6 md:p-8">
             <SectionHeading
               title="Tell Us a Few Details to Get Started"
               subtitle="The more we know about your setup intent, the more accurate your estimate becomes."
@@ -342,9 +416,13 @@ export function CostCalculatorPage() {
                   id="fullName"
                   type="text"
                   placeholder="Your full name"
-                  {...register('fullName')}
+                  {...fullNameField}
+                  onChange={(event) => {
+                    event.target.value = sanitizeLeadFullNameInput(event.target.value)
+                    fullNameField.onChange(event)
+                  }}
                   className={cn(
-                    'w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm outline-none transition focus:ring-4 focus:ring-[#f3e7cf]',
+                    'w-full rounded-md border bg-white px-3.5 py-2.5 text-sm outline-none transition focus:ring-4 focus:ring-[#f3e7cf]',
                     errors.fullName ? 'border-[#df7583]' : 'border-[#e3d8c5] focus:border-[#d6a456]',
                   )}
                 />
@@ -361,7 +439,7 @@ export function CostCalculatorPage() {
                   render={({ field }) => (
                     <div
                       className={cn(
-                        'mfz-phone-field rounded-xl border bg-[#eef2fa] transition focus-within:ring-4 focus-within:ring-[#f3e7cf]',
+                        'mfz-phone-field rounded-md border bg-[#eef2fa] transition focus-within:ring-4 focus-within:ring-[#f3e7cf]',
                         errors.phone ? 'border-[#df7583]' : 'border-[#d6deed] focus-within:border-[#d6a456]',
                       )}
                     >
@@ -371,10 +449,24 @@ export function CostCalculatorPage() {
                         enableSearch
                         disableSearchIcon
                         countryCodeEditable={false}
+                        onMount={(_, countryData) => syncPhoneDialCode(countryData)}
+                        onFocus={(event, countryData) => {
+                          syncPhoneDialCode(countryData)
+                          keepPhoneCursorAfterPrefix(event.currentTarget)
+                        }}
+                        onClick={(event, countryData) => {
+                          syncPhoneDialCode(countryData)
+                          keepPhoneCursorAfterPrefix(event.currentTarget)
+                        }}
+                        onKeyDown={handlePhoneKeyDown}
                         value={(field.value ?? '').replace(/[^\d]/g, '')}
-                        onChange={(value) => field.onChange(value ? `+${value}` : '')}
+                        onChange={(value, countryData) => {
+                          syncPhoneDialCode(countryData)
+                          field.onChange(normalizePhoneNumber(value, countryData))
+                        }}
                         onBlur={field.onBlur}
                         placeholder="Phone number"
+                        searchPlaceholder="Search country"
                         specialLabel=""
                         inputProps={{
                           id: 'phone',
@@ -404,23 +496,32 @@ export function CostCalculatorPage() {
                   placeholder="name@company.com"
                   {...register('email')}
                   className={cn(
-                    'w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm outline-none transition focus:ring-4 focus:ring-[#f3e7cf]',
+                    'w-full rounded-md border bg-white px-3.5 py-2.5 text-sm outline-none transition focus:ring-4 focus:ring-[#f3e7cf]',
                     errors.email ? 'border-[#df7583]' : 'border-[#e3d8c5] focus:border-[#d6a456]',
                   )}
                 />
                 {errors.email && <p className="text-xs text-[#cf4b5c]">{errors.email.message}</p>}
               </div>
 
-              <label className="flex items-start gap-3 rounded-xl border border-[#e9dfcc] bg-white px-3.5 py-3 text-xs leading-relaxed text-slate-600">
+              <label className="flex items-start gap-3  text-xs leading-relaxed text-slate-600">
                 <input
                   type="checkbox"
                   {...register('consent')}
                   className="mt-0.5 h-4 w-4 rounded border-[#bdc8db]"
-                  aria-label="I have read and understood the terms and privacy policy"
+                  aria-label="I confirm that I have read and understood G12's Terms and Privacy Policy"
                 />
                 <span>
-                  I have read and understood the terms and privacy policy. I consent to communication by
-                  email, phone, or WhatsApp regarding my setup request.
+                  I confirm that I have read and understood G12's Terms and Privacy Policy and consent
+                  to the processing of my personal data for the purposes of communication and service
+                  delivery. I agree to be contacted via email, phone, or WhatsApp. I acknowledge that
+                  G12 operates 24/7 and that contact may occur outside standard business hours,
+                  including after 6:00 PM UAE time.
+                  <br />
+                  <br />
+                  I further acknowledge that G12 will never request passwords, one-time passcodes
+                  (OTPs), or payments to personal or unknown bank accounts and that I should verify any
+                  suspicious or unexpected communication by calling 800 FZ1 (800 391) before taking any
+                  action.
                 </span>
               </label>
               {errors.consent && <p className="text-xs text-[#cf4b5c]">{errors.consent.message}</p>}
@@ -436,7 +537,7 @@ export function CostCalculatorPage() {
 
               <p
                 className={cn(
-                  'rounded-xl border px-3.5 py-2 text-xs',
+                  'rounded-md border-l-4 px-3.5 py-3 text-sm',
                   calculatorUnlocked
                     ? 'border-[#b6e2c8] bg-[#e9f9f0] text-[#2f7f4e]'
                     : leadReady
@@ -456,27 +557,7 @@ export function CostCalculatorPage() {
         </div>
       </AnimatedSection>
 
-      {!calculatorUnlocked ? (
-          <AnimatedSection className="w-full" delay={0.12}>
-            <div
-              id="company-setup-section"
-              className="form-section rounded-[2rem] border border-[#ece2cf] bg-[linear-gradient(180deg,#fffaf2_0%,#f7efe0_100%)] p-6 shadow-soft md:p-8"
-            >
-              <div className="max-w-[720px] space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8e7137]">
-                  Calculator Locked
-                </p>
-                <h2 className="text-[1.6rem] font-semibold text-[#171d29]">
-                  Complete the lead form, then press Calculate to unlock the full estimator
-                </h2>
-                <p className="text-sm leading-relaxed text-slate-600">
-                  License cards, activity selection, visa choices, add-ons, and the live quote breakdown
-                  will appear after the initial form step is confirmed.
-                </p>
-              </div>
-            </div>
-          </AnimatedSection>
-        ) : (
+      {calculatorUnlocked ? (
           <>
         <div id="company-setup-section" className="form-section visible space-y-8">
         <AnimatedSection
@@ -528,7 +609,15 @@ export function CostCalculatorPage() {
                         <p className="text-sm font-semibold text-[#ab8134]">Starts {formatAed(option.basePrice)}</p>
                         <button
                           type="button"
-                          onClick={() => setSelectedLicenseId(option.id)}
+                          onClick={() => {
+                            setSelectedLicenseId(option.id)
+                            if (durationYears === 0) {
+                              setDurationYears(1)
+                            }
+                            if (shareholderCount === 0) {
+                              setShareholderCount(1)
+                            }
+                          }}
                           className={cn(
                             'rounded-full px-4 py-2 text-xs font-semibold transition',
                             selected
@@ -590,7 +679,7 @@ export function CostCalculatorPage() {
                 <div className="inline-flex items-center gap-3 rounded-full border border-[#e7dece] bg-[#fef9f2] px-3 py-2">
                   <button
                     type="button"
-                    onClick={() => setShareholderCount((value) => Math.max(1, value - 1))}
+                    onClick={() => setShareholderCount((value) => Math.max(0, value - 1))}
                     className="rounded-full border border-[#c8d2e2] p-1.5 text-[#314058]"
                     aria-label="Decrease shareholder count"
                   >
@@ -627,11 +716,11 @@ export function CostCalculatorPage() {
               title="Select Your Business Activities"
               subtitle={`Choose up to ${pricingConfig.activitySelectionLimit} activities. Search by name, category, or code.`}
             />
-            <div className="mt-4 rounded-xl border border-[#efe4cf] bg-[#fbf4e8] px-3 py-2 text-xs text-[#ab8134]">
+            <div className="mt-4 rounded-md border border-[#efe4cf] bg-[#fbf4e8] px-3 py-2 text-xs text-[#ab8134]">
               Selected {selectedActivityIds.length}/{pricingConfig.activitySelectionLimit}
             </div>
 
-            <label className="mt-4 flex items-center gap-2 rounded-xl border border-[#e9dfcb] bg-[#fef9f2] px-3 py-2 text-slate-500">
+            <label className="mt-4 flex items-center gap-2 rounded-md border border-[#e9dfcb] bg-[#fef9f2] px-3 py-2 text-slate-500">
               <Search size={16} />
               <input
                 value={activityQuery}
@@ -825,130 +914,55 @@ export function CostCalculatorPage() {
           </section>
         </AnimatedSection>
           </>
-        )}
+        ) : null}
           </form>
 
-          <aside className="h-fit self-start rounded-3xl border border-[#e4d9c6] bg-white p-5 shadow-soft lg:sticky lg:top-24">
-            <div className="space-y-3">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#8e7137]">
-                {calculatorUnlocked ? 'Live Estimate' : 'Quote Status'}
-              </p>
-              <h2 className="text-[1.35rem] font-semibold">
-                {calculatorUnlocked ? 'Your Business Setup Estimate' : 'Your Custom Quote Awaits'}
+          <aside className="estimate-glass-card relative self-start overflow-hidden rounded-[2rem] p-7 lg:sticky lg:top-24 lg:w-[450px]">
+
+            <div className="relative space-y-1">
+              <h2 className="text-[1.35rem] font-semibold text-[#0b0f17] md:text-[1.55rem]">
+                Your Business Setup Estimate
               </h2>
-              <p className="text-sm text-slate-500">
-                {calculatorUnlocked
-                  ? 'Your selections now update a grouped estimate in real time.'
-                  : 'Start filling out the form to unlock your personalized pricing breakdown.'}
+              <p className="text-sm leading-relaxed text-slate-500">
+                Here's your total cost, based on the options you selected.
               </p>
             </div>
 
-            {!calculatorUnlocked ? (
-              <div className="mt-5 rounded-[2rem] border border-[#e9dfcc] bg-[linear-gradient(180deg,#fffaf2_0%,#f7efe0_100%)] p-4">
-                <div className="flex min-h-[330px] items-center justify-center rounded-[1.6rem] border border-white/80 bg-white/60 px-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur">
-                  <div className="max-w-[260px] space-y-3">
-                    <p className="text-base font-semibold text-[#7f642d]">Your Custom Quote Awaits</p>
-                    <p className="text-sm leading-relaxed text-slate-500">
-                      Start filling out the form to see your personalized pricing breakdown and live total.
-                    </p>
+            <div className="relative mt-12 rounded-[2rem]">
+              <div className="rounded-lg bg-white transition hover:bg-[#f8f9fa] hover:cursor-pointer px-3 py-4 shadow-[0_14px_34px_rgba(64,91,122,0.12)]">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-md font-normal text-[#252b35]">Grand Total</p>
+                    <strong className="mt-1 block text-xl font-bold leading-none text-[#d6a456]">
+                      {formatAed(quote.total)}
+                    </strong>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={handleShareEstimate}
+                    className="inline-flex min-w-[3.5rem] flex-col items-center gap-1 bg-transparent hover:bg-[#f3f4f6] p-2 rounded-lg text-[#d6a456] transition hover:text-[#d6a456]"
+                    aria-label="Share estimate"
+                  >
+                    <Share2 size={24} strokeWidth={2.2} />
+                    <span className="text-sm font-medium text-slate-500">Share</span>
+                  </button>
                 </div>
-                <p className="mt-4 rounded-2xl border border-[#efe4cf] bg-[#fffaf2] px-3.5 py-2 text-xs text-slate-500">
-                  Complete the required contact step and press Calculate to unlock the full estimator.
-                </p>
               </div>
-            ) : (
-              <>
-                <div className="mt-5 space-y-3">
-                  <div className="rounded-2xl border border-[#e9dfcc] bg-[#fef9f2] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8e7137]">
-                      Company Setup
-                    </p>
-                    <div className="mt-3 space-y-2.5">
-                      <QuoteRow label="License Type" value={selectedLicense?.name ?? 'Not selected'} />
-                      <QuoteRow
-                        label="License Duration"
-                        value={`${durationYears} year${durationYears > 1 ? 's' : ''}`}
-                      />
-                      <QuoteRow label="Shareholders" value={`${shareholderCount}`} />
-                      <QuoteRow label="Total Cost" value={formatAed(companySetupTotal)} />
-                    </div>
-                  </div>
 
-                  <div className="rounded-2xl border border-[#e9dfcc] bg-[#fffdf8] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8e7137]">
-                      Business Activities
-                    </p>
-                    <div className="mt-3 space-y-2.5">
-                      <QuoteRow label="Selected Activities" value={`${selectedActivityIds.length}`} />
-                      <QuoteRow label="Activity Cost" value={formatAed(quote.activitiesTotal)} />
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl border border-[#e9dfcc] bg-[#fffdf8] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8e7137]">
-                      Visa Selection
-                    </p>
-                    <div className="mt-3 space-y-2.5">
-                      <QuoteRow label="Visa Type" value={selectedVisa?.name ?? 'Not selected'} />
-                      <QuoteRow label="Visa Cost" value={formatAed(quote.visaTotal)} />
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl border border-[#e9dfcc] bg-[#fffdf8] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8e7137]">
-                      Additional Services
-                    </p>
-                    <div className="mt-3 space-y-2.5">
-                      <QuoteRow label="Selected Add-ons" value={`${selectedAddOnIds.length}`} />
-                      <QuoteRow label="Service Cost" value={formatAed(quote.addOnsTotal)} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5 rounded-[1.8rem] border border-[#dfd2bc] bg-[linear-gradient(180deg,#e9dcc5_0%,#dcc7a1_100%)] p-4">
-                  <div className="rounded-[1.4rem] bg-white/80 p-4 backdrop-blur">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8e7137]">
-                          Grand Total
-                        </p>
-                        <strong className="mt-1 block text-[1.45rem] text-[#7f642d]">
-                          {formatAed(quote.total)}
-                        </strong>
-                      </div>
-                      <div className="text-right text-xs text-slate-500">
-                        <p>Platform fee</p>
-                        <p className="mt-1 font-semibold text-[#7f642d]">{formatAed(quote.platformFee)}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid gap-3">
-                      <button
-                        type="button"
-                        onClick={handleConfirm}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#7f642d] transition hover:bg-[#fff8ec]"
-                        aria-label="Get instant quote"
-                      >
-                        Get Instant Quote
-                        <ArrowRight size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleReset}
-                        className="inline-flex items-center justify-center gap-2 rounded-full border border-white/70 bg-transparent px-4 py-2.5 text-sm font-semibold text-[#5c513d] transition hover:border-white"
-                      >
-                        <RotateCcw size={15} />
-                        Reset
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
+              <button
+                type="button"
+                onClick={handleConfirm}
+                className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-full border border-[#d6a456] bg-white/86 px-6 py-3 text-md font-medium text-[#d6a456] bg-white transition hover:bg-[#d6a456] hover:text-white"
+                aria-label="Get instant quote"
+              >
+                Get Instant Quote
+                <ArrowRight size={22} />
+              </button>
+            </div>
 
             {submitAttempted && submissionIssues.length > 0 && (
-              <div className="mt-4 rounded-xl border border-[#f0ced4] bg-[#fff4f6] px-3.5 py-3">
+              <div className="mt-4 rounded-md border border-[#f0ced4] bg-[#fff4f6] px-3.5 py-3">
                 <p className="text-xs font-semibold text-[#c54656]">Complete these items before confirming:</p>
                 <ul className="mt-1.5 space-y-1 text-xs text-[#9f3f4a]">
                   {submissionIssues.map((issue) => (

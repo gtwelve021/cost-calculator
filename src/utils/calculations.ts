@@ -16,8 +16,11 @@ export function calculateQuote(
   const activityMap = new Map(sources.activities.map((item) => [item.id, item]))
 
   const licenseBase = license?.basePrice ?? 0
-  const durationDelta = config.durations[state.durationYears] ?? 0
-  const shareholderDelta = Math.max(0, state.shareholderCount - 1) * config.extraShareholderFee
+  const durationDelta = license ? config.durations[state.durationYears] ?? 0 : 0
+  const shareholderDelta =
+    license && state.shareholderCount > 0
+      ? Math.max(0, state.shareholderCount - 1) * config.extraShareholderFee
+      : 0
 
   const activitiesTotal = state.selectedActivityIds.reduce((sum, id) => {
     return sum + (activityMap.get(id)?.fee ?? 0)
@@ -29,8 +32,14 @@ export function calculateQuote(
     return sum + (addOnMap.get(id)?.fee ?? 0)
   }, 0)
 
+  const hasSelections =
+    Boolean(license) ||
+    Boolean(visa) ||
+    state.selectedActivityIds.length > 0 ||
+    state.selectedAddOnIds.length > 0
   const subtotal = licenseBase + durationDelta + shareholderDelta + activitiesTotal + visaTotal + addOnsTotal
-  const total = subtotal + config.platformFee
+  const platformFee = hasSelections ? config.platformFee : 0
+  const total = subtotal + platformFee
 
   return {
     currency: config.currency,
@@ -40,7 +49,7 @@ export function calculateQuote(
     activitiesTotal: round(activitiesTotal),
     visaTotal: round(visaTotal),
     addOnsTotal: round(addOnsTotal),
-    platformFee: round(config.platformFee),
+    platformFee: round(platformFee),
     subtotal: round(subtotal),
     total: round(total),
   }

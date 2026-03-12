@@ -31,8 +31,8 @@ body,
 body {
   min-width: 320px;
   color: var(--ink);
-     background-color: #f5f5f8;
-    min-height: 50vh;
+  background-color: #f5f5f8;
+  min-height: 50vh;
   font-family: 'Roboto', sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -42,9 +42,32 @@ body {
 h1,
 h2,
 h3,
-h4 {
+h4,
+h5,
+h6 {
   margin: 0;
-  font-family: 'Aloevera', 'Roboto', sans-serif;
+  font-family: 'Aloevera', sans-serif;
+}
+
+h1 *,
+h2 *,
+h3 *,
+h4 *,
+h5 *,
+h6 * {
+  font-family: inherit;
+}
+
+p,
+label,
+li,
+a,
+button,
+input,
+textarea,
+select,
+small {
+  font-family: 'Roboto', sans-serif;
 }
 
 button,
@@ -57,20 +80,72 @@ a {
   color: inherit;
 }
 
+.lead-glass-card {
+  background: rgb(255 255 255 / 7%);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgb(255 255 255 / 45%);
+  box-shadow: inset 6px 4px 20px 0px #cad4dd3d, inset -3px -3px 10px 1px rgb(255 255 255), 11.845px 9.871px 30.993px 0 rgba(39, 67, 103, 0.13);
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 10px;
+}
+
+.estimate-glass-card {
+  height: fit-content;
+  background: rgb(255 255 255 / 80%);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgb(255 255 255 / 45%);
+  box-shadow:
+    inset 3px 3px 10px #ccdbe870,
+    inset -3px -3px 10px 1px rgb(255 255 255),
+    11.845px 9.871px 30.993px 0 rgba(39, 67, 103, 0.13);
+  isolation: isolate;
+}
+
+.estimate-glass-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 220px;
+  border-radius: 20px;
+  z-index: -1;
+  background: linear-gradient(0deg, rgb(187 201 219) 0%, rgba(25, 116, 201, 0.20) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.40) 0%, rgba(131, 132, 132, 0.20) 93.45%);
+}
+
+.lead-glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff91;
+  border-radius: 14px;
+  z-index: -1;
+  animation: validationGlow 2s ease-out;
+}
+
 .mfz-phone-field .react-tel-input {
+  position: relative;
+  width: 100%;
+}
+
+.mfz-phone-field .mfz-phone-input-container {
   width: 100%;
 }
 
 .mfz-phone-field .mfz-phone-input {
   width: 100% !important;
-  height: 58px !important;
   border: 0 !important;
-  border-radius: 0.75rem !important;
-  background: transparent !important;
   color: #171d29 !important;
   font-size: 0.875rem !important;
-  padding-left: 118px !important;
-  padding-right: 12px !important;
+  padding-left: 4.75rem !important;
+  padding-right: 1rem !important;
+  height: 41px !important;
 }
 
 .mfz-phone-field .mfz-phone-input:focus {
@@ -82,11 +157,11 @@ a {
 }
 
 .mfz-phone-field .mfz-phone-button {
-  width: 110px !important;
+  width: 3.75rem !important;
   border: 0 !important;
   border-right: 1px solid #d8dfeb !important;
   border-radius: 0.75rem 0 0 0.75rem !important;
-  background: #e4ebf5 !important;
+  background: transparent !important;
 }
 
 .mfz-phone-field .mfz-phone-button:hover,
@@ -94,19 +169,60 @@ a {
   background: #dce5f2 !important;
 }
 
+.mfz-phone-field .mfz-phone-button .selected-flag {
+  width: 3.75rem !important;
+  padding-left: 1rem !important;
+}
+
+.mfz-phone-field .mfz-phone-button .selected-flag .arrow {
+  left: 1.55rem !important;
+}
+
 .mfz-phone-field .mfz-phone-dropdown {
-  width: 100% !important;
-  margin-top: 0.5rem !important;
+  left: 0 !important;
+  width: min(22rem, calc(100vw - 2rem)) !important;
+  max-height: 18rem !important;
+  margin: 0.5rem 0 0 !important;
   border: 1px solid #d6deed !important;
   border-radius: 1rem !important;
   box-shadow: 0 18px 40px rgba(15, 20, 35, 0.14) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable !important;
+}
+
+.mfz-phone-field .mfz-phone-dropdown .country {
+  padding: 0.7rem 0.9rem !important;
+  font-size: 0.95rem !important;
+}
+
+.mfz-phone-field .mfz-phone-dropdown .country-name {
+  margin-right: 0.45rem !important;
 }
 
 .mfz-phone-field .mfz-phone-search {
-  width: calc(100% - 1rem) !important;
-  height: 42px !important;
-  margin: 0.5rem !important;
+  padding: 0.625rem !important;
+  background: #fff !important;
+}
+
+.mfz-phone-field .mfz-phone-search-box {
+  width: 100% !important;
+  height: 2.75rem !important;
+  margin: 0 !important;
+  box-shadow: 0 18px 40px rgba(15, 20, 35, 0.14) !important;
   border: 1px solid #d6deed !important;
   border-radius: 0.75rem !important;
   font-size: 0.875rem !important;
+  padding: 0 0.875rem !important;
+  background: #fff !important;
+}
+
+.mfz-phone-field .mfz-phone-search-box:focus {
+  box-shadow: none !important;
+}
+
+@media (max-width: 640px) {
+  .mfz-phone-field .mfz-phone-dropdown {
+    width: calc(100vw - 2rem) !important;
+  }
 }
