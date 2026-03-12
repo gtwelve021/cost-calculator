@@ -1,0 +1,31 @@
+{
+  "baseUrl": "http://127.0.0.1:4173",
+  "timestamp": "2026-03-12T07:41:17.380Z",
+  "steps": [
+    "Opened home page",
+    "Validated required phone message appears",
+    "Unlocked quote sections",
+    "Opened quote summary modal"
+  ],
+  "warnings": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "desktop": {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "imageIssues": [],
+    "horizontalOverflow": false
+  },
+  "mobile": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "imageIssues": [],
+    "horizontalOverflow": false
+  },
+  "internalRoutes": []
+}

@@ -36,10 +36,14 @@ import { formatAed } from '../utils/currency'
 import { getSubmissionIssues, isLeadFormComplete } from '../utils/gating'
 import { sanitizeLeadFullNameInput } from '../utils/lead'
 import {
+  getPhoneCountryCode,
+  getPhoneInputValue,
   getLockedPhonePrefixLength,
   getPhoneDialCode,
+  getPhoneSelection,
   isValidLeadPhoneNumber,
   normalizePhoneNumber,
+  shouldClearPhoneInput,
   shouldPreventPhonePrefixEdit,
 } from '../utils/phone'
 import { CALCULATOR_STATE_KEY, loadCalculatorState, saveCalculatorState } from '../utils/persistence'
@@ -48,7 +52,8 @@ const BRAND_LOGO_URL = 'https://g12.ae/wp-content/uploads/2024/12/G12-Final-Logo
 const BRAND_SITE_URL = 'https://g12.ae/'
 const CONTACT_NUMBER = '+971 4 570 6451'
 const CONTACT_TEL = '+97145706451'
-const DEFAULT_PHONE_DIAL_CODE = '92'
+const DEFAULT_PHONE_COUNTRY = 'ae'
+const DEFAULT_PHONE_DIAL_CODE = '971'
 
 const leadFormSchema = z.object({
   fullName: z.string().trim().min(1, 'Full name is required.'),
@@ -102,6 +107,10 @@ export function CostCalculatorPage() {
   const currentYear = new Date().getFullYear()
   const persistedState = useMemo(() => loadCalculatorState(), [])
   const initialState = persistedState ?? defaultCalculatorState
+  const initialPhoneSelection = useMemo(
+    () => getPhoneSelection(initialState.leadForm.phone, DEFAULT_PHONE_COUNTRY, DEFAULT_PHONE_DIAL_CODE),
+    [initialState.leadForm.phone],
+  )
 
   const {
     control,
@@ -138,10 +147,11 @@ export function CostCalculatorPage() {
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [quoteStarted, setQuoteStarted] = useState(() => isLeadFormComplete(initialState.leadForm))
+  const [phoneCountry, setPhoneCountry] = useState(initialPhoneSelection.country)
 
   const licenseSectionRef = useRef<HTMLElement | null>(null)
   const finalizeSectionRef = useRef<HTMLElement | null>(null)
-  const phoneDialCodeRef = useRef(DEFAULT_PHONE_DIAL_CODE)
+  const phoneDialCodeRef = useRef(initialPhoneSelection.dialCode)
 
   const state: CalculatorState = useMemo(
     () => ({
@@ -232,8 +242,9 @@ export function CostCalculatorPage() {
     })
   }
 
-  const syncPhoneDialCode = (countryData?: { dialCode?: string } | null) => {
+  const syncPhoneCountryData = (countryData?: { dialCode?: string; countryCode?: string } | null) => {
     phoneDialCodeRef.current = getPhoneDialCode(countryData, phoneDialCodeRef.current)
+    setPhoneCountry((current) => getPhoneCountryCode(countryData, current))
   }
 
   const keepPhoneCursorAfterPrefix = (input: HTMLInputElement) => {
@@ -248,14 +259,35 @@ export function CostCalculatorPage() {
     }, 0)
   }
 
-  const handlePhoneKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handlePhoneKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    clearPhoneValue: () => void,
+  ) => {
+    const input = event.currentTarget
+    const selectionStart = input.selectionStart
+    const selectionEnd = input.selectionEnd
+
+    if (
+      shouldClearPhoneInput({
+        key: event.key,
+        selectionStart,
+        selectionEnd,
+        inputValue: input.value,
+        dialCode: phoneDialCodeRef.current,
+      })
+    ) {
+      event.preventDefault()
+      clearPhoneValue()
+      return
+    }
+
     const prefixLength = getLockedPhonePrefixLength(phoneDialCodeRef.current)
 
     if (
       !shouldPreventPhonePrefixEdit({
         key: event.key,
-        selectionStart: event.currentTarget.selectionStart,
-        selectionEnd: event.currentTarget.selectionEnd,
+        selectionStart,
+        selectionEnd,
         prefixLength,
         hasModifier: event.ctrlKey || event.metaKey || event.altKey,
       })
@@ -264,7 +296,7 @@ export function CostCalculatorPage() {
     }
 
     event.preventDefault()
-    event.currentTarget.setSelectionRange(prefixLength, prefixLength)
+    input.setSelectionRange(prefixLength, prefixLength)
   }
 
   const handleContinue = async () => {
@@ -280,6 +312,8 @@ export function CostCalculatorPage() {
 
   const handleReset = () => {
     reset(defaultLeadForm)
+    setPhoneCountry(DEFAULT_PHONE_COUNTRY)
+    phoneDialCodeRef.current = DEFAULT_PHONE_DIAL_CODE
     setSelectedLicenseId(defaultCalculatorState.selectedLicenseId)
     setDurationYears(defaultCalculatorState.durationYears)
     setShareholderCount(defaultCalculatorState.shareholderCount)
@@ -415,7 +449,7 @@ export function CostCalculatorPage() {
                 <input
                   id="fullName"
                   type="text"
-                  placeholder="Your full name"
+                  placeholder="Your name"
                   {...fullNameField}
                   onChange={(event) => {
                     event.target.value = sanitizeLeadFullNameInput(event.target.value)
@@ -444,25 +478,37 @@ export function CostCalculatorPage() {
                       )}
                     >
                       <PhoneInput
-                        country="pk"
-                        preferredCountries={['pk', 'ae', 'sa', 'gb', 'us']}
+                        country={phoneCountry}
+                        preferredCountries={['ae', 'pk', 'sa', 'gb', 'us']}
                         enableSearch
                         disableSearchIcon
                         countryCodeEditable={false}
-                        onMount={(_, countryData) => syncPhoneDialCode(countryData)}
+                        onMount={(_, countryData) => syncPhoneCountryData(countryData)}
                         onFocus={(event, countryData) => {
-                          syncPhoneDialCode(countryData)
+                          syncPhoneCountryData(countryData)
                           keepPhoneCursorAfterPrefix(event.currentTarget)
                         }}
                         onClick={(event, countryData) => {
-                          syncPhoneDialCode(countryData)
+                          syncPhoneCountryData(countryData)
                           keepPhoneCursorAfterPrefix(event.currentTarget)
                         }}
-                        onKeyDown={handlePhoneKeyDown}
-                        value={(field.value ?? '').replace(/[^\d]/g, '')}
+                        onKeyDown={(event) =>
+                          handlePhoneKeyDown(event, () => {
+                            field.onChange('')
+                          })
+                        }
+                        value={getPhoneInputValue(field.value ?? '', phoneDialCodeRef.current).replace(
+                          /[^\d]/g,
+                          '',
+                        )}
                         onChange={(value, countryData) => {
-                          syncPhoneDialCode(countryData)
-                          field.onChange(normalizePhoneNumber(value, countryData))
+                          const nextPhoneCountryData = {
+                            dialCode: getPhoneDialCode(countryData, phoneDialCodeRef.current),
+                            countryCode: getPhoneCountryCode(countryData, phoneCountry),
+                          }
+
+                          syncPhoneCountryData(nextPhoneCountryData)
+                          field.onChange(normalizePhoneNumber(value, nextPhoneCountryData))
                         }}
                         onBlur={field.onBlur}
                         placeholder="Phone number"
@@ -493,7 +539,7 @@ export function CostCalculatorPage() {
                 <input
                   id="email"
                   type="email"
-                  placeholder="name@company.com"
+                  placeholder="Email address"
                   {...register('email')}
                   className={cn(
                     'w-full rounded-md border bg-white px-3.5 py-2.5 text-sm outline-none transition focus:ring-4 focus:ring-[#f3e7cf]',
@@ -503,12 +549,12 @@ export function CostCalculatorPage() {
                 {errors.email && <p className="text-xs text-[#cf4b5c]">{errors.email.message}</p>}
               </div>
 
-              <label className="flex items-start gap-3  text-xs leading-relaxed text-slate-600">
+              <label className="flex items-start gap-3  text-xs leading-relaxed text-slate-600 cursor-pointer">
                 <input
                   type="checkbox"
                   {...register('consent')}
                   className="mt-0.5 h-4 w-4 rounded border-[#bdc8db]"
-                  aria-label="I confirm that I have read and understood G12's Terms and Privacy Policy"
+                  aria-label="I confirm that I have read and understood G12's Terms and Privacy Policy cursor-pointer"
                 />
                 <span>
                   I confirm that I have read and understood G12's Terms and Privacy Policy and consent
