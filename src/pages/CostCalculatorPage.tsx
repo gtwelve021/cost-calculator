@@ -31,14 +31,10 @@ import { QuoteSidebar } from "../components/cost-calculator/QuoteSidebar";
 import {
   activityCategories,
   addOnGroups,
-  addOnOptions,
-  businessActivities,
   defaultCalculatorState,
   heroImage,
-  licenseOptions,
-  pricingConfig,
-  visaOptions,
 } from "../config/calculatorConfig";
+import { useSheetData } from "../hooks/useSheetData";
 import type {
   BusinessActivityCategory,
   CalculatorState,
@@ -90,14 +86,14 @@ const calculatorAudience = [
   "Entrepreneurs setting up trading or e-commerce business activities",
   "Business owners comparing free zone trade license costs in Dubai",
   "Overseas investors planning a Dubai company formation remotely",
-  "Founders expanding into a new venture, creating a new entity, or adding licensed activities",
+  "Founders expanding into a new venture, setting up a separate legal entity, or adding a new licensed business activity",
 ] as const;
 const calculatorCoverage = [
   "Trade license type and duration",
   "Business activities selection",
   "Number of shareholders",
-  "Visa allocations for investors, employees, and dependents",
-  "Additional business setup services through mPlus",
+  "Visa allocations (investor, employment, and dependant)",
+  "Additional business setup services through\u200dmPlus",
 ] as const;
 const setupFactors = [
   "Trade license type and duration",
@@ -105,14 +101,14 @@ const setupFactors = [
   "Number and type of business activities",
   "Immigration eligibility",
   "Number of shareholders",
-  "Whether a business activity needs extra approvals",
-  "Visa allocations and change-of-status costs",
-  "Extra support services added to the setup",
+  "Whether your business activities require additional approvals",
+  "Visa allocations and change of status (if applicable)",
+  "Any extra support services you choose to add to your setup",
 ] as const;
 const nextSteps = [
-  "Review your cost breakdown and compare setup structures.",
-  "Confirm your activity eligibility and visa requirements.",
-  "Move straight into payment and company setup when you are ready.",
+  "Review Your Cost Breakdown And Compare Setup Structures",
+  "Confirm Your Business Activity Eligibility And Visa Requirements",
+  "Move Straight To Payment And Company Setup. No Manual Quotes, No Additional Follow-Ups",
 ] as const;
 const faqItems = [
   {
@@ -378,6 +374,14 @@ function FaqAccordionItem({
 }
 
 export function CostCalculatorPage() {
+  const {
+    licenses: licenseOptions,
+    visas: visaOptions,
+    addOns: addOnOptions,
+    activities: businessActivities,
+    pricingConfig,
+  } = useSheetData();
+
   const persistedState = useMemo(() => loadCalculatorState(), []);
   const initialState = persistedState ?? defaultCalculatorState;
   const phoneFieldWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -760,7 +764,7 @@ export function CostCalculatorPage() {
             </h1>
 
             <div id="calculate-now" className="relative">
-              <div className="relative flex justify-between pt-0 pb-16 z-10 grid gap-8 lg:grid-cols-[58%_36%] lg:items-start lg:justify-between">
+              <div className="relative pt-0 pb-16 z-10 grid gap-8 lg:grid-cols-[58%_36%] lg:items-start lg:justify-between">
                 <div className="space-y-8">
                   <form
                     onSubmit={(event) => {
@@ -933,10 +937,38 @@ export function CostCalculatorPage() {
                                 aria-label="Terms and privacy policy"
                               />
                               <span>
-                                I confirm I have reviewed the G12 Free Zone
-                                terms and privacy policy and agree to be
-                                contacted about my estimate by email, phone, or
-                                WhatsApp.
+                                I confirm that I have read and understood G12
+                                Free Zone's{' '}
+                                <a
+                                  href="https://meydanfz.ae/terms-and-conditions"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline"
+                                >
+                                  Terms
+                                </a>{' '}
+                                and{' '}
+                                <a
+                                  href="https://meydanfz.ae/privacy-policy"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline"
+                                >
+                                  Privacy Policy
+                                </a>{' '}
+                                and consent to the processing of my personal
+                                data for the purposes of communication and
+                                service delivery. I agree to be contacted via
+                                email, phone, or WhatsApp. I acknowledge that
+                                G12 Free Zone operates 24/7 and that contact
+                                may occur outside standard business hours,
+                                including after 6:00 PM UAE time. I further
+                                acknowledge that G12 Free Zone will never
+                                request passwords, one-time passcodes (OTPs), or
+                                payments to personal or unknown bank accounts
+                                and that I should verify any suspicious or
+                                unexpected communication by calling 800 FZ1 (800
+                                391) before taking any action.
                               </span>
                             </label>
                             <FieldError message={errors.consent?.message} />
@@ -1578,6 +1610,7 @@ export function CostCalculatorPage() {
           </div>
         </section>
 
+        <div className="mx-auto max-w-[1280px] space-y-10 px-4 py-10 md:px-6 md:py-16">
         <AnimatedSection delay={0.04}>
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
             <div className="rounded-[2rem] border border-[#e6ebf2] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
@@ -1585,8 +1618,7 @@ export function CostCalculatorPage() {
                 Who Is This Calculator For?
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                This setup planner is built for founders comparing real-world
-                company formation options.
+                This calculator is built for
               </p>
 
               <div className="mt-6 grid gap-3">
@@ -1606,8 +1638,8 @@ export function CostCalculatorPage() {
                 Ready to estimate
               </p>
               <p className="mt-4 text-lg leading-8 text-white/90">
-                Already know your business activity and visa requirements? Get
-                your estimate now with instant results and no waiting.
+                Already know your business activity and visa requirements?
+                Get your estimate now. Instant results, no waiting.
               </p>
               <CalculateNowLink className="mt-8 border-white/25 bg-white text-[#ab8134] hover:border-white hover:bg-[#fbf4e9]" />
             </div>
@@ -1625,8 +1657,8 @@ export function CostCalculatorPage() {
                   See Exactly What Goes Into Your Dubai Trade License Cost
                 </h2>
                 <p className="mt-3 max-w-[38rem] text-sm leading-7 text-slate-500 md:text-base">
-                  Build your setup step by step, adjust the key inputs, and
-                  track how the total responds before you commit.
+                  Build your setup step by step. Adjust your inputs and watch
+                  your estimate update instantly.
                 </p>
                 <CalculateNowLink className="mt-6" />
               </div>
@@ -1657,13 +1689,13 @@ export function CostCalculatorPage() {
                 Why Your Trade License Cost Depends on Your Setup
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                No two setups are the same, and neither are the costs. Your
-                estimate shifts with the way you configure the company.
+                No two setups are the same and neither are the costs. Your
+                total depends on how you configure your company.
               </p>
 
               <div className="mt-5 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5">
                 <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#ab8134]">
-                  Your estimate changes based on
+                  Your estimate will change based on:
                 </p>
                 <ul className="mt-4 grid gap-3 text-sm leading-7 text-slate-600 md:grid-cols-2 md:text-[0.98rem]">
                   {setupFactors.map((item) => (
@@ -1676,6 +1708,13 @@ export function CostCalculatorPage() {
                   ))}
                 </ul>
               </div>
+
+              <p className="mt-5 text-sm leading-7 text-slate-500 md:text-base">
+                That's why this cost calculator lets you test different setups
+                and compare scenarios, so you can see exactly how each decision
+                impacts your cost before you commit.
+              </p>
+              <CalculateNowLink className="mt-6" />
             </div>
 
             <div className="rounded-[2rem] border border-[#e6ebf2] bg-[linear-gradient(180deg,#ffffff_0%,#f3f7fb_100%)] px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
@@ -1683,15 +1722,16 @@ export function CostCalculatorPage() {
                 How Accurate Is This Cost Estimate?
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                The estimate reflects the current pricing logic in this
-                calculator, standard visa structures, and common approval
-                patterns so you can plan with more confidence.
+                The estimate you receive reflects current G12 Free Zone
+                pricing, standard visa structures, and typical approval
+                scenarios, so you can plan with confidence.
               </p>
               <p className="mt-4 text-sm leading-7 text-slate-500 md:text-base">
-                Final pricing can still change after business activity approval,
-                immigration clearance, and document verification. The calculator
-                helps you validate budget fit before you move into a live
-                application.
+                Final pricing is confirmed after business activity approval,
+                immigration clearance, and document verification, and may
+                adjust depending on changes made during your application.
+                This cost calculator helps you understand whether your budget
+                aligns before you speak to an advisor.
               </p>
               <CalculateNowLink className="mt-6" />
             </div>
@@ -1728,9 +1768,8 @@ export function CostCalculatorPage() {
 
             <div className="mt-6 flex flex-col gap-4 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5 md:flex-row md:items-center md:justify-between">
               <p className="max-w-[42rem] text-sm leading-7 text-slate-500 md:text-base">
-                Not ready to commit? Many founders use this page to compare
-                structures and pressure-test the total before speaking with a
-                team member.
+                Not ready to commit? No problem. Many founders use this
+                estimate purely to compare options before making a decision.
               </p>
               <CalculateNowLink />
             </div>
@@ -1766,6 +1805,7 @@ export function CostCalculatorPage() {
             </div>
           </section>
         </AnimatedSection>
+        </div>
       </main>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#d9e2ed] bg-white/92 px-4 py-3 backdrop-blur-xl lg:hidden">
