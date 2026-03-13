@@ -3,7 +3,7 @@ import { defaultCalculatorState } from '../config/calculatorConfig'
 import { CALCULATOR_STATE_KEY, loadCalculatorState, saveCalculatorState } from './persistence'
 
 describe('persistence', () => {
-  it('saves and restores calculator state', () => {
+  it('saves and restores the v4 calculator state shape', () => {
     const state = {
       ...defaultCalculatorState,
       leadForm: {
@@ -12,20 +12,24 @@ describe('persistence', () => {
         email: 'ali@example.com',
         consent: true,
       },
+      selectedLicenseId: 'fawri',
       durationYears: 2,
-      shareholderCount: 3,
-      selectedActivityIds: ['act-001'],
-      selectedAddOnIds: ['bookkeeping-suite'],
+      shareholderCount: 4,
+      selectedActivityIds: ['ict-6201-10'],
+      selectedAddOnIds: ['bank-account'],
+      investorVisaEnabled: true,
+      employeeVisaCount: 1,
+      dependentVisaCount: 2,
+      applicantsInsideUae: 2,
     }
 
     saveCalculatorState(state)
-    const restored = loadCalculatorState()
 
-    expect(restored).toEqual(state)
+    expect(loadCalculatorState()).toEqual(state)
   })
 
-  it('returns null for invalid stored payload', () => {
-    window.localStorage.setItem(CALCULATOR_STATE_KEY, '{"bad":"payload"}')
+  it('returns null for invalid or legacy payloads', () => {
+    window.localStorage.setItem(CALCULATOR_STATE_KEY, '{"selectedVisaId":"employee-visa"}')
 
     expect(loadCalculatorState()).toBeNull()
   })

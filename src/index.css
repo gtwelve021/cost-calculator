@@ -1,20 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg: #eceef3;
-  --surface: #f8f9fb;
-  --surface-strong: #ffffff;
-  --ink: #10131a;
-  --ink-muted: #626b7b;
-  --line: #d7dce7;
-  --primary: #d6a456;
-  --primary-dark: #ab8134;
-  --primary-soft: #f8edd8;
-  --danger: #cf4b5c;
+  color: #111723;
+  background-color: #f3f4f7;
+  --brand-gold: #d6a456;
+  --brand-bronze: #ab8134;
+  --brand-gold-soft: #f6eee0;
+  --brand-gold-soft-strong: #eddcbf;
+  --brand-gradient: linear-gradient(42deg, rgba(214, 164, 86, 1) 0%, rgba(171, 129, 52, 1) 70%);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
@@ -29,200 +28,158 @@ body,
 }
 
 body {
+  color: #000;
+  height: auto;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 100%;
   min-width: 320px;
-  color: var(--ink);
   background-color: #f5f5f8;
-  min-height: 50vh;
-  font-family: 'Roboto', sans-serif;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background:
+    radial-gradient(circle at top left, rgba(214, 164, 86, 0.12), transparent 30%),
+    linear-gradient(180deg, #f3f4f7 0%, #edf1f6 55%, #f3f4f7 100%);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin: 0;
-  font-family: 'Aloevera', sans-serif;
-}
-
-h1 *,
-h2 *,
-h3 *,
-h4 *,
-h5 *,
-h6 * {
-  font-family: inherit;
-}
-
-p,
-label,
-li,
-a,
 button,
 input,
 textarea,
-select,
-small {
-  font-family: 'Roboto', sans-serif;
-}
-
-button,
-input,
-textarea {
+select {
   font: inherit;
 }
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
-.lead-glass-card {
-  background: rgb(255 255 255 / 7%);
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  border: 1px solid rgb(255 255 255 / 45%);
-  box-shadow: inset 6px 4px 20px 0px #cad4dd3d, inset -3px -3px 10px 1px rgb(255 255 255), 11.845px 9.871px 30.993px 0 rgba(39, 67, 103, 0.13);
-  overflow: hidden;
-  isolation: isolate;
-  border-radius: 10px;
+.brand-text {
+  color: var(--brand-bronze);
 }
 
-.estimate-glass-card {
-  height: fit-content;
-  background: rgb(255 255 255 / 80%);
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  border: 1px solid rgb(255 255 255 / 45%);
-  box-shadow:
-    inset 3px 3px 10px #ccdbe870,
-    inset -3px -3px 10px 1px rgb(255 255 255),
-    11.845px 9.871px 30.993px 0 rgba(39, 67, 103, 0.13);
-  isolation: isolate;
+.brand-border {
+  border-color: var(--brand-bronze);
 }
 
-.estimate-glass-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 220px;
-  border-radius: 20px;
-  z-index: -1;
-  background: linear-gradient(0deg, rgb(187 201 219) 0%, rgba(25, 116, 201, 0.20) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.40) 0%, rgba(131, 132, 132, 0.20) 93.45%);
+.brand-soft-bg {
+  background-color: var(--brand-gold-soft);
 }
 
-.lead-glass-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #ffffff91;
-  border-radius: 14px;
-  z-index: -1;
-  animation: validationGlow 2s ease-out;
+.brand-gradient {
+  background: var(--brand-gradient);
+  color: #fff;
 }
 
-.mfz-phone-field .react-tel-input {
-  position: relative;
+.brand-gradient-hover {
+  transition: filter 160ms ease;
+}
+
+.brand-gradient-hover:hover {
+  filter: brightness(0.96);
+}
+
+.phone-field {
   width: 100%;
 }
 
-.mfz-phone-field .mfz-phone-input-container {
-  width: 100%;
-}
-
-.mfz-phone-field .mfz-phone-input {
+.phone-field .form-control,
+.phone-field__input {
   width: 100% !important;
-  border: 0 !important;
-  color: #171d29 !important;
-  font-size: 0.875rem !important;
-  padding-left: 4.75rem !important;
+  height: 3.8rem !important;
+  border-radius: 0.95rem !important;
+  border: 1px solid #343434 !important;
+  background: #f7f7f8 !important;
+  box-shadow: 0 6px 0 rgba(229, 225, 234, 0.9) !important;
+  color: #343434 !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 1rem !important;
+  padding-left: 8.1rem !important;
   padding-right: 1rem !important;
-  height: 41px !important;
 }
 
-.mfz-phone-field .mfz-phone-input:focus {
-  box-shadow: none !important;
+.phone-field .form-control::placeholder,
+.phone-field__input::placeholder {
+  color: #9b9b9b !important;
 }
 
-.mfz-phone-field .mfz-phone-input::placeholder {
-  color: #94a3b8 !important;
+.phone-field .form-control:focus,
+.phone-field__input:focus {
+  border-color: #343434 !important;
+  background: #fff !important;
 }
 
-.mfz-phone-field .mfz-phone-button {
-  width: 3.75rem !important;
+.phone-field__input--error {
+  border-color: #f15b43 !important;
+  box-shadow: 0 0 0 1px rgba(241, 91, 67, 0.15) !important;
+}
+
+.phone-field .flag-dropdown,
+.phone-field__button {
+  top: 0.4rem !important;
+  left: 0.45rem !important;
+  bottom: 0.4rem !important;
+  width: 4rem !important;
   border: 0 !important;
-  border-right: 1px solid #d8dfeb !important;
+  border-right: 1px solid #d8d8dc !important;
   border-radius: 0.75rem 0 0 0.75rem !important;
-  background: transparent !important;
+  background: #f7f7f8 !important;
 }
 
-.mfz-phone-field .mfz-phone-button:hover,
-.mfz-phone-field .mfz-phone-button:focus {
-  background: #dce5f2 !important;
-}
-
-.mfz-phone-field .mfz-phone-button .selected-flag {
-  width: 3.75rem !important;
-  padding-left: 1rem !important;
-}
-
-.mfz-phone-field .mfz-phone-button .selected-flag .arrow {
-  left: 1.55rem !important;
-}
-
-.mfz-phone-field .mfz-phone-dropdown {
-  left: 0 !important;
-  width: min(22rem, calc(100vw - 2rem)) !important;
-  max-height: 18rem !important;
-  margin: 0.5rem 0 0 !important;
-  border: 1px solid #d6deed !important;
-  border-radius: 1rem !important;
-  box-shadow: 0 18px 40px rgba(15, 20, 35, 0.14) !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  scrollbar-gutter: stable !important;
-}
-
-.mfz-phone-field .mfz-phone-dropdown .country {
-  padding: 0.7rem 0.9rem !important;
-  font-size: 0.95rem !important;
-}
-
-.mfz-phone-field .mfz-phone-dropdown .country-name {
-  margin-right: 0.45rem !important;
-}
-
-.mfz-phone-field .mfz-phone-search {
-  padding: 0.625rem !important;
-  background: #fff !important;
-}
-
-.mfz-phone-field .mfz-phone-search-box {
+.phone-field .selected-flag {
   width: 100% !important;
-  height: 2.75rem !important;
-  margin: 0 !important;
-  box-shadow: 0 18px 40px rgba(15, 20, 35, 0.14) !important;
-  border: 1px solid #d6deed !important;
-  border-radius: 0.75rem !important;
-  font-size: 0.875rem !important;
-  padding: 0 0.875rem !important;
+  padding: 0 0 0 1rem !important;
+  border-radius: 0.75rem 0 0 0.75rem !important;
+}
+
+.phone-field .selected-flag:hover,
+.phone-field .selected-flag:focus,
+.phone-field .flag-dropdown.open,
+.phone-field .flag-dropdown.open .selected-flag {
+  background: #f1f1f3 !important;
+}
+
+.phone-field .selected-dial-code {
+  color: #8c8c91 !important;
+  font-size: 0.98rem !important;
+  margin-left: 0.65rem !important;
+}
+
+.phone-field .country-list,
+.phone-field__dropdown {
+  left: -0.45rem !important;
+  top: calc(100% + 0.85rem) !important;
+  width: var(--phone-dropdown-width, min(36rem, calc(100vw - 2rem))) !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin-top: 0 !important;
+  border: 0 !important;
+  border-radius: 1rem !important;
+  background: #f7f7f8 !important;
+  box-shadow: 0 18px 44px rgba(25, 25, 25, 0.12) !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  z-index: 70 !important;
+}
+
+.phone-field .search-box,
+.phone-field__search {
+  width: calc(100% - 1.5rem) !important;
+  height: 3.5rem !important;
+  margin: 0.75rem !important;
+  border: 1px solid #343434 !important;
+  border-radius: 0.85rem !important;
   background: #fff !important;
+  color: #343434 !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 1rem !important;
+  padding: 0 1rem !important;
 }
 
-.mfz-phone-field .mfz-phone-search-box:focus {
-  box-shadow: none !important;
+.phone-field .country-list .country {
+  padding: 0.85rem 1rem !important;
+  color: #232323 !important;
+  font-size: 0.98rem !important;
 }
 
-@media (max-width: 640px) {
-  .mfz-phone-field .mfz-phone-dropdown {
-    width: calc(100vw - 2rem) !important;
-  }
+.phone-field .country-list .country:hover,
+.phone-field .country-list .country.highlight {
+  background: #ececef !important;
 }

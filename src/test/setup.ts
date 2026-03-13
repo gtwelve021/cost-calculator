@@ -2,6 +2,47 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
 
+vi.mock('framer-motion', async () => {
+  const React = await import('react')
+
+  const stripMotionProps = (props: Record<string, unknown>) => {
+    const {
+      animate,
+      exit,
+      initial,
+      layout,
+      transition,
+      variants,
+      viewport,
+      whileHover,
+      whileInView,
+      whileTap,
+      ...rest
+    } = props
+
+    return rest
+  }
+
+  const motion = new Proxy(
+    {},
+    {
+      get: (_, tag: string) =>
+        React.forwardRef<HTMLElement, Record<string, unknown>>(function MotionComponent(props, ref) {
+          const { children, ...rest } = props as Record<string, unknown> & {
+            children?: React.ReactNode
+          }
+          return React.createElement(tag, { ...stripMotionProps(rest), ref }, children)
+        }),
+    },
+  )
+
+  return {
+    AnimatePresence: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+    motion,
+  }
+})
+
 const memoryStorage = (() => {
   let storage: Record<string, string> = {}
 

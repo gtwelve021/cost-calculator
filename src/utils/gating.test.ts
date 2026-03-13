@@ -25,12 +25,12 @@ describe('isLeadFormComplete', () => {
     ).toBe(true)
   })
 
-  it('returns true when required fields are filled even if values are not format-validated', () => {
+  it('returns false when the phone number format is invalid', () => {
     expect(
       isLeadFormComplete({
-        fullName: 'Ali123',
+        fullName: 'Ali Khan',
         phone: '123',
-        email: 'not-an-email',
+        email: 'ali@example.com',
         consent: true,
       }),
     ).toBe(false)
@@ -48,9 +48,6 @@ describe('getSubmissionIssues', () => {
           email: '',
           consent: false,
         },
-        selectedLicenseId: null,
-        selectedActivityIds: [],
-        selectedVisaId: null,
       },
       1,
     )
@@ -58,10 +55,10 @@ describe('getSubmissionIssues', () => {
     expect(issues).toContain('Lead form is incomplete.')
     expect(issues).toContain('Choose one business license package.')
     expect(issues).toContain('Pick at least 1 business activity.')
-    expect(issues).toContain('Select one visa path.')
+    expect(issues).toContain('Select at least one visa requirement.')
   })
 
-  it('returns no issues for complete state', () => {
+  it('returns no issues for a complete state', () => {
     const issues = getSubmissionIssues(
       {
         ...defaultCalculatorState,
@@ -71,9 +68,9 @@ describe('getSubmissionIssues', () => {
           email: 'ali@example.com',
           consent: true,
         },
-        selectedLicenseId: 'launch-license',
-        selectedVisaId: 'no-visa',
-        selectedActivityIds: ['act-001'],
+        selectedLicenseId: 'fawri',
+        selectedActivityIds: ['ict-6201-10'],
+        investorVisaEnabled: true,
       },
       1,
     )

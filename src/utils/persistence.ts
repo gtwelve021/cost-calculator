@@ -1,24 +1,31 @@
 import { z } from 'zod'
 import type { CalculatorState } from '../types/calculator'
 
-export const CALCULATOR_STATE_KEY = 'calculator_state_v2'
+export const CALCULATOR_STATE_KEY = 'calculator_state_v4'
 
-const leadFormSchema = z.object({
-  fullName: z.string(),
-  phone: z.string(),
-  email: z.string(),
-  consent: z.boolean(),
-})
+const leadFormSchema = z
+  .object({
+    fullName: z.string(),
+    phone: z.string(),
+    email: z.string(),
+    consent: z.boolean(),
+  })
+  .strict()
 
-const calculatorStateSchema = z.object({
-  leadForm: leadFormSchema,
-  selectedLicenseId: z.string().nullable(),
-  durationYears: z.number().int().min(0).max(6),
-  shareholderCount: z.number().int().min(0).max(6),
-  selectedActivityIds: z.array(z.string()),
-  selectedVisaId: z.string().nullable(),
-  selectedAddOnIds: z.array(z.string()),
-})
+const calculatorStateSchema = z
+  .object({
+    leadForm: leadFormSchema,
+    selectedLicenseId: z.string().nullable(),
+    durationYears: z.number().int().min(1).max(6),
+    shareholderCount: z.number().int().min(1).max(10),
+    selectedActivityIds: z.array(z.string()),
+    selectedAddOnIds: z.array(z.string()),
+    investorVisaEnabled: z.boolean(),
+    employeeVisaCount: z.number().int().min(0).max(10),
+    dependentVisaCount: z.number().int().min(0).max(10),
+    applicantsInsideUae: z.number().int().min(0).max(10),
+  })
+  .strict()
 
 export function saveCalculatorState(state: CalculatorState): void {
   if (typeof window === 'undefined') {

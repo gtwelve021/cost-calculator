@@ -9,6 +9,10 @@ export function isLeadFormComplete(data: LeadFormData): boolean {
   return fullNameValid && phoneValid && emailValid && data.consent
 }
 
+export function getTotalVisaApplicants(state: CalculatorState): number {
+  return (state.investorVisaEnabled ? 1 : 0) + state.employeeVisaCount + state.dependentVisaCount
+}
+
 export function getSubmissionIssues(state: CalculatorState, minimumActivities: number): string[] {
   const issues: string[] = []
 
@@ -24,8 +28,8 @@ export function getSubmissionIssues(state: CalculatorState, minimumActivities: n
     issues.push(`Pick at least ${minimumActivities} business activity.`)
   }
 
-  if (!state.selectedVisaId) {
-    issues.push('Select one visa path.')
+  if (getTotalVisaApplicants(state) === 0) {
+    issues.push('Select at least one visa requirement.')
   }
 
   return issues

@@ -12,80 +12,116 @@ import { formatAed } from './currency'
 
 describe('calculateQuote', () => {
   it('returns a different total when license changes', () => {
-    const launchState = {
-      ...defaultCalculatorState,
-      selectedLicenseId: licenseOptions[0].id,
-    }
+    const fawriQuote = calculateQuote(
+      {
+        ...defaultCalculatorState,
+        selectedLicenseId: licenseOptions[0].id,
+      },
+      pricingConfig,
+      {
+        licenses: licenseOptions,
+        activities: businessActivities,
+        visas: visaOptions,
+        addOns: addOnOptions,
+      },
+    )
 
-    const growthState = {
-      ...defaultCalculatorState,
-      selectedLicenseId: licenseOptions[1].id,
-    }
+    const regularQuote = calculateQuote(
+      {
+        ...defaultCalculatorState,
+        selectedLicenseId: licenseOptions[1].id,
+      },
+      pricingConfig,
+      {
+        licenses: licenseOptions,
+        activities: businessActivities,
+        visas: visaOptions,
+        addOns: addOnOptions,
+      },
+    )
 
-    const launchQuote = calculateQuote(launchState, pricingConfig, {
-      licenses: licenseOptions,
-      activities: businessActivities,
-      visas: visaOptions,
-      addOns: addOnOptions,
-    })
-
-    const growthQuote = calculateQuote(growthState, pricingConfig, {
-      licenses: licenseOptions,
-      activities: businessActivities,
-      visas: visaOptions,
-      addOns: addOnOptions,
-    })
-
-    expect(growthQuote.total).toBeGreaterThan(launchQuote.total)
+    expect(regularQuote.total).toBeGreaterThan(fawriQuote.total)
   })
 
-  it('applies duration and extra shareholder deltas', () => {
-    const state = {
-      ...defaultCalculatorState,
-      durationYears: 4,
-      shareholderCount: 3,
-    }
-
-    const quote = calculateQuote(state, pricingConfig, {
-      licenses: licenseOptions,
-      activities: businessActivities,
-      visas: visaOptions,
-      addOns: addOnOptions,
-    })
+  it('applies duration and extra shareholder deltas after the included threshold', () => {
+    const quote = calculateQuote(
+      {
+        ...defaultCalculatorState,
+        selectedLicenseId: licenseOptions[0].id,
+        durationYears: 4,
+        shareholderCount: 8,
+      },
+      pricingConfig,
+      {
+        licenses: licenseOptions,
+        activities: businessActivities,
+        visas: visaOptions,
+        addOns: addOnOptions,
+      },
+    )
 
     expect(quote.durationDelta).toBe(pricingConfig.durations[4])
     expect(quote.shareholderDelta).toBe(2 * pricingConfig.extraShareholderFee)
   })
 
-  it('includes activities, visa, and add-ons in final total', () => {
-    const state = {
-      ...defaultCalculatorState,
-      selectedActivityIds: [businessActivities[0].id, businessActivities[1].id],
-      selectedVisaId: visaOptions[1].id,
-      selectedAddOnIds: [addOnOptions[0].id, addOnOptions[3].id],
-    }
+  it('charges only for activities above the included three', () => {
+    const quote = calculateQuote(
+      {
+        ...defaultCalculatorState,
+        selectedLicenseId: licenseOptions[0].id,
+        selectedActivityIds: businessActivities.slice(0, 5).map((activity) => activity.id),
+      },
+      pricingConfig,
+      {
+        licenses: licenseOptions,
+        activities: businessActivities,
+        visas: visaOptions,
+        addOns: addOnOptions,
+      },
+    )
 
-    const quote = calculateQuote(state, pricingConfig, {
-      licenses: licenseOptions,
-      activities: businessActivities,
-      visas: visaOptions,
-      addOns: addOnOptions,
-    })
+    expect(quote.includedActivities).toBe(3)
+    expect(quote.extraActivityCount).toBe(2)
+    expect(quote.activitiesTotal).toBe(2 * pricingConfig.extraActivityFee)
+  })
 
-    const expectedActivities = businessActivities[0].fee + businessActivities[1].fee
-    const expectedAddOns = addOnOptions[0].fee + addOnOptions[3].fee
+  it('adds multi-visa totals, immigration card fee, inside-UAE status changes, and add-ons', () => {
+    const employeeFee = visaOptions.find((option) => option.id === 'employee-visa')?.fee ?? 0
+    const dependentFee = visaOptions.find((option) => option.id === 'dependent-visa')?.fee ?? 0
+    const investorFee = visaOptions.find((option) => option.id === 'investor-visa')?.fee ?? 0
+    const addOnFee = addOnOptions[0].fee + addOnOptions[3].fee
 
-    expect(quote.activitiesTotal).toBe(expectedActivities)
-    expect(quote.visaTotal).toBe(visaOptions[1].fee)
-    expect(quote.addOnsTotal).toBe(expectedAddOns)
+    const quote = calculateQuote(
+      {
+        ...defaultCalculatorState,
+        selectedLicenseId: licenseOptions[0].id,
+        investorVisaEnabled: true,
+        employeeVisaCount: 2,
+        dependentVisaCount: 1,
+        applicantsInsideUae: 2,
+        selectedAddOnIds: [addOnOptions[0].id, addOnOptions[3].id],
+      },
+      pricingConfig,
+      {
+        licenses: licenseOptions,
+        activities: businessActivities,
+        visas: visaOptions,
+        addOns: addOnOptions,
+      },
+    )
+
+    expect(quote.investorVisaTotal).toBe(investorFee)
+    expect(quote.employeeVisaTotal).toBe(employeeFee * 2)
+    expect(quote.dependentVisaTotal).toBe(dependentFee)
+    expect(quote.immigrationCardFee).toBe(pricingConfig.immigrationCardFee)
+    expect(quote.changeStatusTotal).toBe(2 * pricingConfig.changeStatusInsideFee)
+    expect(quote.addOnsTotal).toBe(addOnFee)
     expect(quote.total).toBe(
-      quote.licenseBase +
-        quote.durationDelta +
-        quote.shareholderDelta +
+      quote.companySetupTotal +
         quote.activitiesTotal +
         quote.visaTotal +
-        quote.addOnsTotal +
-        quote.platformFee,
+        quote.changeStatusTotal +
+        quote.addOnsTotal,
     )
   })
 })

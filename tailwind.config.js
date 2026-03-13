@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Sora', 'Manrope', 'ui-sans-serif', 'system-ui'],
-        body: ['Manrope', 'Segoe UI', 'ui-sans-serif', 'system-ui'],
+        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+        body: ['"Plus Jakarta Sans"', 'sans-serif'],
       },
       boxShadow: {
         soft: '0 18px 45px -28px rgba(16, 19, 26, 0.45)',
