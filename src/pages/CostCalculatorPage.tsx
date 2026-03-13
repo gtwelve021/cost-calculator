@@ -51,6 +51,7 @@ import {
   normalizePhoneNumber,
 } from "../utils/phone";
 import { loadCalculatorState, saveCalculatorState } from "../utils/persistence";
+import { submitQuoteToSheet } from "../utils/sheets";
 
 const DEFAULT_PHONE_COUNTRY = "pk";
 const DEFAULT_PHONE_DIAL_CODE = "92";
@@ -227,7 +228,7 @@ function CounterField({
   max?: number;
 }) {
   return (
-    <div className="rounded-[1.6rem] border border-[#e6ebf2] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+    <div className="rounded-[1.6rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-[#111723]">{label}</h3>
@@ -274,7 +275,7 @@ function CategoryCard({
   onOpen: () => void;
 }) {
   return (
-    <div className="rounded-[1.8rem] border border-[#e6ebf2] bg-white p-5 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+    <div className="rounded-[1.8rem] bg-white p-5 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-3">
           <span
@@ -349,7 +350,7 @@ function FaqAccordionItem({
   question: string;
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-[#e5ebf3] bg-white shadow-[0_14px_34px_rgba(60,91,125,0.08)]">
+    <div className="rounded-[1.5rem] border border-[#e5ebf3] bg-white ">
       <button
         type="button"
         onClick={onToggle}
@@ -682,6 +683,22 @@ export function CostCalculatorPage() {
       scrollToRef(quoteSidebarRef);
       return;
     }
+
+    void submitQuoteToSheet({
+      fullName: leadForm.fullName,
+      phone: leadForm.phone,
+      email: leadForm.email,
+      licenseName: selectedLicense?.name ?? '',
+      durationYears,
+      shareholders: shareholderCount,
+      activities: selectedActivities.map((a) => a.name),
+      investorVisa: investorVisaEnabled,
+      employeeVisas: employeeVisaCount,
+      dependentVisas: dependentVisaCount,
+      applicantsInsideUae,
+      addOns: selectedAddOns.map((a) => a.name),
+      totalAed: quote.total,
+    });
 
     setShowSuccess(true);
     scrollToRef(quoteSidebarRef);
@@ -1116,7 +1133,7 @@ export function CostCalculatorPage() {
                             </div>
 
                             <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                              <div className="rounded-[1.8rem] border border-[#e6ebf2] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                              <div className="rounded-[1.8rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
                                 <h3 className="text-lg font-semibold text-[#111723]">
                                   License Duration
                                 </h3>
@@ -1185,7 +1202,7 @@ export function CostCalculatorPage() {
                               description={`The first ${pricingConfig.includedActivityCount} activities are included. Each additional activity adds ${formatAed(pricingConfig.extraActivityFee)}.`}
                             />
 
-                            <div className="mt-6 rounded-[1.8rem] border border-[#e6ebf2] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                            <div className="mt-6 rounded-[1.8rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
                               <label
                                 htmlFor="activity-search"
                                 className="mb-2 block text-sm font-medium text-[#28394c]"
@@ -1269,7 +1286,7 @@ export function CostCalculatorPage() {
                                 return (
                                   <div
                                     key={visa.id}
-                                    className="rounded-[2rem] border border-[#e6ebf2] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
+                                    className="rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
                                   >
                                     <img
                                       src={visa.image}
@@ -1383,7 +1400,7 @@ export function CostCalculatorPage() {
                                   onChange={updateApplicantsInside}
                                 />
 
-                                <div className="rounded-[1.6rem] border border-[#e6ebf2] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                                <div className="rounded-[1.6rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
                                   <h3 className="text-lg font-semibold text-[#111723]">
                                     Change of Status Summary
                                   </h3>
@@ -1444,7 +1461,7 @@ export function CostCalculatorPage() {
                                 return (
                                   <div
                                     key={group.id}
-                                    className="rounded-[2rem] border border-[#e6ebf2] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
+                                    className="rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
                                   >
                                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                       <div>
@@ -1613,7 +1630,7 @@ export function CostCalculatorPage() {
         <div className="mx-auto max-w-[1280px] space-y-10 px-4 py-10 md:px-6 md:py-16">
         <AnimatedSection delay={0.04}>
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-            <div className="rounded-[2rem] border border-[#e6ebf2] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+            <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
               <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
                 Who Is This Calculator For?
               </h2>
@@ -1649,7 +1666,7 @@ export function CostCalculatorPage() {
         <AnimatedSection delay={0.08}>
           <section
             id="why-trade"
-            className="rounded-[2.2rem] border border-[#e6ebf2] bg-white px-6 py-8 shadow-[0_24px_60px_rgba(60,91,125,0.1)] md:px-8"
+            className="rounded-[2.2rem] bg-white px-6 py-8  md:px-8"
           >
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center">
               <div>
@@ -1684,7 +1701,7 @@ export function CostCalculatorPage() {
 
         <AnimatedSection delay={0.12}>
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
-            <div className="rounded-[2rem] border border-[#e6ebf2] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+            <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
               <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
                 Why Your Trade License Cost Depends on Your Setup
               </h2>
@@ -1717,7 +1734,7 @@ export function CostCalculatorPage() {
               <CalculateNowLink className="mt-6" />
             </div>
 
-            <div className="rounded-[2rem] border border-[#e6ebf2] bg-[linear-gradient(180deg,#ffffff_0%,#f3f7fb_100%)] px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+            <div className="rounded-[2rem] bg-[linear-gradient(180deg,#ffffff_0%,#f3f7fb_100%)] px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
               <h2 className=" text-[1.65rem] font-semibold leading-tight text-[#111723] md:text-[2rem]">
                 How Accurate Is This Cost Estimate?
               </h2>
@@ -1739,7 +1756,7 @@ export function CostCalculatorPage() {
         </AnimatedSection>
 
         <AnimatedSection delay={0.16}>
-          <section className="rounded-[2.2rem] border border-[#e6ebf2] bg-white px-6 py-8 shadow-[0_24px_60px_rgba(60,91,125,0.1)] md:px-8">
+          <section className="rounded-[2.2rem] bg-white px-6 py-8  md:px-8">
             <div className="max-w-[48rem]">
               <h2 className=" text-[1.9rem] font-semibold leading-tight text-[#111723] md:text-[2.55rem]">
                 What Happens After You Get Your Cost Estimate
@@ -1779,7 +1796,7 @@ export function CostCalculatorPage() {
         <AnimatedSection delay={0.2}>
           <section
             id="cc-faq"
-            className="rounded-[2.2rem] border border-[#e6ebf2] bg-white px-6 py-8 shadow-[0_24px_60px_rgba(60,91,125,0.1)] md:px-8"
+            className="rounded-[2.2rem] bg-white px-6 py-8 md:px-8"
           >
             <div className="max-w-[46rem]">
               <h2 className=" text-[1.9rem] font-semibold leading-tight text-[#111723] md:text-[2.55rem]">

@@ -2,6 +2,9 @@ const SHEET_ID = '1oG10Q8gWyeiqS0rl0sNik7radJFkZQJ1okWuz8D0N04'
 const SHEET_GID = '0'
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`
 
+// Google Apps Script Web App URL — deploy the script bound to this sheet and paste the URL here
+const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL ?? ''
+
 function parseCSV(csv: string): string[][] {
   const rows: string[][] = []
   let current = ''
@@ -179,5 +182,56 @@ export async function fetchSheetData(): Promise<SheetPricingData | null> {
     return mapSheetData(objects)
   } catch {
     return null
+  }
+}
+
+export interface QuoteSubmission {
+  fullName: string
+  phone: string
+  email: string
+  licenseName: string
+  durationYears: number
+  shareholders: number
+  activities: string[]
+  investorVisa: boolean
+  employeeVisas: number
+  dependentVisas: number
+  applicantsInsideUae: number
+  addOns: string[]
+  totalAed: number
+}
+
+export async function submitQuoteToSheet(data: QuoteSubmission): Promise<boolean> {
+  if (!APPS_SCRIPT_URL) {
+    console.warn('VITE_APPS_SCRIPT_URL is not set — quote will not be saved to Google Sheets.')
+    return false
+  }
+
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        fullName: data.fullName,
+        phone: data.phone,
+        email: data.email,
+        licenseName: data.licenseName,
+        durationYears: data.durationYears,
+        shareholders: data.shareholders,
+        activities: data.activities.join(', '),
+        investorVisa: data.investorVisa ? 'Yes' : 'No',
+        employeeVisas: data.employeeVisas,
+        dependentVisas: data.dependentVisas,
+        applicantsInsideUae: data.applicantsInsideUae,
+        addOns: data.addOns.join(', '),
+        totalAed: data.totalAed,
+      }),
+      signal: AbortSignal.timeout(10000),
+    })
+
+    return response.ok
+  } catch {
+    return false
   }
 }

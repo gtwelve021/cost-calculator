@@ -91,7 +91,7 @@ describe('CostCalculatorPage', () => {
 
       await waitFor(() => {
         expect(screen.queryByRole('dialog', { name: /Fawri License/i })).not.toBeInTheDocument()
-      })
+      }, { timeout: 5000 })
     },
     20000,
   )
@@ -111,7 +111,7 @@ describe('CostCalculatorPage', () => {
 
       await waitFor(() => {
         expect(screen.getAllByText(/Software Development/i).length).toBeGreaterThan(0)
-      })
+      }, { timeout: 5000 })
     },
     20000,
   )

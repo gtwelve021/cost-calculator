@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "setup:sheets": "node scripts/setup-sheets.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
