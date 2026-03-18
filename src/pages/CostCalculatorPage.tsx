@@ -1179,13 +1179,11 @@ export function CostCalculatorPage() {
                                     className={cn(
                                       "px-6 py-3 rounded-full",
                                       selected
-                                        ? "bg-[#111723] text-white"
-                                        : "brand-gradient brand-gradient-hover text-white",
+                                        ? "bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                        : "bg-white/70 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                     )}
                                   >
-                                    {selected
-                                      ? "Selected"
-                                      : "Select"}
+                                    {selected ? "Selected" : "Select"}
                                   </button>
                                 </div>
                               </div>
@@ -1245,69 +1243,69 @@ export function CostCalculatorPage() {
                       </div>
                     </div>
                   </AnimatedSection>
-                  <AnimatedSection delay={0.06}>
-                    <div ref={activitiesSectionRef} className="scroll-mt-24">
-                      <SectionHeading
-                        title="Choose your business activities"
-                        description={`The first ${pricingConfig.includedActivityCount} activities are included. Each additional activity adds ${formatAed(pricingConfig.extraActivityFee)}.`}
-                      />
 
-                      <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                        <label
-                          htmlFor="activity-search"
-                          className="mb-2 block text-sm font-medium text-[#28394c]"
-                        >
-                          Search activity categories
-                        </label>
-                        <div className="relative">
-                          <Search
-                            size={18}
-                            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                          />
-                          <input
-                            id="activity-search"
-                            value={activityQuery}
-                            onChange={(event) =>
-                              setActivityQuery(event.target.value)
-                            }
-                            className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#ab8134] focus:bg-white"
-                            placeholder="Search categories, activity names, or codes"
-                            aria-label="Search activity categories"
-                          />
-                        </div>
-                      </div>
+                  <div ref={activitiesSectionRef} className="scroll-mt-24">
+                    <SectionHeading
+                      title="Choose your business activities"
+                      description={`The first ${pricingConfig.includedActivityCount} activities are included. Each additional activity adds ${formatAed(pricingConfig.extraActivityFee)}.`}
+                    />
 
-                      <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                        {filteredCategories.map((category) => {
-                          const categorySelections = selectedActivities.filter(
-                            (activity) => activity.categoryId === category.id,
-                          );
-                          const preview = categorySelections
-                            .slice(0, 2)
-                            .map((activity) => activity.name);
-
-                          if (categorySelections.length > 2) {
-                            preview.push(
-                              `+${categorySelections.length - 2} more selected`,
-                            );
+                    <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                      <label
+                        htmlFor="activity-search"
+                        className="mb-2 block text-sm font-medium text-[#28394c]"
+                      >
+                        Search activity categories
+                      </label>
+                      <div className="relative">
+                        <Search
+                          size={18}
+                          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        />
+                        <input
+                          id="activity-search"
+                          value={activityQuery}
+                          onChange={(event) =>
+                            setActivityQuery(event.target.value)
                           }
-
-                          return (
-                            <CategoryCard
-                              key={category.id}
-                              category={category}
-                              preview={preview}
-                              selectedCount={categorySelections.length}
-                              onOpen={() => {
-                                setActivityModalQuery("");
-                                setActivityCategoryModalId(category.id);
-                              }}
-                            />
-                          );
-                        })}
+                          className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#ab8134] focus:bg-white"
+                          placeholder="Search categories, activity names, or codes"
+                          aria-label="Search activity categories"
+                        />
                       </div>
                     </div>
-                  </AnimatedSection>
+
+                    <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                      {filteredCategories.map((category) => {
+                        const categorySelections = selectedActivities.filter(
+                          (activity) => activity.categoryId === category.id,
+                        );
+                        const preview = categorySelections
+                          .slice(0, 2)
+                          .map((activity) => activity.name);
+
+                        if (categorySelections.length > 2) {
+                          preview.push(
+                            `+${categorySelections.length - 2} more selected`,
+                          );
+                        }
+
+                        return (
+                          <CategoryCard
+                            key={category.id}
+                            category={category}
+                            preview={preview}
+                            selectedCount={categorySelections.length}
+                            onOpen={() => {
+                              setActivityModalQuery("");
+                              setActivityCategoryModalId(category.id);
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <AnimatedSection delay={0.1}>
                     <div ref={visasSectionRef} className="scroll-mt-24">
                       <SectionHeading

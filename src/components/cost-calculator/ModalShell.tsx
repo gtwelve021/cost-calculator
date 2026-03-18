@@ -1,14 +1,14 @@
-import type { PropsWithChildren, ReactNode } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, X } from 'lucide-react'
+import type { PropsWithChildren, ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, X } from "lucide-react";
 
 interface ModalShellProps extends PropsWithChildren {
-  isOpen: boolean
-  title: string
-  onClose: () => void
-  imageSrc?: string
-  imageAlt?: string
-  footer?: ReactNode
+  isOpen: boolean;
+  title: string;
+  onClose: () => void;
+  imageSrc?: string;
+  imageAlt?: string;
+  footer?: ReactNode;
 }
 
 export function ModalShell({
@@ -27,20 +27,19 @@ export function ModalShell({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[70] grid place-items-center bg-[#0f1422]/60 p-4"
+          className="fixed inset-0 z-[70] grid place-items-center bg-[#0f1422]/60"
         >
           <motion.div
             initial={{ opacity: 0, y: 18, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.97 }}
-            transition={{ duration: 0.22, ease: 'easeOut' }}
-            className="w-full max-w-[780px] overflow-hidden rounded-[2rem] bg-white shadow-[0_28px_70px_rgba(15,20,34,0.28)]"
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="w-full max-w-lg overflow-hidden rounded-[2rem] bg-white shadow-[0_28px_70px_rgba(15,20,34,0.28)]"
             role="dialog"
             aria-modal="true"
             aria-label={title}
           >
             <div className="flex items-center justify-between gap-4 px-6 pt-6">
-              <h2 className="text-[1.55rem] font-semibold text-[#111723]">{title}</h2>
               <button
                 type="button"
                 onClick={onClose}
@@ -50,7 +49,7 @@ export function ModalShell({
                 <X size={18} />
               </button>
             </div>
-
+      
             <div className="max-h-[72vh] overflow-y-auto px-6 pb-6 pt-4">
               {imageSrc ? (
                 <img
@@ -59,20 +58,28 @@ export function ModalShell({
                   className="mb-5 h-60 w-full rounded-[1.5rem] border border-[#edf1f7] object-cover"
                 />
               ) : null}
-              <div className="space-y-4 text-[1rem] leading-8 text-slate-600">{children}</div>
             </div>
-
-            {footer ? <div className="border-t border-[#eef2f6] px-6 py-5">{footer}</div> : null}
+                  <h2 className="text-[1.55rem] font-semibold text-[#111723]">
+              {title}
+            </h2>
+            <div className="space-y-4 text-[1rem] leading-8 text-slate-600">
+              {children}
+            </div>
+            {footer ? (
+              <div className="border-t border-[#eef2f6] px-6 py-5">
+                {footer}
+              </div>
+            ) : null}
           </motion.div>
         </motion.div>
       ) : null}
     </AnimatePresence>
-  )
+  );
 }
 
 interface ModalActionProps {
-  label: string
-  onClick: () => void
+  label: string;
+  onClick: () => void;
 }
 
 export function ModalAction({ label, onClick }: ModalActionProps) {
@@ -85,5 +92,5 @@ export function ModalAction({ label, onClick }: ModalActionProps) {
       {label}
       <ArrowRight size={16} />
     </button>
-  )
+  );
 }

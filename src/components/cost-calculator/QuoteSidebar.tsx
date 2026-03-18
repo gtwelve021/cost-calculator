@@ -200,79 +200,76 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
             Here's your total cost, based on the options you selected.
           </p>
         </div>
+        <div className="space-y-4 overflow-scroll pr-2 h-80">
+          {selectedLicense ? (
+            <QuoteSection
+              title="Company Setup"
+              onEdit={onEditCompanySetup}
+              total={formatAed(quote.companySetupTotal)}
+              rows={[
+                {
+                  label: "License Type",
+                  value: selectedLicense.name.replace(" Business License", ""),
+                },
+                {
+                  label: "License Duration",
+                  value:
+                    durationYears === 1 ? "1 Year" : `${durationYears} Years`,
+                },
+                { label: "Shareholders", value: String(shareholderCount) },
+              ]}
+            />
+          ) : null}
 
-        <div className="relative">
+          {selectedActivityRows.length > 0 ? (
+            <QuoteSection
+              title="Business Activities"
+              onEdit={onEditActivities}
+              total={formatAed(quote.activitiesTotal)}
+              rows={selectedActivityRows}
+            />
+          ) : null}
+
+          {visaRows.length > 0 ? (
+            <QuoteSection
+              title="Number of Visas"
+              onEdit={onEditVisas}
+              total={formatAed(quote.visaTotal)}
+              rows={visaRows}
+            />
+          ) : null}
+
+          {totalVisaApplicants > 0 ? (
+            <QuoteSection
+              title="Change of Status"
+              total={formatAed(quote.changeStatusTotal)}
+              rows={[
+                {
+                  label: `Applicants Outside the UAE (${applicantsOutsideUae})`,
+                  value: formatAed(quote.outsideStatusTotal),
+                },
+                {
+                  label: `Applicants Inside the UAE (${applicantsInsideUae})`,
+                  value: formatAed(quote.insideStatusTotal),
+                },
+              ]}
+            />
+          ) : null}
+
+          {selectedAddOns.length > 0 ? (
+            <QuoteSection
+              title="Additional Services"
+              onEdit={onEditAddOns}
+              total={formatAed(quote.addOnsTotal)}
+              rows={selectedAddOns.map((item) => ({
+                label: item.name,
+                value: formatAed(item.fee),
+              }))}
+            />
+          ) : null}
+        </div>
+        <div className="relative mt-16">
           <div className="space-y-4">
-            {selectedLicense ? (
-              <QuoteSection
-                title="Company Setup"
-                onEdit={onEditCompanySetup}
-                total={formatAed(quote.companySetupTotal)}
-                rows={[
-                  {
-                    label: "License Type",
-                    value: selectedLicense.name.replace(
-                      " Business License",
-                      "",
-                    ),
-                  },
-                  {
-                    label: "License Duration",
-                    value:
-                      durationYears === 1 ? "1 Year" : `${durationYears} Years`,
-                  },
-                  { label: "Shareholders", value: String(shareholderCount) },
-                ]}
-              />
-            ) : null}
-
-            {selectedActivityRows.length > 0 ? (
-              <QuoteSection
-                title="Business Activities"
-                onEdit={onEditActivities}
-                total={formatAed(quote.activitiesTotal)}
-                rows={selectedActivityRows}
-              />
-            ) : null}
-
-            {visaRows.length > 0 ? (
-              <QuoteSection
-                title="Number of Visas"
-                onEdit={onEditVisas}
-                total={formatAed(quote.visaTotal)}
-                rows={visaRows}
-              />
-            ) : null}
-
-            {totalVisaApplicants > 0 ? (
-              <QuoteSection
-                title="Change of Status"
-                total={formatAed(quote.changeStatusTotal)}
-                rows={[
-                  {
-                    label: `Applicants Outside the UAE (${applicantsOutsideUae})`,
-                    value: formatAed(quote.outsideStatusTotal),
-                  },
-                  {
-                    label: `Applicants Inside the UAE (${applicantsInsideUae})`,
-                    value: formatAed(quote.insideStatusTotal),
-                  },
-                ]}
-              />
-            ) : null}
-
-            {selectedAddOns.length > 0 ? (
-              <QuoteSection
-                title="Additional Services"
-                onEdit={onEditAddOns}
-                total={formatAed(quote.addOnsTotal)}
-                rows={selectedAddOns.map((item) => ({
-                  label: item.name,
-                  value: formatAed(item.fee),
-                }))}
-              />
-            ) : null}
-
             <div className="rounded-[1.7rem] bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
               <div className="flex items-center justify-between gap-4">
                 <div>
