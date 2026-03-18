@@ -1,8 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
-  Check,
   CircleAlert,
   Minus,
   Plus,
@@ -243,7 +241,7 @@ function CounterField({
   max?: number;
 }) {
   return (
-    <div className="rounded-[1.6rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+    <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-[#111723]">{label}</h3>
@@ -290,7 +288,7 @@ function CategoryCard({
   onOpen: () => void;
 }) {
   return (
-    <div className="rounded-[1.8rem] bg-white p-5 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+    <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-3">
           <span
@@ -478,10 +476,10 @@ export function CostCalculatorPage() {
     null,
   );
 
-  const licenseSectionRef = useRef<HTMLElement | null>(null);
-  const activitiesSectionRef = useRef<HTMLElement | null>(null);
-  const visasSectionRef = useRef<HTMLElement | null>(null);
-  const addOnsSectionRef = useRef<HTMLElement | null>(null);
+  const licenseSectionRef = useRef<HTMLDivElement | null>(null);
+  const activitiesSectionRef = useRef<HTMLDivElement | null>(null);
+  const visasSectionRef = useRef<HTMLDivElement | null>(null);
+  const addOnsSectionRef = useRef<HTMLDivElement | null>(null);
   const quoteSidebarRef = useRef<HTMLDivElement | null>(null);
   const shareResetRef = useRef<number | null>(null);
 
@@ -661,7 +659,7 @@ export function CostCalculatorPage() {
     };
   }, []);
 
-  const scrollToRef = (ref: RefObject<HTMLElement | HTMLDivElement | null>) => {
+  const scrollToRef = (ref: RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -851,7 +849,7 @@ export function CostCalculatorPage() {
                       event.preventDefault();
                       void handleContinue();
                     }}
-                    className="rounded-xlflex-1 flex flex-col items-start gap-8 p-[40px_24px] bg-white/7 backdrop-blur-[22px] backdrop-saturate-[180%] border border-white/45 shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255,255,255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] overflow-hidden isolate rounded-[10px] border border-[#e4ebf3] px-6 py-6 shadow-[0_22px_58px_rgba(60,91,125,0.11)] md:px-7 md:py-10"
+                    className="flex flex-col items-start gap-8 overflow-hidden isolate rounded-[10px] border border-white/45 bg-white/7 p-[40px_24px] backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] md:px-7 md:py-10"
                   >
                     <div className="relative mb-2 space-y-2">
                       <h2 className="text-2xl leading-12 font-semibold mb-4">
@@ -1091,7 +1089,7 @@ export function CostCalculatorPage() {
                     <p
                       className={cn(
                         "text-sm",
-                        calculatorUnlocked ? "text-green-600" : "text-gray-600",
+                        calculatorUnlocked ? "text-gray-600" : "text-green-600",
                       )}
                     >
                       {calculatorUnlocked
@@ -1114,8 +1112,26 @@ export function CostCalculatorPage() {
                           return (
                             <div
                               key={license.id}
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => {
+                                setShowSuccess(false);
+                                setSelectedLicenseId(license.id);
+                              }}
+                              onKeyDown={(
+                                event: ReactKeyboardEvent<HTMLDivElement>,
+                              ) => {
+                                if (
+                                  event.key === "Enter" ||
+                                  event.key === " "
+                                ) {
+                                  event.preventDefault();
+                                  setShowSuccess(false);
+                                  setSelectedLicenseId(license.id);
+                                }
+                              }}
                               className={cn(
-                                "p-4 bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] cursor-pointer overflow-hidden isolate transition",
+                                "cursor-pointer overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#eddcbf] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                 selected
                                   ? "border-[#ab8134] ring-2 ring-[#eddcbf]"
                                   : "border-[#e6ebf2]",
@@ -1145,9 +1161,10 @@ export function CostCalculatorPage() {
                                 <div className="mt-2 flex items-center justify-between">
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      setLicenseModalId(license.id)
-                                    }
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      setLicenseModalId(license.id);
+                                    }}
                                     className="text-xs font-medium text-[#7F98A8] flex items-center gap-1 p-1"
                                     aria-label={`Learn more about ${license.name}`}
                                   >
@@ -1178,7 +1195,7 @@ export function CostCalculatorPage() {
                       </div>
 
                       <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                        <div className="rounded-[1.8rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                        <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
                           <h3 className="text-lg font-semibold text-[#111723]">
                             License Duration
                           </h3>
@@ -1235,7 +1252,7 @@ export function CostCalculatorPage() {
                         description={`The first ${pricingConfig.includedActivityCount} activities are included. Each additional activity adds ${formatAed(pricingConfig.extraActivityFee)}.`}
                       />
 
-                      <div className="mt-6 rounded-[1.8rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                      <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
                         <label
                           htmlFor="activity-search"
                           className="mb-2 block text-sm font-medium text-[#28394c]"
@@ -1313,7 +1330,7 @@ export function CostCalculatorPage() {
                           return (
                             <div
                               key={visa.id}
-                              className="rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
+                              className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
                             >
                               <img
                                 src={visa.image}
@@ -1427,7 +1444,7 @@ export function CostCalculatorPage() {
                             onChange={updateApplicantsInside}
                           />
 
-                          <div className="rounded-[1.6rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                          <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
                             <h3 className="text-lg font-semibold text-[#111723]">
                               Change of Status Summary
                             </h3>
@@ -1483,7 +1500,7 @@ export function CostCalculatorPage() {
                           return (
                             <div
                               key={group.id}
-                              className="rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
+                              className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
                             >
                               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                 <div>

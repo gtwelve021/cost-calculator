@@ -51,7 +51,7 @@ function QuoteSection({
   total: string;
 }) {
   return (
-    <div className="rounded-[1.6rem] border border-[#e5ebf3] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+    <div className="border-t border-[#e5ebf3] px-5 py-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#7b8ea8]">
           {title}
