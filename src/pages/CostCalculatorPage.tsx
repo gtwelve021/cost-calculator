@@ -198,26 +198,17 @@ const leadFormSchema = z.object({
 });
 
 function SectionHeading({
-  eyebrow,
   title,
   description,
 }: {
-  eyebrow: string;
   title: string;
   description: string;
 }) {
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ab8134]">
-        {eyebrow}
-      </p>
       <div className="space-y-2">
-        <h2 className=" text-[1.75rem] font-semibold leading-tight text-[#111723] md:text-[2.15rem]">
-          {title}
-        </h2>
-        <p className="max-w-[42rem] text-sm leading-7 text-slate-500 md:text-[0.98rem]">
-          {description}
-        </p>
+        <h2 className=" text-2xl font-semibold leading-tight mb-2">{title}</h2>
+        <p className="text-sm leading-7 text-gray-600">{description}</p>
       </div>
     </div>
   );
@@ -854,7 +845,7 @@ export function CostCalculatorPage() {
 
             <div id="calculate-now" className="relative">
               <div className="relative pt-0 pb-16 z-10 grid gap-8 lg:grid-cols-[58%_36%] lg:items-start lg:justify-between">
-                <div className="space-y-8">
+                <div className="space-y-12">
                   <form
                     onSubmit={(event) => {
                       event.preventDefault();
@@ -938,49 +929,55 @@ export function CostCalculatorPage() {
                                 DEFAULT_PHONE_DIAL_CODE;
 
                               return (
-                            <PhoneInput
-                              country={
-                                phoneSelection.country || DEFAULT_PHONE_COUNTRY
-                              }
-                              value={getPhoneInputValue(field.value ?? "", dialCode)}
-                              onBlur={field.onBlur}
-                              onChange={(value, country) => {
-                                field.onChange(
-                                  normalizePhoneNumber(value, country),
-                                );
-                              }}
-                              enableSearch
-                              disableSearchIcon
-                              countryCodeEditable={false}
-                              searchPlaceholder="Search"
-                              placeholder="Phone number"
-                              containerClass="phone-field"
-                              buttonClass={cn(
-                                "phone-field__button",
-                                errors.phone
-                                  ? "phone-field__button--error"
-                                  : "",
-                              )}
-                              inputClass={cn(
-                                "phone-field__input",
-                                errors.phone ? "phone-field__input--error" : "",
-                              )}
-                              dropdownClass="phone-field__dropdown"
-                              searchClass="phone-field__search"
-                              inputProps={{
-                                id: "lead-phone",
-                                name: field.name,
-                                "aria-label": "Enter phone number",
-                                onKeyDown: (
-                                  event: ReactKeyboardEvent<HTMLInputElement>,
-                                ) =>
-                                  handlePhoneInputKeyDown(
-                                    event,
+                                <PhoneInput
+                                  country={
+                                    phoneSelection.country ||
+                                    DEFAULT_PHONE_COUNTRY
+                                  }
+                                  value={getPhoneInputValue(
+                                    field.value ?? "",
                                     dialCode,
-                                    field.onChange,
-                                  ),
-                              }}
-                            />
+                                  )}
+                                  onBlur={field.onBlur}
+                                  onChange={(value, country) => {
+                                    field.onChange(
+                                      normalizePhoneNumber(value, country),
+                                    );
+                                  }}
+                                  enableSearch
+                                  disableSearchIcon
+                                  countryCodeEditable={false}
+                                  searchPlaceholder="Search"
+                                  placeholder="Phone number"
+                                  containerClass="phone-field"
+                                  buttonClass={cn(
+                                    "phone-field__button",
+                                    errors.phone
+                                      ? "phone-field__button--error"
+                                      : "",
+                                  )}
+                                  inputClass={cn(
+                                    "phone-field__input",
+                                    errors.phone
+                                      ? "phone-field__input--error"
+                                      : "",
+                                  )}
+                                  dropdownClass="phone-field__dropdown"
+                                  searchClass="phone-field__search"
+                                  inputProps={{
+                                    id: "lead-phone",
+                                    name: field.name,
+                                    "aria-label": "Enter phone number",
+                                    onKeyDown: (
+                                      event: ReactKeyboardEvent<HTMLInputElement>,
+                                    ) =>
+                                      handlePhoneInputKeyDown(
+                                        event,
+                                        dialCode,
+                                        field.onChange,
+                                      ),
+                                  }}
+                                />
                               );
                             })()}
                             <FieldError message={errors.phone?.message} />
@@ -1085,532 +1082,472 @@ export function CostCalculatorPage() {
                     <button
                       type="submit"
                       disabled={isUnlocking}
-                      className="brand-gradient brand-gradient-hover mt-6 inline-flex w-full items-center justify-center rounded-full px-6 py-4 text-base font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+                      className="brand-gradient brand-gradient-hover gap-3 inline-flex items-center justify-center rounded-full px-6 py-4 text-base font-semibold disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {isUnlocking ? "Unlocking calculator..." : "Calculate"}
+                      {isUnlocking ? "Unlocking calculator..." : "Calculate"}{" "}
+                      <ArrowRight size={18} />
                     </button>
 
-                    <p className="mt-4 text-sm text-slate-500">
-                      This is a required step to calculate your business setup
-                      cost.
+                    <p
+                      className={cn(
+                        "text-sm",
+                        calculatorUnlocked ? "text-green-600" : "text-gray-600",
+                      )}
+                    >
+                      {calculatorUnlocked
+                        ? "You're all set. Let's explore your business setup options."
+                        : "This is a required step to calculate your business setup cost."}
                     </p>
                   </form>
 
-                  <AnimatePresence initial={false}>
-                    {calculatorUnlocked ? (
-                      <motion.div
-                        key="calculator-sections"
-                        initial={{ opacity: 0, y: 18 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 18 }}
-                        className="space-y-8"
-                      >
-                        <AnimatedSection delay={0.02}>
-                          <section
-                            ref={licenseSectionRef}
-                            className="scroll-mt-24"
-                          >
-                            <SectionHeading
-                              eyebrow="Step 2"
-                              title="Choose your G12 license"
-                              description="Select the license package that matches your launch speed and growth plans, then adjust the duration and shareholder count."
-                            />
+                  <AnimatedSection delay={0.02}>
+                    <div ref={licenseSectionRef} className="scroll-mt-24">
+                      <SectionHeading
+                        title="Pick From Two Powerful Business License Options"
+                        description="Choose the setup that aligns with your goals."
+                      />
 
-                            <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                              {licenseOptions.map((license) => {
-                                const selected =
-                                  selectedLicenseId === license.id;
+                      <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                        {licenseOptions.map((license) => {
+                          const selected = selectedLicenseId === license.id;
 
-                                return (
-                                  <div
-                                    key={license.id}
+                          return (
+                            <div
+                              key={license.id}
+                              className={cn(
+                                "p-4 bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] cursor-pointer overflow-hidden isolate transition",
+                                selected
+                                  ? "border-[#ab8134] ring-2 ring-[#eddcbf]"
+                                  : "border-[#e6ebf2]",
+                              )}
+                            >
+                              <div className="w-full overflow-hidden rounded-2xl aspect-[286/386]">
+                                <img
+                                  src={license.image}
+                                  alt={license.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                              <div className="pt-5 flex flex-col gap-4">
+                                <div className="flex items-center justify-between">
+                                  <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                    {license.name}
+                                  </h3>
+                                  <span className="p-2 text-xs font-medium">
+                                    {license.timeline}
+                                  </span>
+                                </div>
+
+                                <p className="text-sm font-normal leading-12 text-gray-600">
+                                  {license.description}
+                                </p>
+
+                                <div className="mt-2 flex items-center justify-between">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setLicenseModalId(license.id)
+                                    }
+                                    className="text-xs font-medium text-[#7F98A8] flex items-center gap-1 p-1"
+                                    aria-label={`Learn more about ${license.name}`}
+                                  >
+                                    Learn More <ArrowRight size={12} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowSuccess(false);
+                                      setSelectedLicenseId(license.id);
+                                    }}
                                     className={cn(
-                                      "overflow-hidden rounded-[2rem] border bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)] transition",
+                                      "px-6 py-3 rounded-full",
                                       selected
-                                        ? "border-[#ab8134] ring-2 ring-[#eddcbf]"
-                                        : "border-[#e6ebf2]",
+                                        ? "bg-[#111723] text-white"
+                                        : "brand-gradient brand-gradient-hover text-white",
                                     )}
                                   >
-                                    <div className="flex items-start justify-between gap-4">
-                                      <div className="space-y-3">
-                                        <span className="inline-flex rounded-full bg-[#f6eee0] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#ab8134]">
-                                          {license.timeline}
-                                        </span>
-                                        <div>
-                                          <h3 className="text-[1.55rem] font-semibold text-[#111723]">
-                                            {license.name}
-                                          </h3>
-                                          <p className="mt-1 text-sm font-medium text-[#a77b35]">
-                                            {license.tagline}
-                                          </p>
-                                        </div>
-                                      </div>
+                                    {selected
+                                      ? "Selected"
+                                      : "Select"}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
 
-                                      {selected ? (
-                                        <span className="inline-flex items-center gap-2 rounded-full bg-[#e9f6e5] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#5c9151]">
-                                          <Check size={14} />
-                                          Selected
+                      <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                        <div className="rounded-[1.8rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                          <h3 className="text-lg font-semibold text-[#111723]">
+                            License Duration
+                          </h3>
+                          <p className="mt-2 text-sm leading-6 text-slate-500">
+                            Extend your setup duration. The additional cost
+                            follows G12's multi-year pricing grid.
+                          </p>
+                          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            {[1, 2, 3, 4, 5, 6].map((year) => {
+                              const selected = durationYears === year;
+
+                              return (
+                                <button
+                                  key={year}
+                                  type="button"
+                                  onClick={() => {
+                                    setShowSuccess(false);
+                                    setDurationYears(year);
+                                  }}
+                                  className={cn(
+                                    "rounded-[1.2rem] border px-4 py-3 text-left transition",
+                                    selected
+                                      ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
+                                      : "border-[#d8e1eb] bg-[#fbfcfe] text-[#111723] hover:border-[#bfd0e3]",
+                                  )}
+                                >
+                                  <span className="block text-sm font-semibold">
+                                    {year === 1 ? "1 Year" : `${year} Years`}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <CounterField
+                          label="Shareholders"
+                          description={`Up to ${pricingConfig.includedShareholders} shareholders are included. Each additional shareholder adds ${formatAed(pricingConfig.extraShareholderFee)}.`}
+                          value={shareholderCount}
+                          min={1}
+                          max={15}
+                          onChange={(value) => {
+                            setShowSuccess(false);
+                            setShareholderCount(value);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </AnimatedSection>
+                  <AnimatedSection delay={0.06}>
+                    <div ref={activitiesSectionRef} className="scroll-mt-24">
+                      <SectionHeading
+                        title="Choose your business activities"
+                        description={`The first ${pricingConfig.includedActivityCount} activities are included. Each additional activity adds ${formatAed(pricingConfig.extraActivityFee)}.`}
+                      />
+
+                      <div className="mt-6 rounded-[1.8rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                        <label
+                          htmlFor="activity-search"
+                          className="mb-2 block text-sm font-medium text-[#28394c]"
+                        >
+                          Search activity categories
+                        </label>
+                        <div className="relative">
+                          <Search
+                            size={18}
+                            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                          />
+                          <input
+                            id="activity-search"
+                            value={activityQuery}
+                            onChange={(event) =>
+                              setActivityQuery(event.target.value)
+                            }
+                            className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#ab8134] focus:bg-white"
+                            placeholder="Search categories, activity names, or codes"
+                            aria-label="Search activity categories"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                        {filteredCategories.map((category) => {
+                          const categorySelections = selectedActivities.filter(
+                            (activity) => activity.categoryId === category.id,
+                          );
+                          const preview = categorySelections
+                            .slice(0, 2)
+                            .map((activity) => activity.name);
+
+                          if (categorySelections.length > 2) {
+                            preview.push(
+                              `+${categorySelections.length - 2} more selected`,
+                            );
+                          }
+
+                          return (
+                            <CategoryCard
+                              key={category.id}
+                              category={category}
+                              preview={preview}
+                              selectedCount={categorySelections.length}
+                              onOpen={() => {
+                                setActivityModalQuery("");
+                                setActivityCategoryModalId(category.id);
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </AnimatedSection>
+                  <AnimatedSection delay={0.1}>
+                    <div ref={visasSectionRef} className="scroll-mt-24">
+                      <SectionHeading
+                        title="Select your visa requirements"
+                        description="Use the investor toggle and visa counters to reflect who needs residency support. Change of status only applies to applicants already inside the UAE."
+                      />
+
+                      <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                        {visaOptions.map((visa) => {
+                          const isInvestor = visa.id === "investor-visa";
+                          const count =
+                            visa.id === "employee-visa"
+                              ? employeeVisaCount
+                              : visa.id === "dependent-visa"
+                                ? dependentVisaCount
+                                : investorVisaEnabled
+                                  ? 1
+                                  : 0;
+
+                          return (
+                            <div
+                              key={visa.id}
+                              className="rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
+                            >
+                              <img
+                                src={visa.image}
+                                alt={visa.name}
+                                className="h-36 w-full rounded-[1.4rem] border border-[#edf1f7] bg-[#f8fafc] object-cover p-5"
+                              />
+
+                              <div className="mt-5 flex items-start justify-between gap-4">
+                                <div>
+                                  <h3 className="text-[1.35rem] font-semibold text-[#111723]">
+                                    {visa.name}
+                                  </h3>
+                                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                                    {visa.description}
+                                  </p>
+                                </div>
+                                <div className="rounded-full bg-[#f6eee0] px-3 py-1 text-xs font-semibold text-[#ab8134]">
+                                  {formatAed(visa.fee)}
+                                </div>
+                              </div>
+
+                              <div className="mt-6 flex items-center justify-between gap-4">
+                                <button
+                                  type="button"
+                                  onClick={() => setVisaModalId(visa.id)}
+                                  className="inline-flex items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
+                                  aria-label={`Learn more about ${visa.name}`}
+                                >
+                                  Learn More
+                                </button>
+
+                                {isInvestor ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowSuccess(false);
+                                      setInvestorVisaEnabled(
+                                        (current) => !current,
+                                      );
+                                    }}
+                                    className={cn(
+                                      "inline-flex min-w-[9rem] items-center justify-center rounded-full px-4 py-3 text-sm font-semibold transition",
+                                      investorVisaEnabled
+                                        ? "brand-gradient brand-gradient-hover text-white"
+                                        : "border border-[#d7deea] text-[#111723] hover:bg-[#f5f8fc]",
+                                    )}
+                                  >
+                                    {investorVisaEnabled
+                                      ? "Investor Selected"
+                                      : "Add Investor Visa"}
+                                  </button>
+                                ) : (
+                                  <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        visa.id === "employee-visa"
+                                          ? updateEmployeeCount(
+                                              Math.max(
+                                                0,
+                                                employeeVisaCount - 1,
+                                              ),
+                                            )
+                                          : updateDependentCount(
+                                              Math.max(
+                                                0,
+                                                dependentVisaCount - 1,
+                                              ),
+                                            )
+                                      }
+                                      className="grid h-10 w-10 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+                                      aria-label={`Decrease ${visa.name}`}
+                                    >
+                                      <Minus size={16} />
+                                    </button>
+                                    <span className="min-w-[2ch] text-center text-lg font-semibold text-[#111723]">
+                                      {count}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        visa.id === "employee-visa"
+                                          ? updateEmployeeCount(
+                                              employeeVisaCount + 1,
+                                            )
+                                          : updateDependentCount(
+                                              dependentVisaCount + 1,
+                                            )
+                                      }
+                                      className="brand-gradient brand-gradient-hover grid h-10 w-10 place-items-center rounded-full"
+                                      aria-label={`Increase ${visa.name}`}
+                                    >
+                                      <Plus size={16} />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {totalVisaApplicants > 0 ? (
+                        <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                          <CounterField
+                            label="Applicants Inside the UAE"
+                            description={`Only applicants inside the UAE incur the ${formatAed(pricingConfig.changeStatusInsideFee)} change-of-status fee.`}
+                            value={applicantsInsideUae}
+                            min={0}
+                            max={totalVisaApplicants}
+                            onChange={updateApplicantsInside}
+                          />
+
+                          <div className="rounded-[1.6rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
+                            <h3 className="text-lg font-semibold text-[#111723]">
+                              Change of Status Summary
+                            </h3>
+                            <div className="mt-4 space-y-3 text-sm text-slate-600">
+                              <div className="flex items-center justify-between gap-4">
+                                <span>Total visa applicants</span>
+                                <span className="font-semibold text-[#111723]">
+                                  {totalVisaApplicants}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-4">
+                                <span>Applicants outside the UAE</span>
+                                <span className="font-semibold text-[#111723]">
+                                  {Math.max(
+                                    0,
+                                    totalVisaApplicants - applicantsInsideUae,
+                                  )}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-4">
+                                <span>Applicants inside the UAE</span>
+                                <span className="font-semibold text-[#111723]">
+                                  {applicantsInsideUae}
+                                </span>
+                              </div>
+                              <div className="border-t border-[#eef2f6] pt-3">
+                                <div className="flex items-center justify-between gap-4 font-semibold text-[#ab8134]">
+                                  <span>Change of status total</span>
+                                  <span>
+                                    {formatAed(quote.changeStatusTotal)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </AnimatedSection>
+                  <AnimatedSection delay={0.14}>
+                    <div ref={addOnsSectionRef} className="scroll-mt-24">
+                      <SectionHeading
+                        title="Add optional G12 services"
+                        description="Choose add-ons in grouped packages. All selections remain local-only and feed directly into the quote sidebar."
+                      />
+
+                      <div className="mt-6 space-y-5">
+                        {addOnGroups.map((group) => {
+                          const groupItems = addOnOptions.filter(
+                            (item) => item.groupId === group.id,
+                          );
+
+                          return (
+                            <div
+                              key={group.id}
+                              className="rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
+                            >
+                              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                <div>
+                                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
+                                    {group.name}
+                                  </p>
+                                  <h3 className="mt-2 text-[1.45rem] font-semibold text-[#111723]">
+                                    {group.name}
+                                  </h3>
+                                  <p className="mt-2 max-w-[42rem] text-sm leading-7 text-slate-500">
+                                    {group.description}
+                                  </p>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setAddOnGroupModalId(group.id)}
+                                  className="inline-flex items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
+                                  aria-label={`Learn more about ${group.name}`}
+                                >
+                                  Learn More
+                                </button>
+                              </div>
+
+                              <div className="mt-5 flex flex-wrap gap-3">
+                                {groupItems.map((item) => {
+                                  const selected = selectedAddOnSet.has(
+                                    item.id,
+                                  );
+
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => toggleAddOn(item.id)}
+                                      aria-pressed={selected}
+                                      className={cn(
+                                        "rounded-full border px-4 py-3 text-left text-sm transition",
+                                        selected
+                                          ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
+                                          : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
+                                      )}
+                                    >
+                                      <span className="font-semibold">
+                                        {item.name}
+                                      </span>
+                                      <span className="ml-2 text-slate-500">
+                                        {formatAed(item.fee)}
+                                      </span>
+                                      {item.recommended ? (
+                                        <span className="ml-2 rounded-full bg-[#e9f6e5] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5c9151]">
+                                          Recommended
                                         </span>
                                       ) : null}
-                                    </div>
-
-                                    <img
-                                      src={license.image}
-                                      alt={license.name}
-                                      className="mt-5 h-40 w-full rounded-[1.5rem] border border-[#edf1f7] bg-[#f8fafc] object-cover p-5"
-                                    />
-
-                                    <p className="mt-5 text-sm leading-7 text-slate-500">
-                                      {license.description}
-                                    </p>
-
-                                    <ul className="mt-5 space-y-3">
-                                      {license.features.map((feature) => (
-                                        <li
-                                          key={feature}
-                                          className="flex items-start gap-3 text-sm text-slate-600"
-                                        >
-                                          <span className="mt-1 grid h-5 w-5 place-items-center rounded-full bg-[#f6eee0] text-[#ab8134]">
-                                            <Check size={12} />
-                                          </span>
-                                          {feature}
-                                        </li>
-                                      ))}
-                                    </ul>
-
-                                    <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          setLicenseModalId(license.id)
-                                        }
-                                        className="inline-flex flex-1 items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
-                                        aria-label={`Learn more about ${license.name}`}
-                                      >
-                                        Learn More
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setShowSuccess(false);
-                                          setSelectedLicenseId(license.id);
-                                        }}
-                                        className={cn(
-                                          "inline-flex flex-1 items-center justify-center rounded-full px-4 py-3 text-sm font-semibold transition",
-                                          selected
-                                            ? "bg-[#111723] text-white"
-                                            : "brand-gradient brand-gradient-hover text-white",
-                                        )}
-                                      >
-                                        {selected
-                                          ? "Selected"
-                                          : license.selectLabel}
-                                      </button>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-
-                            <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                              <div className="rounded-[1.8rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
-                                <h3 className="text-lg font-semibold text-[#111723]">
-                                  License Duration
-                                </h3>
-                                <p className="mt-2 text-sm leading-6 text-slate-500">
-                                  Extend your setup duration. The additional
-                                  cost follows G12's multi-year pricing grid.
-                                </p>
-                                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                                  {[1, 2, 3, 4, 5, 6].map((year) => {
-                                    const selected = durationYears === year;
-
-                                    return (
-                                      <button
-                                        key={year}
-                                        type="button"
-                                        onClick={() => {
-                                          setShowSuccess(false);
-                                          setDurationYears(year);
-                                        }}
-                                        className={cn(
-                                          "rounded-[1.2rem] border px-4 py-3 text-left transition",
-                                          selected
-                                            ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
-                                            : "border-[#d8e1eb] bg-[#fbfcfe] text-[#111723] hover:border-[#bfd0e3]",
-                                        )}
-                                      >
-                                        <span className="block text-sm font-semibold">
-                                          {year === 1
-                                            ? "1 Year"
-                                            : `${year} Years`}
-                                        </span>
-                                        <span className="mt-1 block text-xs text-slate-500">
-                                          +
-                                          {formatAed(
-                                            pricingConfig.durations[year] ?? 0,
-                                          )}
-                                        </span>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-
-                              <CounterField
-                                label="Shareholders"
-                                description={`Up to ${pricingConfig.includedShareholders} shareholders are included. Each additional shareholder adds ${formatAed(pricingConfig.extraShareholderFee)}.`}
-                                value={shareholderCount}
-                                min={1}
-                                max={15}
-                                onChange={(value) => {
-                                  setShowSuccess(false);
-                                  setShareholderCount(value);
-                                }}
-                              />
-                            </div>
-                          </section>
-                        </AnimatedSection>
-                        <AnimatedSection delay={0.06}>
-                          <section
-                            ref={activitiesSectionRef}
-                            className="scroll-mt-24"
-                          >
-                            <SectionHeading
-                              eyebrow="Step 3"
-                              title="Choose your business activities"
-                              description={`The first ${pricingConfig.includedActivityCount} activities are included. Each additional activity adds ${formatAed(pricingConfig.extraActivityFee)}.`}
-                            />
-
-                            <div className="mt-6 rounded-[1.8rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
-                              <label
-                                htmlFor="activity-search"
-                                className="mb-2 block text-sm font-medium text-[#28394c]"
-                              >
-                                Search activity categories
-                              </label>
-                              <div className="relative">
-                                <Search
-                                  size={18}
-                                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                                />
-                                <input
-                                  id="activity-search"
-                                  value={activityQuery}
-                                  onChange={(event) =>
-                                    setActivityQuery(event.target.value)
-                                  }
-                                  className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#ab8134] focus:bg-white"
-                                  placeholder="Search categories, activity names, or codes"
-                                  aria-label="Search activity categories"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                              {filteredCategories.map((category) => {
-                                const categorySelections =
-                                  selectedActivities.filter(
-                                    (activity) =>
-                                      activity.categoryId === category.id,
+                                    </button>
                                   );
-                                const preview = categorySelections
-                                  .slice(0, 2)
-                                  .map((activity) => activity.name);
-
-                                if (categorySelections.length > 2) {
-                                  preview.push(
-                                    `+${categorySelections.length - 2} more selected`,
-                                  );
-                                }
-
-                                return (
-                                  <CategoryCard
-                                    key={category.id}
-                                    category={category}
-                                    preview={preview}
-                                    selectedCount={categorySelections.length}
-                                    onOpen={() => {
-                                      setActivityModalQuery("");
-                                      setActivityCategoryModalId(category.id);
-                                    }}
-                                  />
-                                );
-                              })}
-                            </div>
-                          </section>
-                        </AnimatedSection>
-                        <AnimatedSection delay={0.1}>
-                          <section
-                            ref={visasSectionRef}
-                            className="scroll-mt-24"
-                          >
-                            <SectionHeading
-                              eyebrow="Step 4"
-                              title="Select your visa requirements"
-                              description="Use the investor toggle and visa counters to reflect who needs residency support. Change of status only applies to applicants already inside the UAE."
-                            />
-
-                            <div className="mt-6 grid gap-5 xl:grid-cols-3">
-                              {visaOptions.map((visa) => {
-                                const isInvestor = visa.id === "investor-visa";
-                                const count =
-                                  visa.id === "employee-visa"
-                                    ? employeeVisaCount
-                                    : visa.id === "dependent-visa"
-                                      ? dependentVisaCount
-                                      : investorVisaEnabled
-                                        ? 1
-                                        : 0;
-
-                                return (
-                                  <div
-                                    key={visa.id}
-                                    className="rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
-                                  >
-                                    <img
-                                      src={visa.image}
-                                      alt={visa.name}
-                                      className="h-36 w-full rounded-[1.4rem] border border-[#edf1f7] bg-[#f8fafc] object-cover p-5"
-                                    />
-
-                                    <div className="mt-5 flex items-start justify-between gap-4">
-                                      <div>
-                                        <h3 className="text-[1.35rem] font-semibold text-[#111723]">
-                                          {visa.name}
-                                        </h3>
-                                        <p className="mt-2 text-sm leading-6 text-slate-500">
-                                          {visa.description}
-                                        </p>
-                                      </div>
-                                      <div className="rounded-full bg-[#f6eee0] px-3 py-1 text-xs font-semibold text-[#ab8134]">
-                                        {formatAed(visa.fee)}
-                                      </div>
-                                    </div>
-
-                                    <div className="mt-6 flex items-center justify-between gap-4">
-                                      <button
-                                        type="button"
-                                        onClick={() => setVisaModalId(visa.id)}
-                                        className="inline-flex items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
-                                        aria-label={`Learn more about ${visa.name}`}
-                                      >
-                                        Learn More
-                                      </button>
-
-                                      {isInvestor ? (
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setShowSuccess(false);
-                                            setInvestorVisaEnabled(
-                                              (current) => !current,
-                                            );
-                                          }}
-                                          className={cn(
-                                            "inline-flex min-w-[9rem] items-center justify-center rounded-full px-4 py-3 text-sm font-semibold transition",
-                                            investorVisaEnabled
-                                              ? "brand-gradient brand-gradient-hover text-white"
-                                              : "border border-[#d7deea] text-[#111723] hover:bg-[#f5f8fc]",
-                                          )}
-                                        >
-                                          {investorVisaEnabled
-                                            ? "Investor Selected"
-                                            : "Add Investor Visa"}
-                                        </button>
-                                      ) : (
-                                        <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              visa.id === "employee-visa"
-                                                ? updateEmployeeCount(
-                                                    Math.max(
-                                                      0,
-                                                      employeeVisaCount - 1,
-                                                    ),
-                                                  )
-                                                : updateDependentCount(
-                                                    Math.max(
-                                                      0,
-                                                      dependentVisaCount - 1,
-                                                    ),
-                                                  )
-                                            }
-                                            className="grid h-10 w-10 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
-                                            aria-label={`Decrease ${visa.name}`}
-                                          >
-                                            <Minus size={16} />
-                                          </button>
-                                          <span className="min-w-[2ch] text-center text-lg font-semibold text-[#111723]">
-                                            {count}
-                                          </span>
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              visa.id === "employee-visa"
-                                                ? updateEmployeeCount(
-                                                    employeeVisaCount + 1,
-                                                  )
-                                                : updateDependentCount(
-                                                    dependentVisaCount + 1,
-                                                  )
-                                            }
-                                            className="brand-gradient brand-gradient-hover grid h-10 w-10 place-items-center rounded-full"
-                                            aria-label={`Increase ${visa.name}`}
-                                          >
-                                            <Plus size={16} />
-                                          </button>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-
-                            {totalVisaApplicants > 0 ? (
-                              <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                                <CounterField
-                                  label="Applicants Inside the UAE"
-                                  description={`Only applicants inside the UAE incur the ${formatAed(pricingConfig.changeStatusInsideFee)} change-of-status fee.`}
-                                  value={applicantsInsideUae}
-                                  min={0}
-                                  max={totalVisaApplicants}
-                                  onChange={updateApplicantsInside}
-                                />
-
-                                <div className="rounded-[1.6rem] bg-white px-5 py-4 shadow-[0_18px_40px_rgba(60,91,125,0.08)]">
-                                  <h3 className="text-lg font-semibold text-[#111723]">
-                                    Change of Status Summary
-                                  </h3>
-                                  <div className="mt-4 space-y-3 text-sm text-slate-600">
-                                    <div className="flex items-center justify-between gap-4">
-                                      <span>Total visa applicants</span>
-                                      <span className="font-semibold text-[#111723]">
-                                        {totalVisaApplicants}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center justify-between gap-4">
-                                      <span>Applicants outside the UAE</span>
-                                      <span className="font-semibold text-[#111723]">
-                                        {Math.max(
-                                          0,
-                                          totalVisaApplicants -
-                                            applicantsInsideUae,
-                                        )}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center justify-between gap-4">
-                                      <span>Applicants inside the UAE</span>
-                                      <span className="font-semibold text-[#111723]">
-                                        {applicantsInsideUae}
-                                      </span>
-                                    </div>
-                                    <div className="border-t border-[#eef2f6] pt-3">
-                                      <div className="flex items-center justify-between gap-4 font-semibold text-[#ab8134]">
-                                        <span>Change of status total</span>
-                                        <span>
-                                          {formatAed(quote.changeStatusTotal)}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
+                                })}
                               </div>
-                            ) : null}
-                          </section>
-                        </AnimatedSection>
-                        <AnimatedSection delay={0.14}>
-                          <section
-                            ref={addOnsSectionRef}
-                            className="scroll-mt-24"
-                          >
-                            <SectionHeading
-                              eyebrow="Step 5"
-                              title="Add optional G12 services"
-                              description="Choose add-ons in grouped packages. All selections remain local-only and feed directly into the quote sidebar."
-                            />
-
-                            <div className="mt-6 space-y-5">
-                              {addOnGroups.map((group) => {
-                                const groupItems = addOnOptions.filter(
-                                  (item) => item.groupId === group.id,
-                                );
-
-                                return (
-                                  <div
-                                    key={group.id}
-                                    className="rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(60,91,125,0.08)]"
-                                  >
-                                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                                      <div>
-                                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
-                                          {group.name}
-                                        </p>
-                                        <h3 className="mt-2 text-[1.45rem] font-semibold text-[#111723]">
-                                          {group.name}
-                                        </h3>
-                                        <p className="mt-2 max-w-[42rem] text-sm leading-7 text-slate-500">
-                                          {group.description}
-                                        </p>
-                                      </div>
-
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          setAddOnGroupModalId(group.id)
-                                        }
-                                        className="inline-flex items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
-                                        aria-label={`Learn more about ${group.name}`}
-                                      >
-                                        Learn More
-                                      </button>
-                                    </div>
-
-                                    <div className="mt-5 flex flex-wrap gap-3">
-                                      {groupItems.map((item) => {
-                                        const selected = selectedAddOnSet.has(
-                                          item.id,
-                                        );
-
-                                        return (
-                                          <button
-                                            key={item.id}
-                                            type="button"
-                                            onClick={() => toggleAddOn(item.id)}
-                                            aria-pressed={selected}
-                                            className={cn(
-                                              "rounded-full border px-4 py-3 text-left text-sm transition",
-                                              selected
-                                                ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
-                                                : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
-                                            )}
-                                          >
-                                            <span className="font-semibold">
-                                              {item.name}
-                                            </span>
-                                            <span className="ml-2 text-slate-500">
-                                              {formatAed(item.fee)}
-                                            </span>
-                                            {item.recommended ? (
-                                              <span className="ml-2 rounded-full bg-[#e9f6e5] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5c9151]">
-                                                Recommended
-                                              </span>
-                                            ) : null}
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                );
-                              })}
                             </div>
-                          </section>
-                        </AnimatedSection>
-                      </motion.div>
-                    ) : null}
-                  </AnimatePresence>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </AnimatedSection>
                 </div>
 
                 <QuoteSidebar
