@@ -77,6 +77,39 @@ describe('CostCalculatorPage', () => {
   )
 
   it(
+    'shows a validation error for an invalid email address',
+    async () => {
+      render(<CostCalculatorPage />)
+      const user = userEvent.setup()
+
+      const email = screen.getByLabelText(/Enter email address/i)
+
+      await user.type(email, 'asdadad')
+      await user.tab()
+
+      expect(await screen.findByText(/Please enter a valid email address\./i)).toBeInTheDocument()
+    },
+    20000,
+  )
+
+  it(
+    'keeps the dial code visible when local phone digits are deleted with backspace',
+    async () => {
+      render(<CostCalculatorPage />)
+      const user = userEvent.setup()
+      const phone = screen.getByLabelText(/Enter phone number/i)
+
+      await user.type(phone, '501')
+      await user.keyboard('{Backspace}{Backspace}{Backspace}')
+
+      await waitFor(() => {
+        expect(phone).toHaveValue('+92')
+      })
+    },
+    20000,
+  )
+
+  it(
     'opens and closes the license modal',
     async () => {
       persistUnlockedLead()

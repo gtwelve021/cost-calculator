@@ -35,6 +35,17 @@ describe('isLeadFormComplete', () => {
       }),
     ).toBe(false)
   })
+
+  it('returns false when the email address format is invalid', () => {
+    expect(
+      isLeadFormComplete({
+        fullName: 'Ali Khan',
+        phone: '+971501234567',
+        email: 'asdadad',
+        consent: true,
+      }),
+    ).toBe(false)
+  })
 })
 
 describe('getSubmissionIssues', () => {

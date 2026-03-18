@@ -1,10 +1,11 @@
 import type { CalculatorState, LeadFormData } from '../types/calculator'
+import { isValidLeadEmail } from './email'
 import { isValidLeadPhoneNumber } from './phone'
 
 export function isLeadFormComplete(data: LeadFormData): boolean {
   const fullNameValid = data.fullName.trim().length > 0
   const phoneValid = isValidLeadPhoneNumber(data.phone)
-  const emailValid = data.email.trim().length > 0
+  const emailValid = isValidLeadEmail(data.email)
 
   return fullNameValid && phoneValid && emailValid && data.consent
 }

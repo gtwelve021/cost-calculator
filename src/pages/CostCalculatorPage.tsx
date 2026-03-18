@@ -17,6 +17,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   type RefObject,
 } from "react";
 import PhoneInput from "react-phone-input-2";
@@ -43,12 +44,17 @@ import type {
 import { calculateQuote } from "../utils/calculations";
 import { cn } from "../utils/cn";
 import { formatAed } from "../utils/currency";
+import { isValidLeadEmail } from "../utils/email";
 import { getSubmissionIssues, isLeadFormComplete } from "../utils/gating";
 import { sanitizeLeadFullNameInput } from "../utils/lead";
 import {
+  getLockedPhonePrefixLength,
+  getPhoneInputValue,
   getPhoneSelection,
   isValidLeadPhoneNumber,
   normalizePhoneNumber,
+  shouldClearPhoneInput,
+  shouldPreventPhonePrefixEdit,
 } from "../utils/phone";
 import { loadCalculatorState, saveCalculatorState } from "../utils/persistence";
 import { submitQuoteToSheet } from "../utils/sheets";
@@ -167,7 +173,25 @@ const leadFormSchema = z.object({
         });
       }
     }),
-  email: z.string().trim().min(1, "Email address is required."),
+  email: z
+    .string()
+    .trim()
+    .superRefine((value, ctx) => {
+      if (!value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Email address is required.",
+        });
+        return;
+      }
+
+      if (!isValidLeadEmail(value)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please enter a valid email address.",
+        });
+      }
+    }),
   consent: z.boolean().refine((value) => value, {
     message: "This field is required.",
   }),
@@ -350,7 +374,7 @@ function FaqAccordionItem({
   question: string;
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-[#e5ebf3] bg-white ">
+    <div className="border-b-2 border-black/10">
       <button
         type="button"
         onClick={onToggle}
@@ -650,6 +674,54 @@ export function CostCalculatorPage() {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const handlePhoneInputKeyDown = (
+    event: ReactKeyboardEvent<HTMLInputElement>,
+    dialCode: string,
+    onChange: (value: string) => void,
+  ) => {
+    const input = event.currentTarget;
+    const prefixLength = getLockedPhonePrefixLength(dialCode);
+
+    if (
+      shouldPreventPhonePrefixEdit({
+        key: event.key,
+        selectionStart: input.selectionStart,
+        selectionEnd: input.selectionEnd,
+        prefixLength,
+        hasModifier: event.ctrlKey || event.metaKey || event.altKey,
+      })
+    ) {
+      event.preventDefault();
+      return;
+    }
+
+    if (
+      shouldClearPhoneInput({
+        key: event.key,
+        selectionStart: input.selectionStart,
+        selectionEnd: input.selectionEnd,
+        inputValue: input.value,
+        dialCode,
+      })
+    ) {
+      event.preventDefault();
+      onChange("");
+
+      window.requestAnimationFrame(() => {
+        const phoneInput = document.getElementById(
+          "lead-phone",
+        ) as HTMLInputElement | null;
+
+        if (!phoneInput) {
+          return;
+        }
+
+        const lockedPrefixLength = getLockedPhonePrefixLength(dialCode);
+        phoneInput.setSelectionRange(lockedPrefixLength, lockedPrefixLength);
+      });
+    }
+  };
+
   const handleContinue = async () => {
     setLeadValidationAttempted(true);
     const valid = await trigger();
@@ -688,7 +760,7 @@ export function CostCalculatorPage() {
       fullName: leadForm.fullName,
       phone: leadForm.phone,
       email: leadForm.email,
-      licenseName: selectedLicense?.name ?? '',
+      licenseName: selectedLicense?.name ?? "",
       durationYears,
       shareholders: shareholderCount,
       activities: selectedActivities.map((a) => a.name),
@@ -788,28 +860,19 @@ export function CostCalculatorPage() {
                       event.preventDefault();
                       void handleContinue();
                     }}
-                    className="rounded-[2rem] border border-[#e4ebf3] bg-[#f3f3f4] px-6 py-6 shadow-[0_22px_58px_rgba(60,91,125,0.11)] md:px-7 md:py-7"
+                    className="rounded-xlflex-1 flex flex-col items-start gap-8 p-[40px_24px] bg-white/7 backdrop-blur-[22px] backdrop-saturate-[180%] border border-white/45 shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255,255,255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] overflow-hidden isolate rounded-[10px] border border-[#e4ebf3] px-6 py-6 shadow-[0_22px_58px_rgba(60,91,125,0.11)] md:px-7 md:py-10"
                   >
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-                      <div className="space-y-2">
-                        <h2 className=" text-[1.85rem] font-semibold text-[#111723]">
-                          Tell Us a Few Details to Get Started
-                        </h2>
-                        <p className="max-w-[30rem] text-sm leading-7 text-slate-500">
-                          The more we know about your business goals, the more
-                          accurate your setup path.
-                        </p>
-                      </div>
-
-                      {leadReady ? (
-                        <div className="inline-flex items-center gap-2 rounded-full bg-[#e9f6e5] px-4 py-2 text-sm font-semibold text-[#5c9151]">
-                          <Check size={16} />
-                          Ready to calculate
-                        </div>
-                      ) : null}
+                    <div className="relative mb-2 space-y-2">
+                      <h2 className="text-2xl leading-12 font-semibold mb-4">
+                        Tell Us a Few Details to Get Started
+                      </h2>
+                      <p className="text-sm leading-7 font-normal text-black/70">
+                        The more we know about your business goals, the more
+                        accurate your setup path.
+                      </p>
                     </div>
 
-                    <div className="mt-6 grid gap-4">
+                    <div className="grid gap-4">
                       <Controller
                         control={control}
                         name="fullName"
@@ -817,7 +880,7 @@ export function CostCalculatorPage() {
                           <div>
                             <label
                               htmlFor="lead-full-name"
-                              className="mb-3 block text-[1.05rem] font-semibold text-[#343434]"
+                              className="mb-3 block text-sm font-semibold text-black"
                             >
                               Enter your full name *
                             </label>
@@ -831,10 +894,10 @@ export function CostCalculatorPage() {
                                 )
                               }
                               className={cn(
-                                "w-full rounded-[0.95rem] border bg-[#f7f7f8] px-5 py-4 text-[1rem] text-[#343434] outline-none transition placeholder:text-[#9b9b9b] focus:bg-white",
+                                "w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#343434] outline-none transition placeholder:text-[#9b9b9b] focus:bg-transparent",
                                 errors.fullName
                                   ? "border-[#f15b43] ring-1 ring-[#f15b43]/15"
-                                  : "border-[#d8d8dc] focus:border-[#343434]",
+                                  : "border-[#d8d8dc] focus:border-[#ab8134]",
                               )}
                               placeholder="Your name"
                               aria-label="Enter your full name"
@@ -860,19 +923,26 @@ export function CostCalculatorPage() {
                           >
                             <label
                               htmlFor="lead-phone"
-                              className="mb-3 block text-[1.05rem] font-semibold text-[#343434]"
+                              className="mb-3 block text-sm font-semibold text-black"
                             >
                               Enter phone number *
                             </label>
+                            {(() => {
+                              const phoneSelection = getPhoneSelection(
+                                field.value ?? "",
+                                DEFAULT_PHONE_COUNTRY,
+                                DEFAULT_PHONE_DIAL_CODE,
+                              );
+                              const dialCode =
+                                phoneSelection.dialCode ||
+                                DEFAULT_PHONE_DIAL_CODE;
+
+                              return (
                             <PhoneInput
                               country={
-                                getPhoneSelection(
-                                  field.value ?? "",
-                                  DEFAULT_PHONE_COUNTRY,
-                                  DEFAULT_PHONE_DIAL_CODE,
-                                ).country || DEFAULT_PHONE_COUNTRY
+                                phoneSelection.country || DEFAULT_PHONE_COUNTRY
                               }
-                              value={field.value ?? ""}
+                              value={getPhoneInputValue(field.value ?? "", dialCode)}
                               onBlur={field.onBlur}
                               onChange={(value, country) => {
                                 field.onChange(
@@ -901,8 +971,18 @@ export function CostCalculatorPage() {
                                 id: "lead-phone",
                                 name: field.name,
                                 "aria-label": "Enter phone number",
+                                onKeyDown: (
+                                  event: ReactKeyboardEvent<HTMLInputElement>,
+                                ) =>
+                                  handlePhoneInputKeyDown(
+                                    event,
+                                    dialCode,
+                                    field.onChange,
+                                  ),
                               }}
                             />
+                              );
+                            })()}
                             <FieldError message={errors.phone?.message} />
                           </div>
                         )}
@@ -915,7 +995,7 @@ export function CostCalculatorPage() {
                           <div>
                             <label
                               htmlFor="lead-email"
-                              className="mb-3 block text-[1.05rem] font-semibold text-[#343434]"
+                              className="mb-3 block text-sm font-semibold text-black"
                             >
                               Enter email address *
                             </label>
@@ -925,10 +1005,10 @@ export function CostCalculatorPage() {
                               type="email"
                               value={field.value ?? ""}
                               className={cn(
-                                "w-full rounded-[0.95rem] border bg-[#f7f7f8] px-5 py-4 text-[1rem] text-[#343434] outline-none transition placeholder:text-[#9b9b9b] focus:bg-white",
+                                "w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#343434] outline-none transition placeholder:text-[#9b9b9b] focus:bg-transparent",
                                 errors.email
                                   ? "border-[#f15b43] ring-1 ring-[#f15b43]/15"
-                                  : "border-transparent focus:border-[#343434]",
+                                  : "border-[#d8d8dc] focus:border-[#ab8134]",
                               )}
                               placeholder="Email address"
                               aria-label="Enter email address"
@@ -943,7 +1023,7 @@ export function CostCalculatorPage() {
                         name="consent"
                         render={({ field }) => (
                           <div>
-                            <label className="flex cursor-pointer items-start gap-3 rounded-[1.2rem] border border-[#dfe6ef] bg-[#fbfcfe] px-4 py-4 text-sm text-slate-600">
+                            <label className="flex cursor-pointer items-start gap-3 text-xs font-normal text-gray-600">
                               <input
                                 type="checkbox"
                                 checked={field.value ?? false}
@@ -955,7 +1035,7 @@ export function CostCalculatorPage() {
                               />
                               <span>
                                 I confirm that I have read and understood G12
-                                Free Zone's{' '}
+                                Free Zone's{" "}
                                 <a
                                   href="https://meydanfz.ae/terms-and-conditions"
                                   target="_blank"
@@ -963,8 +1043,8 @@ export function CostCalculatorPage() {
                                   className="underline"
                                 >
                                   Terms
-                                </a>{' '}
-                                and{' '}
+                                </a>{" "}
+                                and{" "}
                                 <a
                                   href="https://meydanfz.ae/privacy-policy"
                                   target="_blank"
@@ -972,20 +1052,20 @@ export function CostCalculatorPage() {
                                   className="underline"
                                 >
                                   Privacy Policy
-                                </a>{' '}
+                                </a>{" "}
                                 and consent to the processing of my personal
                                 data for the purposes of communication and
                                 service delivery. I agree to be contacted via
                                 email, phone, or WhatsApp. I acknowledge that
-                                G12 Free Zone operates 24/7 and that contact
-                                may occur outside standard business hours,
-                                including after 6:00 PM UAE time. I further
-                                acknowledge that G12 Free Zone will never
-                                request passwords, one-time passcodes (OTPs), or
-                                payments to personal or unknown bank accounts
-                                and that I should verify any suspicious or
-                                unexpected communication by calling 800 FZ1 (800
-                                391) before taking any action.
+                                G12 Free Zone operates 24/7 and that contact may
+                                occur outside standard business hours, including
+                                after 6:00 PM UAE time. I further acknowledge
+                                that G12 Free Zone will never request passwords,
+                                one-time passcodes (OTPs), or payments to
+                                personal or unknown bank accounts and that I
+                                should verify any suspicious or unexpected
+                                communication by calling 800 FZ1 (800 391)
+                                before taking any action.
                               </span>
                             </label>
                             <FieldError message={errors.consent?.message} />
@@ -1628,200 +1708,200 @@ export function CostCalculatorPage() {
         </section>
 
         <div className="mx-auto max-w-[1280px] space-y-10 px-4 py-10 md:px-6 md:py-16">
-        <AnimatedSection delay={0.04}>
-          <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-            <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
-              <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
-                Who Is This Calculator For?
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                This calculator is built for
-              </p>
-
-              <div className="mt-6 grid gap-3">
-                {calculatorAudience.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-[1.4rem] border border-[#ebf0f6] bg-[#f8fbfe] px-4 py-4 text-sm leading-7 text-[#34465a] md:text-[0.98rem]"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-[#d8e3ef] bg-[linear-gradient(42deg,#d6a456_0%,#ab8134_70%)] px-6 py-7 text-white shadow-[0_28px_65px_rgba(171,129,52,0.28)] md:px-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
-                Ready to estimate
-              </p>
-              <p className="mt-4 text-lg leading-8 text-white/90">
-                Already know your business activity and visa requirements?
-                Get your estimate now. Instant results, no waiting.
-              </p>
-              <CalculateNowLink className="mt-8 border-white/25 bg-white text-[#ab8134] hover:border-white hover:bg-[#fbf4e9]" />
-            </div>
-          </section>
-        </AnimatedSection>
-
-        <AnimatedSection delay={0.08}>
-          <section
-            id="why-trade"
-            className="rounded-[2.2rem] bg-white px-6 py-8  md:px-8"
-          >
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center">
-              <div>
-                <h2 className=" text-[1.9rem] font-semibold leading-tight text-[#111723] md:text-[2.55rem]">
-                  See Exactly What Goes Into Your Dubai Trade License Cost
+          <AnimatedSection delay={0.04}>
+            <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+              <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+                <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
+                  Who Is This Calculator For?
                 </h2>
-                <p className="mt-3 max-w-[38rem] text-sm leading-7 text-slate-500 md:text-base">
-                  Build your setup step by step. Adjust your inputs and watch
-                  your estimate update instantly.
+                <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
+                  This calculator is built for
                 </p>
-                <CalculateNowLink className="mt-6" />
-              </div>
 
-              <div className="rounded-[1.9rem] border border-[#d8e3ef] bg-[linear-gradient(160deg,#f6f9fd_0%,#e7f0fb_100%)] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
-                  The cost calculator covers
-                </p>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {calculatorCoverage.map((item) => (
+                <div className="mt-6 grid gap-3">
+                  {calculatorAudience.map((item) => (
                     <div
                       key={item}
-                      className="rounded-[1.35rem] border border-white/80 bg-white/80 px-4 py-4 text-sm font-medium leading-6 text-[#27384a]"
+                      className="rounded-[1.4rem] border border-[#ebf0f6] bg-[#f8fbfe] px-4 py-4 text-sm leading-7 text-[#34465a] md:text-[0.98rem]"
                     >
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-          </section>
-        </AnimatedSection>
 
-        <AnimatedSection delay={0.12}>
-          <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
-            <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
-              <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
-                Why Your Trade License Cost Depends on Your Setup
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                No two setups are the same and neither are the costs. Your
-                total depends on how you configure your company.
-              </p>
-
-              <div className="mt-5 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5">
-                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#ab8134]">
-                  Your estimate will change based on:
+              <div className="rounded-[2rem] border border-[#d8e3ef] bg-[linear-gradient(42deg,#d6a456_0%,#ab8134_70%)] px-6 py-7 text-white shadow-[0_28px_65px_rgba(171,129,52,0.28)] md:px-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+                  Ready to estimate
                 </p>
-                <ul className="mt-4 grid gap-3 text-sm leading-7 text-slate-600 md:grid-cols-2 md:text-[0.98rem]">
-                  {setupFactors.map((item) => (
-                    <li
-                      key={item}
-                      className="rounded-[1.2rem] border border-[#e5edf6] bg-white px-4 py-3"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <p className="mt-4 text-lg leading-8 text-white/90">
+                  Already know your business activity and visa requirements? Get
+                  your estimate now. Instant results, no waiting.
+                </p>
+                <CalculateNowLink className="mt-8 border-white/25 bg-white text-[#ab8134] hover:border-white hover:bg-[#fbf4e9]" />
+              </div>
+            </section>
+          </AnimatedSection>
+
+          <AnimatedSection delay={0.08}>
+            <section
+              id="why-trade"
+              className="rounded-[2.2rem] bg-white px-6 py-8  md:px-8"
+            >
+              <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center">
+                <div>
+                  <h2 className=" text-4xl font-semibold leading-14">
+                    See Exactly What Goes Into Your Dubai Trade License Cost
+                  </h2>
+                  <p className="mt-3 max-w-[38rem] text-sm leading-7 text-slate-500 md:text-base">
+                    Build your setup step by step. Adjust your inputs and watch
+                    your estimate update instantly.
+                  </p>
+                  <CalculateNowLink className="mt-6" />
+                </div>
+
+                <div className="rounded-[1.9rem] border border-[#d8e3ef] bg-[linear-gradient(160deg,#f6f9fd_0%,#e7f0fb_100%)] p-6">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
+                    The cost calculator covers
+                  </p>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {calculatorCoverage.map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-[1.35rem] border border-white/80 bg-white/80 px-4 py-4 text-sm font-medium leading-6 text-[#27384a]"
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          </AnimatedSection>
+
+          <AnimatedSection delay={0.12}>
+            <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
+              <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+                <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
+                  Why Your Trade License Cost Depends on Your Setup
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
+                  No two setups are the same and neither are the costs. Your
+                  total depends on how you configure your company.
+                </p>
+
+                <div className="mt-5 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5">
+                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#ab8134]">
+                    Your estimate will change based on:
+                  </p>
+                  <ul className="mt-4 grid gap-3 text-sm leading-7 text-slate-600 md:grid-cols-2 md:text-[0.98rem]">
+                    {setupFactors.map((item) => (
+                      <li
+                        key={item}
+                        className="rounded-[1.2rem] border border-[#e5edf6] bg-white px-4 py-3"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <p className="mt-5 text-sm leading-7 text-slate-500 md:text-base">
+                  That's why this cost calculator lets you test different setups
+                  and compare scenarios, so you can see exactly how each
+                  decision impacts your cost before you commit.
+                </p>
+                <CalculateNowLink className="mt-6" />
               </div>
 
-              <p className="mt-5 text-sm leading-7 text-slate-500 md:text-base">
-                That's why this cost calculator lets you test different setups
-                and compare scenarios, so you can see exactly how each decision
-                impacts your cost before you commit.
-              </p>
-              <CalculateNowLink className="mt-6" />
-            </div>
+              <div className="rounded-[2rem] bg-[linear-gradient(180deg,#ffffff_0%,#f3f7fb_100%)] px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+                <h2 className=" text-[1.65rem] font-semibold leading-tight text-[#111723] md:text-[2rem]">
+                  How Accurate Is This Cost Estimate?
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
+                  The estimate you receive reflects current G12 Free Zone
+                  pricing, standard visa structures, and typical approval
+                  scenarios, so you can plan with confidence.
+                </p>
+                <p className="mt-4 text-sm leading-7 text-slate-500 md:text-base">
+                  Final pricing is confirmed after business activity approval,
+                  immigration clearance, and document verification, and may
+                  adjust depending on changes made during your application. This
+                  cost calculator helps you understand whether your budget
+                  aligns before you speak to an advisor.
+                </p>
+                <CalculateNowLink className="mt-6" />
+              </div>
+            </section>
+          </AnimatedSection>
 
-            <div className="rounded-[2rem] bg-[linear-gradient(180deg,#ffffff_0%,#f3f7fb_100%)] px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
-              <h2 className=" text-[1.65rem] font-semibold leading-tight text-[#111723] md:text-[2rem]">
-                How Accurate Is This Cost Estimate?
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                The estimate you receive reflects current G12 Free Zone
-                pricing, standard visa structures, and typical approval
-                scenarios, so you can plan with confidence.
-              </p>
-              <p className="mt-4 text-sm leading-7 text-slate-500 md:text-base">
-                Final pricing is confirmed after business activity approval,
-                immigration clearance, and document verification, and may
-                adjust depending on changes made during your application.
-                This cost calculator helps you understand whether your budget
-                aligns before you speak to an advisor.
-              </p>
-              <CalculateNowLink className="mt-6" />
-            </div>
-          </section>
-        </AnimatedSection>
+          <AnimatedSection delay={0.16}>
+            <section className="rounded-[2.2rem] px-6 py-8  md:px-8">
+              <div className="max-w-[48rem]">
+                <h2 className=" text-4xl font-semibold leading-14">
+                  What Happens After You Get Your Cost Estimate
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
+                  Your results are generated instantly, giving you a clear view
+                  of the estimated setup structure before you make a decision.
+                </p>
+              </div>
 
-        <AnimatedSection delay={0.16}>
-          <section className="rounded-[2.2rem] bg-white px-6 py-8  md:px-8">
-            <div className="max-w-[48rem]">
-              <h2 className=" text-[1.9rem] font-semibold leading-tight text-[#111723] md:text-[2.55rem]">
-                What Happens After You Get Your Cost Estimate
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                Your results are generated instantly, giving you a clear view of
-                the estimated setup structure before you make a decision.
-              </p>
-            </div>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              {nextSteps.map((item, index) => (
-                <div
-                  key={item}
-                  className="rounded-[1.7rem] border border-[#dfe7f0] bg-[linear-gradient(180deg,#fbfdff_0%,#f1f6fb_100%)] px-5 py-5"
-                >
-                  <div className="text-[2rem] font-semibold leading-none text-[#ab8134]">
-                    {String(index + 1).padStart(2, "0")}
+              <div className="mt-6 grid gap-4 md:grid-cols-3">
+                {nextSteps.map((item, index) => (
+                  <div
+                    key={item}
+                    className="rounded-[1.7rem] border border-[#dfe7f0] bg-[linear-gradient(180deg,#fbfdff_0%,#f1f6fb_100%)] px-5 py-5"
+                  >
+                    <div className="text-[2rem] font-semibold leading-none text-[#ab8134]">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                    <p className="mt-4 text-sm leading-7 text-slate-600 md:text-[0.98rem]">
+                      {item}
+                    </p>
                   </div>
-                  <p className="mt-4 text-sm leading-7 text-slate-600 md:text-[0.98rem]">
-                    {item}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            <div className="mt-6 flex flex-col gap-4 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5 md:flex-row md:items-center md:justify-between">
-              <p className="max-w-[42rem] text-sm leading-7 text-slate-500 md:text-base">
-                Not ready to commit? No problem. Many founders use this
-                estimate purely to compare options before making a decision.
-              </p>
-              <CalculateNowLink />
-            </div>
-          </section>
-        </AnimatedSection>
+              <div className="mt-6 flex flex-col gap-4 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5 md:flex-row md:items-center md:justify-between">
+                <p className="max-w-[42rem] text-sm leading-7 text-slate-500 md:text-base">
+                  Not ready to commit? No problem. Many founders use this
+                  estimate purely to compare options before making a decision.
+                </p>
+                <CalculateNowLink />
+              </div>
+            </section>
+          </AnimatedSection>
 
-        <AnimatedSection delay={0.2}>
-          <section
-            id="cc-faq"
-            className="rounded-[2.2rem] bg-white px-6 py-8 md:px-8"
-          >
-            <div className="max-w-[46rem]">
-              <h2 className=" text-[1.9rem] font-semibold leading-tight text-[#111723] md:text-[2.55rem]">
-                Common Questions Founders Ask Before Checking Trade License
-                Costs
-              </h2>
-            </div>
+          <AnimatedSection delay={0.2}>
+            <section
+              id="cc-faq"
+              className="rounded-[2.2rem] bg-white px-6 py-8 md:px-8"
+            >
+              <div className="max-w-2xl">
+                <h2 className=" text-4xl font-semibold leading-14">
+                  Common Questions Founders Ask Before Checking Trade License
+                  Costs
+                </h2>
+              </div>
 
-            <div className="mt-6 space-y-4">
-              {faqItems.map((item, index) => (
-                <FaqAccordionItem
-                  key={item.question}
-                  question={item.question}
-                  answer={item.answer}
-                  isOpen={openFaqIndex === index}
-                  onToggle={() =>
-                    setOpenFaqIndex((current) =>
-                      current === index ? -1 : index,
-                    )
-                  }
-                />
-              ))}
-            </div>
-          </section>
-        </AnimatedSection>
+              <div className="mt-6 space-y-4">
+                {faqItems.map((item, index) => (
+                  <FaqAccordionItem
+                    key={item.question}
+                    question={item.question}
+                    answer={item.answer}
+                    isOpen={openFaqIndex === index}
+                    onToggle={() =>
+                      setOpenFaqIndex((current) =>
+                        current === index ? -1 : index,
+                      )
+                    }
+                  />
+                ))}
+              </div>
+            </section>
+          </AnimatedSection>
         </div>
       </main>
 
