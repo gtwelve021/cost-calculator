@@ -1,9 +1,9 @@
 import heroBackgroundArtwork from '../assets/69aa70ff69eeb157659c4cf4_cc-hero-bg.webp'
-import launchLicenseArtwork from '../assets/artwork/license-launch.svg'
-import growthLicenseArtwork from '../assets/artwork/license-growth.svg'
-import investorVisaArtwork from '../assets/artwork/visa-investor.svg'
-import employeeVisaArtwork from '../assets/artwork/visa-employee.svg'
-import dependentVisaArtwork from '../assets/artwork/visa-dependent.svg'
+import fawriLicenseArtwork from '../assets/artwork/b2c-fawri.webp'
+import regularLicenseArtwork from '../assets/artwork/b2c-regular.webp'
+import investorVisaArtwork from '../assets/artwork/investor-visa.webp'
+import employeeVisaArtwork from '../assets/artwork/employee-visa.webp'
+import dependentVisaArtwork from '../assets/artwork/depentent-visa.webp'
 import type {
   AddOnGroup,
   AddOnOption,
@@ -105,7 +105,7 @@ export const licenseOptions: LicenseOption[] = [
       'It is ideal for independent operators, consultants, and lean teams who need a streamlined Dubai setup with room to grow later.',
     ],
     basePrice: 11500,
-    image: launchLicenseArtwork,
+    image: fawriLicenseArtwork,
     selectLabel: 'Select Fawri License',
   },
   {
@@ -121,7 +121,7 @@ export const licenseOptions: LicenseOption[] = [
       'It supports multi-partner setups, broader operating models, and long-term expansion with a more tailored business presence in Dubai.',
     ],
     basePrice: 12500,
-    image: growthLicenseArtwork,
+    image: regularLicenseArtwork,
     selectLabel: 'Select Regular License',
   },
 ]

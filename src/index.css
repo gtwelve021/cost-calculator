@@ -162,6 +162,10 @@ a {
   padding: 8px 0 !important;
 }
 
+.react-tel-input .country-list .search-box {
+  border: 0px !important;
+}
+
 .phone-field .search-box,
 .phone-field__search {
   width: calc(100% - 16px) !important;

@@ -34,36 +34,38 @@ export function ModalShell({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.97 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="w-full max-w-lg overflow-hidden rounded-[2rem] bg-white shadow-[0_28px_70px_rgba(15,20,34,0.28)]"
+            className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-[0_28px_70px_rgba(15,20,34,0.28)]"
             role="dialog"
             aria-modal="true"
             aria-label={title}
           >
-            <div className="flex items-center justify-between gap-4 px-6 pt-6">
+            <div className="flex items-center justify-end gap-4 px-6 pt-6">
               <button
                 type="button"
                 onClick={onClose}
-                className="grid h-11 w-11 place-items-center rounded-full border border-[#e4e8ef] text-slate-500 transition hover:border-[#cad2de] hover:text-[#111723]"
+                className="grid h-10 w-10 place-items-center rounded-full border border-[#e4e8ef] text-slate-500 transition hover:border-[#cad2de] hover:text-[#111723]"
                 aria-label="Close modal"
               >
                 <X size={18} />
               </button>
             </div>
-      
-            <div className="max-h-[72vh] overflow-y-auto px-6 pb-6 pt-4">
+
+            <div className="max-h-[72vh] overflow-y-auto px-6 pb-10 pt-4">
               {imageSrc ? (
                 <img
                   src={imageSrc}
                   alt={imageAlt ?? title}
-                  className="mb-5 h-60 w-full rounded-[1.5rem] border border-[#edf1f7] object-cover"
+                  className="h-60 w-full rounded-[1.5rem] border border-[#edf1f7] object-cover"
                 />
               ) : null}
             </div>
-                  <h2 className="text-[1.55rem] font-semibold text-[#111723]">
+            <h2 className="px-6 pb-2 text-xl font-semibold">
               {title}
             </h2>
-            <div className="space-y-4 text-[1rem] leading-8 text-slate-600">
-              {children}
+            <div className="px-6 pb-6 pt-2 overflow-auto h-36">
+              <div className="space-y-4 text-sm leading-6 font-normal text-slate-600">
+                {children}
+              </div>
             </div>
             {footer ? (
               <div className="border-t border-[#eef2f6] px-6 py-5">

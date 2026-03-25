@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,
+  CheckCheck,
   CircleAlert,
   Minus,
   Plus,
@@ -21,7 +22,6 @@ import {
 import PhoneInput from "react-phone-input-2";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
-import { AnimatedSection } from "../components/AnimatedSection";
 import {
   ModalAction,
   ModalShell,
@@ -204,10 +204,8 @@ function SectionHeading({
 }) {
   return (
     <div className="space-y-3">
-      <div className="space-y-2">
-        <h2 className=" text-2xl font-semibold leading-tight mb-2">{title}</h2>
-        <p className="text-sm leading-7 text-gray-600">{description}</p>
-      </div>
+      <h2 className=" text-2xl font-semibold leading-tight mb-2">{title}</h2>
+      <p className="text-sm leading-7 text-gray-600">{description}</p>
     </div>
   );
 }
@@ -244,7 +242,9 @@ function CounterField({
     <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="text-lg font-semibold text-[#111723]">{label}</h3>
+          <h3 className="text-base font-semibold text-gray-900 leading-12">
+            {label}
+          </h3>
           <p className="mt-1 max-w-[24rem] text-sm leading-6 text-slate-500">
             {description}
           </p>
@@ -254,18 +254,18 @@ function CounterField({
           <button
             type="button"
             onClick={() => onChange(Math.max(min, value - 1))}
-            className="grid h-10 w-10 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+            className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
             aria-label={`Decrease ${label}`}
           >
             <Minus size={16} />
           </button>
-          <span className="min-w-[2ch] text-center text-lg font-semibold text-[#111723]">
+          <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
             {value}
           </span>
           <button
             type="button"
             onClick={() => onChange(Math.min(max, value + 1))}
-            className="brand-gradient brand-gradient-hover grid h-10 w-10 place-items-center rounded-full"
+            className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
             aria-label={`Increase ${label}`}
           >
             <Plus size={16} />
@@ -278,60 +278,54 @@ function CounterField({
 
 function CategoryCard({
   category,
-  preview,
   selectedCount,
   onOpen,
 }: {
   category: BusinessActivityCategory;
-  preview: string[];
   selectedCount: number;
   onOpen: () => void;
 }) {
+  const selected = selectedCount > 0;
+
   return (
-    <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-3">
-          <span
-            className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#111723]"
-            style={{ backgroundColor: category.accent }}
-          >
-            {category.badge}
-          </span>
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-[#111723]">
-              {category.name}
-            </h3>
-            <p className="text-sm leading-6 text-slate-500">
-              {category.description}
-            </p>
-          </div>
+    <div className="w-full snap-start rounded-2xl border border-[#e2e9f2] bg-white p-5 shadow-[0_8px_22px_rgba(71,103,136,0.08)] transition hover:shadow-[0_10px_28px_rgba(71,103,136,0.12)]">
+      <div className="flex items-start justify-between gap-3">
+        <div
+          className="grid h-11 w-11 place-items-center rounded-xl text-sm font-semibold text-[#2f4863]"
+          style={{ backgroundColor: category.accent }}
+        >
+          {category.badge}
         </div>
 
-        <div className="rounded-full bg-[#f6eee0] px-3 py-2 text-xs font-semibold text-[#ab8134]">
-          {selectedCount} selected
+        <div
+          className={cn(
+            "grid h-7 w-7 place-items-center rounded-lg border text-xs",
+            selected
+              ? "border-[#1473e6] bg-[#1473e6] text-white"
+              : "border-[#cfd9e6] bg-white text-transparent",
+          )}
+          aria-hidden="true"
+        >
+          ✓
         </div>
-      </div>
-
-      <div className="mt-5 min-h-[5rem] rounded-[1.4rem] bg-[#f8fbfe] px-4 py-3">
-        {preview.length > 0 ? (
-          <div className="space-y-2 text-sm text-slate-600">
-            {preview.map((item) => (
-              <p key={item}>{item}</p>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm leading-6 text-slate-500">
-            No activities selected in this group yet.
-          </p>
-        )}
       </div>
 
       <button
         type="button"
         onClick={onOpen}
-        className="mt-5 inline-flex w-full items-center justify-center rounded-full border border-[#d8e1eb] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:border-[#bfd0e3] hover:bg-[#f5f8fc]"
+        className="mt-5 w-full text-left"
       >
-        Explore {category.name} activities
+        <h3 className="text-sm leading-none font-semibold">
+          {category.name}
+        </h3>
+        <div className="mt-3 flex items-center justify-between text-sm text-[#4f5f72]">
+          <span>
+            {selected
+              ? `${selectedCount} selected`
+              : "Select your activity"}
+          </span>
+          <ArrowRight size={16} className="rotate-[-27deg] text-[#111723]" />
+        </div>
       </button>
     </div>
   );
@@ -373,7 +367,7 @@ function FaqAccordionItem({
         <span className="text-base font-semibold text-[#111723] md:text-lg">
           {question}
         </span>
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f6eee0] text-[#ab8134]">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f6eee0] text-[#ab8134]">
           {isOpen ? <Minus size={16} /> : <Plus size={16} />}
         </span>
       </button>
@@ -434,6 +428,9 @@ export function CostCalculatorPage() {
   );
   const [shareholderCount, setShareholderCount] = useState(
     initialState.shareholderCount,
+  );
+  const [shareholderCounterSelected, setShareholderCounterSelected] = useState(
+    initialState.shareholderCount > 1,
   );
   const [selectedActivityIds, setSelectedActivityIds] = useState<string[]>(
     initialState.selectedActivityIds,
@@ -1028,14 +1025,13 @@ export function CostCalculatorPage() {
                                 className="mt-0.5 h-4 w-4 rounded border-[#b9c7d7] text-[#ab8134]"
                                 aria-label="Terms and privacy policy"
                               />
-                              <span>
-                                I confirm that I have read and understood G12
+                              <span className="consent-text">
+                                I confirm that I have read and understood Meydan
                                 Free Zone's{" "}
                                 <a
                                   href="https://meydanfz.ae/terms-and-conditions"
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="underline"
                                 >
                                   Terms
                                 </a>{" "}
@@ -1044,7 +1040,6 @@ export function CostCalculatorPage() {
                                   href="https://meydanfz.ae/privacy-policy"
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="underline"
                                 >
                                   Privacy Policy
                                 </a>{" "}
@@ -1052,14 +1047,16 @@ export function CostCalculatorPage() {
                                 data for the purposes of communication and
                                 service delivery. I agree to be contacted via
                                 email, phone, or WhatsApp. I acknowledge that
-                                G12 Free Zone operates 24/7 and that contact may
-                                occur outside standard business hours, including
-                                after 6:00 PM UAE time. I further acknowledge
-                                that G12 Free Zone will never request passwords,
-                                one-time passcodes (OTPs), or payments to
-                                personal or unknown bank accounts and that I
-                                should verify any suspicious or unexpected
-                                communication by calling 800 FZ1 (800 391)
+                                Meydan Free Zone operates 24/7 and that contact
+                                may occur outside standard business hours,
+                                including after 6:00 PM UAE time.
+                                <br />
+                                <br />I further acknowledge that Meydan Free
+                                Zone will never request passwords, one-time
+                                passcodes (OTPs), or payments to personal or
+                                unknown bank accounts and that I should verify
+                                any suspicious or unexpected communication by
+                                calling <strong>800 FZ1 (800 391)</strong>{" "}
                                 before taking any action.
                               </span>
                             </label>
@@ -1080,7 +1077,7 @@ export function CostCalculatorPage() {
                     <button
                       type="submit"
                       disabled={isUnlocking}
-                      className="brand-gradient brand-gradient-hover gap-3 inline-flex items-center justify-center rounded-full px-6 py-4 text-base font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+                      className="brand-gradient brand-gradient-hover gap-3 inline-flex items-center justify-center rounded-full px-6 py-3 text-base font-semibold disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isUnlocking ? "Unlocking calculator..." : "Calculate"}{" "}
                       <ArrowRight size={18} />
@@ -1089,7 +1086,7 @@ export function CostCalculatorPage() {
                     <p
                       className={cn(
                         "text-sm",
-                        calculatorUnlocked ? "text-gray-600" : "text-green-600",
+                        calculatorUnlocked ? "text-green-600" : "text-gray-600",
                       )}
                     >
                       {calculatorUnlocked
@@ -1098,471 +1095,596 @@ export function CostCalculatorPage() {
                     </p>
                   </form>
 
-                  <AnimatedSection delay={0.02}>
-                    <div ref={licenseSectionRef} className="scroll-mt-24">
-                      <SectionHeading
-                        title="Pick From Two Powerful Business License Options"
-                        description="Choose the setup that aligns with your goals."
-                      />
+                  {calculatorUnlocked ? (
+                    <>
+                      <div
+                        ref={licenseSectionRef}
+                        className="relative scroll-mt-24"
+                      >
+                        <SectionHeading
+                          title="Pick From Two Powerful Business License Options"
+                          description="Choose the setup that aligns with your goals."
+                        />
 
-                      <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                        {licenseOptions.map((license) => {
-                          const selected = selectedLicenseId === license.id;
+                        <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                          {licenseOptions.map((license) => {
+                            const selected = selectedLicenseId === license.id;
 
-                          return (
-                            <div
-                              key={license.id}
-                              role="button"
-                              tabIndex={0}
-                              onClick={() => {
-                                setShowSuccess(false);
-                                setSelectedLicenseId(license.id);
-                              }}
-                              onKeyDown={(
-                                event: ReactKeyboardEvent<HTMLDivElement>,
-                              ) => {
-                                if (
-                                  event.key === "Enter" ||
-                                  event.key === " "
-                                ) {
-                                  event.preventDefault();
+                            return (
+                              <div
+                                key={license.id}
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => {
                                   setShowSuccess(false);
                                   setSelectedLicenseId(license.id);
-                                }
-                              }}
-                              className={cn(
-                                "cursor-pointer overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#eddcbf] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                selected
-                                  ? "border-[#ab8134] ring-2 ring-[#eddcbf]"
-                                  : "border-[#e6ebf2]",
-                              )}
-                            >
-                              <div className="w-full overflow-hidden rounded-2xl aspect-[286/386]">
-                                <img
-                                  src={license.image}
-                                  alt={license.name}
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                              <div className="pt-5 flex flex-col gap-4">
-                                <div className="flex items-center justify-between">
-                                  <h3 className="text-base font-semibold text-gray-900 leading-12">
-                                    {license.name}
-                                  </h3>
-                                  <span className="p-2 text-xs font-medium">
-                                    {license.timeline}
-                                  </span>
-                                </div>
-
-                                <p className="text-sm font-normal leading-12 text-gray-600">
-                                  {license.description}
-                                </p>
-
-                                <div className="mt-2 flex items-center justify-between">
-                                  <button
-                                    type="button"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      setLicenseModalId(license.id);
-                                    }}
-                                    className="text-xs font-medium text-[#7F98A8] flex items-center gap-1 p-1"
-                                    aria-label={`Learn more about ${license.name}`}
-                                  >
-                                    Learn More <ArrowRight size={12} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setShowSuccess(false);
-                                      setSelectedLicenseId(license.id);
-                                    }}
-                                    className={cn(
-                                      "px-6 py-3 rounded-full",
-                                      selected
-                                        ? "bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                        : "bg-white/70 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                    )}
-                                  >
-                                    {selected ? "Selected" : "Select"}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                        <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                          <h3 className="text-lg font-semibold text-[#111723]">
-                            License Duration
-                          </h3>
-                          <p className="mt-2 text-sm leading-6 text-slate-500">
-                            Extend your setup duration. The additional cost
-                            follows G12's multi-year pricing grid.
-                          </p>
-                          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                            {[1, 2, 3, 4, 5, 6].map((year) => {
-                              const selected = durationYears === year;
-
-                              return (
-                                <button
-                                  key={year}
-                                  type="button"
-                                  onClick={() => {
+                                }}
+                                onKeyDown={(
+                                  event: ReactKeyboardEvent<HTMLDivElement>,
+                                ) => {
+                                  if (
+                                    event.key === "Enter" ||
+                                    event.key === " "
+                                  ) {
+                                    event.preventDefault();
                                     setShowSuccess(false);
-                                    setDurationYears(year);
-                                  }}
-                                  className={cn(
-                                    "rounded-[1.2rem] border px-4 py-3 text-left transition",
-                                    selected
-                                      ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
-                                      : "border-[#d8e1eb] bg-[#fbfcfe] text-[#111723] hover:border-[#bfd0e3]",
-                                  )}
-                                >
-                                  <span className="block text-sm font-semibold">
-                                    {year === 1 ? "1 Year" : `${year} Years`}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        <CounterField
-                          label="Shareholders"
-                          description={`Up to ${pricingConfig.includedShareholders} shareholders are included. Each additional shareholder adds ${formatAed(pricingConfig.extraShareholderFee)}.`}
-                          value={shareholderCount}
-                          min={1}
-                          max={15}
-                          onChange={(value) => {
-                            setShowSuccess(false);
-                            setShareholderCount(value);
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </AnimatedSection>
-
-                  <div ref={activitiesSectionRef} className="scroll-mt-24">
-                    <SectionHeading
-                      title="Choose your business activities"
-                      description={`The first ${pricingConfig.includedActivityCount} activities are included. Each additional activity adds ${formatAed(pricingConfig.extraActivityFee)}.`}
-                    />
-
-                    <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                      <label
-                        htmlFor="activity-search"
-                        className="mb-2 block text-sm font-medium text-[#28394c]"
-                      >
-                        Search activity categories
-                      </label>
-                      <div className="relative">
-                        <Search
-                          size={18}
-                          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                        />
-                        <input
-                          id="activity-search"
-                          value={activityQuery}
-                          onChange={(event) =>
-                            setActivityQuery(event.target.value)
-                          }
-                          className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#ab8134] focus:bg-white"
-                          placeholder="Search categories, activity names, or codes"
-                          aria-label="Search activity categories"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                      {filteredCategories.map((category) => {
-                        const categorySelections = selectedActivities.filter(
-                          (activity) => activity.categoryId === category.id,
-                        );
-                        const preview = categorySelections
-                          .slice(0, 2)
-                          .map((activity) => activity.name);
-
-                        if (categorySelections.length > 2) {
-                          preview.push(
-                            `+${categorySelections.length - 2} more selected`,
-                          );
-                        }
-
-                        return (
-                          <CategoryCard
-                            key={category.id}
-                            category={category}
-                            preview={preview}
-                            selectedCount={categorySelections.length}
-                            onOpen={() => {
-                              setActivityModalQuery("");
-                              setActivityCategoryModalId(category.id);
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <AnimatedSection delay={0.1}>
-                    <div ref={visasSectionRef} className="scroll-mt-24">
-                      <SectionHeading
-                        title="Select your visa requirements"
-                        description="Use the investor toggle and visa counters to reflect who needs residency support. Change of status only applies to applicants already inside the UAE."
-                      />
-
-                      <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                        {visaOptions.map((visa) => {
-                          const isInvestor = visa.id === "investor-visa";
-                          const count =
-                            visa.id === "employee-visa"
-                              ? employeeVisaCount
-                              : visa.id === "dependent-visa"
-                                ? dependentVisaCount
-                                : investorVisaEnabled
-                                  ? 1
-                                  : 0;
-
-                          return (
-                            <div
-                              key={visa.id}
-                              className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
-                            >
-                              <img
-                                src={visa.image}
-                                alt={visa.name}
-                                className="h-36 w-full rounded-[1.4rem] border border-[#edf1f7] bg-[#f8fafc] object-cover p-5"
-                              />
-
-                              <div className="mt-5 flex items-start justify-between gap-4">
-                                <div>
-                                  <h3 className="text-[1.35rem] font-semibold text-[#111723]">
-                                    {visa.name}
-                                  </h3>
-                                  <p className="mt-2 text-sm leading-6 text-slate-500">
-                                    {visa.description}
-                                  </p>
-                                </div>
-                                <div className="rounded-full bg-[#f6eee0] px-3 py-1 text-xs font-semibold text-[#ab8134]">
-                                  {formatAed(visa.fee)}
-                                </div>
-                              </div>
-
-                              <div className="mt-6 flex items-center justify-between gap-4">
-                                <button
-                                  type="button"
-                                  onClick={() => setVisaModalId(visa.id)}
-                                  className="inline-flex items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
-                                  aria-label={`Learn more about ${visa.name}`}
-                                >
-                                  Learn More
-                                </button>
-
-                                {isInvestor ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setShowSuccess(false);
-                                      setInvestorVisaEnabled(
-                                        (current) => !current,
-                                      );
-                                    }}
-                                    className={cn(
-                                      "inline-flex min-w-[9rem] items-center justify-center rounded-full px-4 py-3 text-sm font-semibold transition",
-                                      investorVisaEnabled
-                                        ? "brand-gradient brand-gradient-hover text-white"
-                                        : "border border-[#d7deea] text-[#111723] hover:bg-[#f5f8fc]",
-                                    )}
-                                  >
-                                    {investorVisaEnabled
-                                      ? "Investor Selected"
-                                      : "Add Investor Visa"}
-                                  </button>
-                                ) : (
-                                  <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        visa.id === "employee-visa"
-                                          ? updateEmployeeCount(
-                                              Math.max(
-                                                0,
-                                                employeeVisaCount - 1,
-                                              ),
-                                            )
-                                          : updateDependentCount(
-                                              Math.max(
-                                                0,
-                                                dependentVisaCount - 1,
-                                              ),
-                                            )
-                                      }
-                                      className="grid h-10 w-10 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
-                                      aria-label={`Decrease ${visa.name}`}
-                                    >
-                                      <Minus size={16} />
-                                    </button>
-                                    <span className="min-w-[2ch] text-center text-lg font-semibold text-[#111723]">
-                                      {count}
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        visa.id === "employee-visa"
-                                          ? updateEmployeeCount(
-                                              employeeVisaCount + 1,
-                                            )
-                                          : updateDependentCount(
-                                              dependentVisaCount + 1,
-                                            )
-                                      }
-                                      className="brand-gradient brand-gradient-hover grid h-10 w-10 place-items-center rounded-full"
-                                      aria-label={`Increase ${visa.name}`}
-                                    >
-                                      <Plus size={16} />
-                                    </button>
-                                  </div>
+                                    setSelectedLicenseId(license.id);
+                                  }
+                                }}
+                                className={cn(
+                                  "cursor-pointer overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#eddcbf] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                  selected
+                                    ? "border-[#ab8134] ring-2 ring-[#eddcbf]"
+                                    : "border-[#e6ebf2]",
                                 )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {totalVisaApplicants > 0 ? (
-                        <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                          <CounterField
-                            label="Applicants Inside the UAE"
-                            description={`Only applicants inside the UAE incur the ${formatAed(pricingConfig.changeStatusInsideFee)} change-of-status fee.`}
-                            value={applicantsInsideUae}
-                            min={0}
-                            max={totalVisaApplicants}
-                            onChange={updateApplicantsInside}
-                          />
-
-                          <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                            <h3 className="text-lg font-semibold text-[#111723]">
-                              Change of Status Summary
-                            </h3>
-                            <div className="mt-4 space-y-3 text-sm text-slate-600">
-                              <div className="flex items-center justify-between gap-4">
-                                <span>Total visa applicants</span>
-                                <span className="font-semibold text-[#111723]">
-                                  {totalVisaApplicants}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between gap-4">
-                                <span>Applicants outside the UAE</span>
-                                <span className="font-semibold text-[#111723]">
-                                  {Math.max(
-                                    0,
-                                    totalVisaApplicants - applicantsInsideUae,
-                                  )}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between gap-4">
-                                <span>Applicants inside the UAE</span>
-                                <span className="font-semibold text-[#111723]">
-                                  {applicantsInsideUae}
-                                </span>
-                              </div>
-                              <div className="border-t border-[#eef2f6] pt-3">
-                                <div className="flex items-center justify-between gap-4 font-semibold text-[#ab8134]">
-                                  <span>Change of status total</span>
-                                  <span>
-                                    {formatAed(quote.changeStatusTotal)}
-                                  </span>
+                              >
+                                <div className="w-full overflow-hidden rounded-2xl aspect-[286/386]">
+                                  <img
+                                    src={license.image}
+                                    alt={license.name}
+                                    className="h-full w-full object-cover"
+                                  />
                                 </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-                  </AnimatedSection>
-                  <AnimatedSection delay={0.14}>
-                    <div ref={addOnsSectionRef} className="scroll-mt-24">
-                      <SectionHeading
-                        title="Add optional G12 services"
-                        description="Choose add-ons in grouped packages. All selections remain local-only and feed directly into the quote sidebar."
-                      />
+                                <div className="pt-5 flex flex-col gap-4">
+                                  <div className="flex items-center justify-between">
+                                    <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                      {license.name}
+                                    </h3>
+                                    <span className="p-2 text-xs font-medium">
+                                      {license.timeline}
+                                    </span>
+                                  </div>
 
-                      <div className="mt-6 space-y-5">
-                        {addOnGroups.map((group) => {
-                          const groupItems = addOnOptions.filter(
-                            (item) => item.groupId === group.id,
-                          );
-
-                          return (
-                            <div
-                              key={group.id}
-                              className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
-                            >
-                              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                                <div>
-                                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
-                                    {group.name}
+                                  <p className="text-sm font-normal leading-12 text-gray-600">
+                                    {license.description}
                                   </p>
-                                  <h3 className="mt-2 text-[1.45rem] font-semibold text-[#111723]">
-                                    {group.name}
-                                  </h3>
-                                  <p className="mt-2 max-w-[42rem] text-sm leading-7 text-slate-500">
-                                    {group.description}
-                                  </p>
-                                </div>
 
-                                <button
-                                  type="button"
-                                  onClick={() => setAddOnGroupModalId(group.id)}
-                                  className="inline-flex items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
-                                  aria-label={`Learn more about ${group.name}`}
-                                >
-                                  Learn More
-                                </button>
-                              </div>
-
-                              <div className="mt-5 flex flex-wrap gap-3">
-                                {groupItems.map((item) => {
-                                  const selected = selectedAddOnSet.has(
-                                    item.id,
-                                  );
-
-                                  return (
+                                  <div className="mt-2 flex items-center justify-between">
                                     <button
-                                      key={item.id}
                                       type="button"
-                                      onClick={() => toggleAddOn(item.id)}
-                                      aria-pressed={selected}
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        setLicenseModalId(license.id);
+                                      }}
+                                      className="text-xs font-medium text-[#7F98A8] flex items-center gap-1 p-1"
+                                      aria-label={`Learn more about ${license.name}`}
+                                    >
+                                      Learn More <ArrowRight size={12} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setShowSuccess(false);
+                                        setSelectedLicenseId(license.id);
+                                      }}
                                       className={cn(
-                                        "rounded-full border px-4 py-3 text-left text-sm transition",
+                                        "px-6 py-3 rounded-full inline-flex items-center gap-2",
                                         selected
-                                          ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
-                                          : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
+                                          ? "bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                          : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                       )}
                                     >
-                                      <span className="font-semibold">
-                                        {item.name}
-                                      </span>
-                                      <span className="ml-2 text-slate-500">
-                                        {formatAed(item.fee)}
-                                      </span>
-                                      {item.recommended ? (
-                                        <span className="ml-2 rounded-full bg-[#e9f6e5] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5c9151]">
-                                          Recommended
-                                        </span>
-                                      ) : null}
+                                      {selected ? (
+                                        <>
+                                          <CheckCheck
+                                            size={16}
+                                            aria-hidden="true"
+                                          />{" "}
+                                          Selected
+                                        </>
+                                      ) : (
+                                        "Select"
+                                      )}
                                     </button>
-                                  );
-                                })}
+                                  </div>
+                                </div>
                               </div>
+                            );
+                          })}
+                        </div>
+
+                        <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                          <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                            <h3 className="text-base font-semibold text-gray-900 leading-12">
+                              Duration of Business License
+                            </h3>
+                            <div className="mt-5 flex flex-wrap gap-3">
+                              {[1, 2, 3, 4, 5, 6].map((year) => {
+                                const selected = durationYears === year;
+
+                                return (
+                                  <button
+                                    key={year}
+                                    type="button"
+                                    onClick={() => {
+                                      setShowSuccess(false);
+                                      setDurationYears(year);
+                                    }}
+                                    className={cn(
+                                      "rounded-full border px-5 py-3 text-left transition shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                      selected
+                                        ? "  brand-gradient brand-gradient-hover text-white"
+                                        : " bg-[#fbfcfe] text-[#111723] ",
+                                    )}
+                                  >
+                                    <span className="block text-sm font-semibold transition">
+                                      {selected
+                                        ? year === 1
+                                          ? "1 Year"
+                                          : `${year} Years`
+                                        : year}
+                                    </span>
+                                  </button>
+                                );
+                              })}
                             </div>
-                          );
-                        })}
+
+                            <p className="mt-7 text-xs leading-4 text-gray-400">
+                              * Discounts available on multi-year licenses
+                            </p>
+                          </div>
+
+                          <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                            <h3 className="text-base font-semibold text-gray-900 leading-12">
+                              Number of Shareholders
+                            </h3>
+
+                            <div
+                              className={cn(
+                                "mt-5 flex items-center gap-3",
+                                shareholderCounterSelected
+                                  ? "justify-between"
+                                  : "justify-end",
+                              )}
+                            >
+                              {shareholderCounterSelected ? (
+                                <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowSuccess(false);
+                                      setShareholderCount(
+                                        Math.max(1, shareholderCount - 1),
+                                      );
+                                    }}
+                                    className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+                                    aria-label="Decrease Shareholders"
+                                  >
+                                    <Minus size={16} />
+                                  </button>
+                                  <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
+                                    {shareholderCount}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowSuccess(false);
+                                      setShareholderCount(
+                                        Math.min(15, shareholderCount + 1),
+                                      );
+                                    }}
+                                    className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
+                                    aria-label="Increase Shareholders"
+                                  >
+                                    <Plus size={16} />
+                                  </button>
+                                </div>
+                              ) : null}
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setShowSuccess(false);
+                                  setShareholderCounterSelected(true);
+                                }}
+                                className={cn(
+                                  "px-6 py-3 rounded-full inline-flex items-center gap-2",
+                                  shareholderCounterSelected
+                                    ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                    : " bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                )}
+                              >
+                                {shareholderCounterSelected ? (
+                                  <>
+                                    <CheckCheck size={16} aria-hidden="true" />
+                                    Selected
+                                  </>
+                                ) : (
+                                  "Select"
+                                )}
+                              </button>
+                            </div>
+
+                            <p className="mt-7 text-xs leading-4 text-gray-400">
+                              * Includes {pricingConfig.includedShareholders}{" "}
+                              shareholders;{" "}
+                              {formatAed(pricingConfig.extraShareholderFee)} for
+                              each additional.
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </AnimatedSection>
+                      <div
+                        ref={activitiesSectionRef}
+                        className="relative scroll-mt-24 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
+                      >
+                        <SectionHeading
+                          title="Select Your Business Activities"
+                          description={`Choose business activities from 2,500+ options.`}
+                        />
+                        <div className="mt-8 flex items-start gap-3 rounded-xl border border-[#d9e8f8] bg-[#eaf4ff] px-4 py-3 text-[#2d68a6]">
+                          <span className="mt-0.5 rounded-lg bg-[#2a4bcf] p-1.5 text-white">
+                            <CircleAlert size={14} />
+                          </span>
+                          <p className="text-xs font-semibold leading-6">
+                            You get 3 business activity groups included with
+                            your license at no cost. Any additional activities
+                            will incur a charge of AED 1,000 each.
+                          </p>
+                        </div>
+                        <div className="mt-6 rounded-xl border border-[#e1e8f1] bg-white px-5 py-4 shadow-[0_8px_22px_rgba(71,103,136,0.08)]">
+                          <label
+                            htmlFor="activity-search"
+                            className="mb-2 block text-sm font-medium text-[#28394c]"
+                          >
+                            Search business activity group
+                          </label>
+                          <div className="relative">
+                            <Search
+                              size={18}
+                              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                            />
+                            <input
+                              id="activity-search"
+                              value={activityQuery}
+                              onChange={(event) =>
+                                setActivityQuery(event.target.value)
+                              }
+                              className="w-full rounded-[1rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#1473e6] focus:bg-white"
+                              placeholder="Search business activity group"
+                              aria-label="Search activity categories"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-6 rounded-2xl border border-[#dbe6f3] bg-[#eaf3fb] p-2">
+                          <div className="grid grid-flow-col grid-rows-2 auto-cols-[12rem] gap-2 overflow-x-auto pb-2 pr-2">
+                          {filteredCategories.map((category) => {
+                            const categorySelections =
+                              selectedActivities.filter(
+                                (activity) =>
+                                  activity.categoryId === category.id,
+                              );
+
+                            return (
+                              <CategoryCard
+                                key={category.id}
+                                category={category}
+                                selectedCount={categorySelections.length}
+                                onOpen={() => {
+                                  setActivityModalQuery("");
+                                  setActivityCategoryModalId(category.id);
+                                }}
+                              />
+                            );
+                          })}
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        ref={visasSectionRef}
+                        className="relative scroll-mt-24"
+                      >
+                        <SectionHeading
+                          title="Please Select Your Visa Type"
+                          description="Choose the visa types you need, for yourself, your team, or your dependents."
+                        />
+
+                        <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                          {visaOptions.map((visa) => {
+                            const isInvestor = visa.id === "investor-visa";
+                            const count =
+                              visa.id === "employee-visa"
+                                ? employeeVisaCount
+                                : visa.id === "dependent-visa"
+                                  ? dependentVisaCount
+                                  : investorVisaEnabled
+                                    ? 1
+                                    : 0;
+
+                            return (
+                              <div
+                                key={visa.id}
+                                className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#eddcbf] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] border-[#e6ebf2]"
+                              >
+                                <div className="w-full overflow-hidden rounded-2xl">
+                                  <img
+                                    src={visa.image}
+                                    alt={visa.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                </div>
+
+                                <div className="mt-5 mb-2 flex items-start justify-between gap-4">
+                                  <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                    {visa.name}
+                                  </h3>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => setVisaModalId(visa.id)}
+                                    className="text-xs font-medium flex items-center gap-1 p-1"
+                                    aria-label={`Learn more about ${visa.name}`}
+                                  >
+                                    Learn More{" "}
+                                    <ArrowRight
+                                      size={16}
+                                      className="rotate-[-27deg]"
+                                    />
+                                  </button>
+                                </div>
+                                <p className="text-xs font-normal leading-12 text-gray-600">
+                                  {visa.description}
+                                </p>
+                                <div className="mt-6 flex items-center justify-end gap-4">
+                                  {isInvestor ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setShowSuccess(false);
+                                        setInvestorVisaEnabled(
+                                          (current) => !current,
+                                        );
+                                      }}
+                                      className={cn(
+                                        "inline-flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                        investorVisaEnabled
+                                          ? "shadow-[0_10px_24px_rgba(20,115,230,0.18)]"
+                                          : "hover:bg-white",
+                                      )}
+                                      aria-label="Toggle Investor Visa"
+                                    >
+                                      <span className="">
+                                        {investorVisaEnabled ? "Yes" : "No"}
+                                      </span>
+                                      <span
+                                        className={cn(
+                                          "relative grid h-7 w-[3.2rem] place-items-center rounded-full transition ",
+                                          investorVisaEnabled
+                                            ? "brand-gradient brand-gradient-hover"
+                                            : "bg-white",
+                                        )}
+                                      >
+                                        <span
+                                          className={cn(
+                                            "h-5 w-5 rounded-full bg-white shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] transition-transform",
+                                            investorVisaEnabled
+                                              ? "translate-x-[0.7rem]"
+                                              : "-translate-x-[0.7rem]",
+                                          )}
+                                        />
+                                      </span>
+                                    </button>
+                                  ) : (
+                                    <div
+                                      className={cn(
+                                        "flex w-full items-center gap-3",
+                                        count > 0
+                                          ? "justify-between"
+                                          : "justify-end",
+                                      )}
+                                    >
+                                      {count > 0 ? (
+                                        <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              visa.id === "employee-visa"
+                                                ? updateEmployeeCount(
+                                                    Math.max(
+                                                      0,
+                                                      employeeVisaCount - 1,
+                                                    ),
+                                                  )
+                                                : updateDependentCount(
+                                                    Math.max(
+                                                      0,
+                                                      dependentVisaCount - 1,
+                                                    ),
+                                                  )
+                                            }
+                                            className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+                                            aria-label={`Decrease ${visa.name}`}
+                                          >
+                                            <Minus size={16} />
+                                          </button>
+                                          <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
+                                            {count}
+                                          </span>
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              visa.id === "employee-visa"
+                                                ? updateEmployeeCount(
+                                                    employeeVisaCount + 1,
+                                                  )
+                                                : updateDependentCount(
+                                                    dependentVisaCount + 1,
+                                                  )
+                                            }
+                                            className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
+                                            aria-label={`Increase ${visa.name}`}
+                                          >
+                                            <Plus size={16} />
+                                          </button>
+                                        </div>
+                                      ) : null}
+
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowSuccess(false);
+                                          if (visa.id === "employee-visa") {
+                                            updateEmployeeCount(
+                                              count > 0 ? 0 : 1,
+                                            );
+                                          } else {
+                                            updateDependentCount(
+                                              count > 0 ? 0 : 1,
+                                            );
+                                          }
+                                        }}
+                                        className={cn(
+                                          "px-6 py-3 rounded-full inline-flex items-center gap-2",
+                                          count > 0
+                                            ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                            : " bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                        )}
+                                        aria-label={
+                                          count > 0
+                                            ? `Select ${visa.name}`
+                                            : `Select ${visa.name}`
+                                        }
+                                      >
+                                        {count > 0 ? (
+                                          <>
+                                            <CheckCheck
+                                              size={16}
+                                              aria-hidden="true"
+                                            />
+                                            Selected
+                                          </>
+                                        ) : (
+                                          "Select"
+                                        )}
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {totalVisaApplicants > 0 ? (
+                          <div className="mt-6">
+                            <CounterField
+                              label="Applicants Inside the UAE"
+                              description={`Only applicants inside the UAE incur the ${formatAed(pricingConfig.changeStatusInsideFee)} change-of-status fee.`}
+                              value={applicantsInsideUae}
+                              min={0}
+                              max={totalVisaApplicants}
+                              onChange={updateApplicantsInside}
+                            />
+                          </div>
+                        ) : null}
+                      </div>
+                      <div
+                        ref={addOnsSectionRef}
+                        className="relative scroll-mt-24"
+                      >
+                        <SectionHeading
+                          title="Add optional G12 services"
+                          description="Choose add-ons in grouped packages. All selections remain local-only and feed directly into the quote sidebar."
+                        />
+
+                        <div className="mt-6 space-y-5">
+                          {addOnGroups.map((group) => {
+                            const groupItems = addOnOptions.filter(
+                              (item) => item.groupId === group.id,
+                            );
+
+                            return (
+                              <div
+                                key={group.id}
+                                className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
+                              >
+                                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                  <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
+                                      {group.name}
+                                    </p>
+                                    <h3 className="mt-2 text-[1.45rem] font-semibold text-[#111723]">
+                                      {group.name}
+                                    </h3>
+                                    <p className="mt-2 max-w-[42rem] text-sm leading-7 text-slate-500">
+                                      {group.description}
+                                    </p>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setAddOnGroupModalId(group.id)
+                                    }
+                                    className="inline-flex items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
+                                    aria-label={`Learn more about ${group.name}`}
+                                  >
+                                    Learn More
+                                  </button>
+                                </div>
+
+                                <div className="mt-5 flex flex-wrap gap-3">
+                                  {groupItems.map((item) => {
+                                    const selected = selectedAddOnSet.has(
+                                      item.id,
+                                    );
+
+                                    return (
+                                      <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => toggleAddOn(item.id)}
+                                        aria-pressed={selected}
+                                        className={cn(
+                                          "rounded-full border px-4 py-3 text-left text-sm transition",
+                                          selected
+                                            ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
+                                            : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
+                                        )}
+                                      >
+                                        <span className="font-semibold">
+                                          {item.name}
+                                        </span>
+                                        <span className="ml-2 text-slate-500">
+                                          {formatAed(item.fee)}
+                                        </span>
+                                        {item.recommended ? (
+                                          <span className="ml-2 rounded-full bg-[#e9f6e5] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5c9151]">
+                                            Recommended
+                                          </span>
+                                        ) : null}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
                 </div>
 
                 <QuoteSidebar
@@ -1571,6 +1693,8 @@ export function CostCalculatorPage() {
                   selectedLicense={selectedLicense}
                   durationYears={durationYears}
                   shareholderCount={shareholderCount}
+                  includedShareholders={pricingConfig.includedShareholders}
+                  extraShareholderFee={pricingConfig.extraShareholderFee}
                   selectedActivities={selectedActivities}
                   selectedAddOns={selectedAddOns}
                   visaOptions={visaOptions}
@@ -1660,200 +1784,190 @@ export function CostCalculatorPage() {
         </section>
 
         <div className="mx-auto max-w-[1280px] space-y-10 px-4 py-10 md:px-6 md:py-16">
-          <AnimatedSection delay={0.04}>
-            <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-              <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
-                <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
-                  Who Is This Calculator For?
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                  This calculator is built for
-                </p>
+          <section className="relative grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+            <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+              <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
+                Who Is This Calculator For?
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
+                This calculator is built for
+              </p>
 
-                <div className="mt-6 grid gap-3">
-                  {calculatorAudience.map((item) => (
+              <div className="mt-6 grid gap-3">
+                {calculatorAudience.map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-[1.4rem] border border-[#ebf0f6] bg-[#f8fbfe] px-4 py-4 text-sm leading-7 text-[#34465a] md:text-[0.98rem]"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-[#d8e3ef] bg-[linear-gradient(42deg,#d6a456_0%,#ab8134_70%)] px-6 py-7 text-white shadow-[0_28px_65px_rgba(171,129,52,0.28)] md:px-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+                Ready to estimate
+              </p>
+              <p className="mt-4 text-lg leading-8 text-white/90">
+                Already know your business activity and visa requirements? Get
+                your estimate now. Instant results, no waiting.
+              </p>
+              <CalculateNowLink className="mt-8 border-white/25 bg-white text-[#ab8134] hover:border-white hover:bg-[#fbf4e9]" />
+            </div>
+          </section>
+
+          <section
+            className="relative rounded-[2.2rem] bg-white px-6 py-8  md:px-8"
+            id="why-trade"
+          >
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center">
+              <div>
+                <h2 className=" text-4xl font-semibold leading-14">
+                  See Exactly What Goes Into Your Dubai Trade License Cost
+                </h2>
+                <p className="mt-3 max-w-[38rem] text-sm leading-7 text-slate-500 md:text-base">
+                  Build your setup step by step. Adjust your inputs and watch
+                  your estimate update instantly.
+                </p>
+                <CalculateNowLink className="mt-6" />
+              </div>
+
+              <div className="rounded-[1.9rem] border border-[#d8e3ef] bg-[linear-gradient(160deg,#f6f9fd_0%,#e7f0fb_100%)] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
+                  The cost calculator covers
+                </p>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {calculatorCoverage.map((item) => (
                     <div
                       key={item}
-                      className="rounded-[1.4rem] border border-[#ebf0f6] bg-[#f8fbfe] px-4 py-4 text-sm leading-7 text-[#34465a] md:text-[0.98rem]"
+                      className="rounded-[1.35rem] border border-white/80 bg-white/80 px-4 py-4 text-sm font-medium leading-6 text-[#27384a]"
                     >
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
+            </div>
+          </section>
 
-              <div className="rounded-[2rem] border border-[#d8e3ef] bg-[linear-gradient(42deg,#d6a456_0%,#ab8134_70%)] px-6 py-7 text-white shadow-[0_28px_65px_rgba(171,129,52,0.28)] md:px-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
-                  Ready to estimate
+          <section className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
+            <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+              <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
+                Why Your Trade License Cost Depends on Your Setup
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
+                No two setups are the same and neither are the costs. Your total
+                depends on how you configure your company.
+              </p>
+
+              <div className="mt-5 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5">
+                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#ab8134]">
+                  Your estimate will change based on:
                 </p>
-                <p className="mt-4 text-lg leading-8 text-white/90">
-                  Already know your business activity and visa requirements? Get
-                  your estimate now. Instant results, no waiting.
-                </p>
-                <CalculateNowLink className="mt-8 border-white/25 bg-white text-[#ab8134] hover:border-white hover:bg-[#fbf4e9]" />
-              </div>
-            </section>
-          </AnimatedSection>
-
-          <AnimatedSection delay={0.08}>
-            <section
-              id="why-trade"
-              className="rounded-[2.2rem] bg-white px-6 py-8  md:px-8"
-            >
-              <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center">
-                <div>
-                  <h2 className=" text-4xl font-semibold leading-14">
-                    See Exactly What Goes Into Your Dubai Trade License Cost
-                  </h2>
-                  <p className="mt-3 max-w-[38rem] text-sm leading-7 text-slate-500 md:text-base">
-                    Build your setup step by step. Adjust your inputs and watch
-                    your estimate update instantly.
-                  </p>
-                  <CalculateNowLink className="mt-6" />
-                </div>
-
-                <div className="rounded-[1.9rem] border border-[#d8e3ef] bg-[linear-gradient(160deg,#f6f9fd_0%,#e7f0fb_100%)] p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
-                    The cost calculator covers
-                  </p>
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    {calculatorCoverage.map((item) => (
-                      <div
-                        key={item}
-                        className="rounded-[1.35rem] border border-white/80 bg-white/80 px-4 py-4 text-sm font-medium leading-6 text-[#27384a]"
-                      >
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-          </AnimatedSection>
-
-          <AnimatedSection delay={0.12}>
-            <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
-              <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
-                <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
-                  Why Your Trade License Cost Depends on Your Setup
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                  No two setups are the same and neither are the costs. Your
-                  total depends on how you configure your company.
-                </p>
-
-                <div className="mt-5 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5">
-                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#ab8134]">
-                    Your estimate will change based on:
-                  </p>
-                  <ul className="mt-4 grid gap-3 text-sm leading-7 text-slate-600 md:grid-cols-2 md:text-[0.98rem]">
-                    {setupFactors.map((item) => (
-                      <li
-                        key={item}
-                        className="rounded-[1.2rem] border border-[#e5edf6] bg-white px-4 py-3"
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <p className="mt-5 text-sm leading-7 text-slate-500 md:text-base">
-                  That's why this cost calculator lets you test different setups
-                  and compare scenarios, so you can see exactly how each
-                  decision impacts your cost before you commit.
-                </p>
-                <CalculateNowLink className="mt-6" />
-              </div>
-
-              <div className="rounded-[2rem] bg-[linear-gradient(180deg,#ffffff_0%,#f3f7fb_100%)] px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
-                <h2 className=" text-[1.65rem] font-semibold leading-tight text-[#111723] md:text-[2rem]">
-                  How Accurate Is This Cost Estimate?
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                  The estimate you receive reflects current G12 Free Zone
-                  pricing, standard visa structures, and typical approval
-                  scenarios, so you can plan with confidence.
-                </p>
-                <p className="mt-4 text-sm leading-7 text-slate-500 md:text-base">
-                  Final pricing is confirmed after business activity approval,
-                  immigration clearance, and document verification, and may
-                  adjust depending on changes made during your application. This
-                  cost calculator helps you understand whether your budget
-                  aligns before you speak to an advisor.
-                </p>
-                <CalculateNowLink className="mt-6" />
-              </div>
-            </section>
-          </AnimatedSection>
-
-          <AnimatedSection delay={0.16}>
-            <section className="rounded-[2.2rem] px-6 py-8  md:px-8">
-              <div className="max-w-[48rem]">
-                <h2 className=" text-4xl font-semibold leading-14">
-                  What Happens After You Get Your Cost Estimate
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                  Your results are generated instantly, giving you a clear view
-                  of the estimated setup structure before you make a decision.
-                </p>
-              </div>
-
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
-                {nextSteps.map((item, index) => (
-                  <div
-                    key={item}
-                    className="rounded-[1.7rem] border border-[#dfe7f0] bg-[linear-gradient(180deg,#fbfdff_0%,#f1f6fb_100%)] px-5 py-5"
-                  >
-                    <div className="text-[2rem] font-semibold leading-none text-[#ab8134]">
-                      {String(index + 1).padStart(2, "0")}
-                    </div>
-                    <p className="mt-4 text-sm leading-7 text-slate-600 md:text-[0.98rem]">
+                <ul className="mt-4 grid gap-3 text-sm leading-7 text-slate-600 md:grid-cols-2 md:text-[0.98rem]">
+                  {setupFactors.map((item) => (
+                    <li
+                      key={item}
+                      className="rounded-[1.2rem] border border-[#e5edf6] bg-white px-4 py-3"
+                    >
                       {item}
-                    </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <p className="mt-5 text-sm leading-7 text-slate-500 md:text-base">
+                That's why this cost calculator lets you test different setups
+                and compare scenarios, so you can see exactly how each decision
+                impacts your cost before you commit.
+              </p>
+              <CalculateNowLink className="mt-6" />
+            </div>
+
+            <div className="rounded-[2rem] bg-[linear-gradient(180deg,#ffffff_0%,#f3f7fb_100%)] px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
+              <h2 className=" text-[1.65rem] font-semibold leading-tight text-[#111723] md:text-[2rem]">
+                How Accurate Is This Cost Estimate?
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
+                The estimate you receive reflects current G12 Free Zone pricing,
+                standard visa structures, and typical approval scenarios, so you
+                can plan with confidence.
+              </p>
+              <p className="mt-4 text-sm leading-7 text-slate-500 md:text-base">
+                Final pricing is confirmed after business activity approval,
+                immigration clearance, and document verification, and may adjust
+                depending on changes made during your application. This cost
+                calculator helps you understand whether your budget aligns
+                before you speak to an advisor.
+              </p>
+              <CalculateNowLink className="mt-6" />
+            </div>
+          </section>
+
+          <section className="relative rounded-[2.2rem] px-6 py-8  md:px-8">
+            <div className="max-w-[48rem]">
+              <h2 className=" text-4xl font-semibold leading-14">
+                What Happens After You Get Your Cost Estimate
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
+                Your results are generated instantly, giving you a clear view of
+                the estimated setup structure before you make a decision.
+              </p>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {nextSteps.map((item, index) => (
+                <div
+                  key={item}
+                  className="rounded-[1.7rem] border border-[#dfe7f0] bg-[linear-gradient(180deg,#fbfdff_0%,#f1f6fb_100%)] px-5 py-5"
+                >
+                  <div className="text-[2rem] font-semibold leading-none text-[#ab8134]">
+                    {String(index + 1).padStart(2, "0")}
                   </div>
-                ))}
-              </div>
+                  <p className="mt-4 text-sm leading-7 text-slate-600 md:text-[0.98rem]">
+                    {item}
+                  </p>
+                </div>
+              ))}
+            </div>
 
-              <div className="mt-6 flex flex-col gap-4 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5 md:flex-row md:items-center md:justify-between">
-                <p className="max-w-[42rem] text-sm leading-7 text-slate-500 md:text-base">
-                  Not ready to commit? No problem. Many founders use this
-                  estimate purely to compare options before making a decision.
-                </p>
-                <CalculateNowLink />
-              </div>
-            </section>
-          </AnimatedSection>
+            <div className="mt-6 flex flex-col gap-4 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5 md:flex-row md:items-center md:justify-between">
+              <p className="max-w-[42rem] text-sm leading-7 text-slate-500 md:text-base">
+                Not ready to commit? No problem. Many founders use this estimate
+                purely to compare options before making a decision.
+              </p>
+              <CalculateNowLink />
+            </div>
+          </section>
 
-          <AnimatedSection delay={0.2}>
-            <section
-              id="cc-faq"
-              className="rounded-[2.2rem] bg-white px-6 py-8 md:px-8"
-            >
-              <div className="max-w-2xl">
-                <h2 className=" text-4xl font-semibold leading-14">
-                  Common Questions Founders Ask Before Checking Trade License
-                  Costs
-                </h2>
-              </div>
+          <section
+            className="relative rounded-[2.2rem] bg-white px-6 py-8 md:px-8"
+            id="cc-faq"
+          >
+            <div className="max-w-2xl">
+              <h2 className=" text-4xl font-semibold leading-14">
+                Common Questions Founders Ask Before Checking Trade License
+                Costs
+              </h2>
+            </div>
 
-              <div className="mt-6 space-y-4">
-                {faqItems.map((item, index) => (
-                  <FaqAccordionItem
-                    key={item.question}
-                    question={item.question}
-                    answer={item.answer}
-                    isOpen={openFaqIndex === index}
-                    onToggle={() =>
-                      setOpenFaqIndex((current) =>
-                        current === index ? -1 : index,
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </section>
-          </AnimatedSection>
+            <div className="mt-6 space-y-4">
+              {faqItems.map((item, index) => (
+                <FaqAccordionItem
+                  key={item.question}
+                  question={item.question}
+                  answer={item.answer}
+                  isOpen={openFaqIndex === index}
+                  onToggle={() =>
+                    setOpenFaqIndex((current) =>
+                      current === index ? -1 : index,
+                    )
+                  }
+                />
+              ))}
+            </div>
+          </section>
         </div>
       </main>
 

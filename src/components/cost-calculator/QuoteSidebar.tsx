@@ -14,6 +14,8 @@ interface QuoteSidebarProps {
   selectedLicense: LicenseOption | null;
   durationYears: number;
   shareholderCount: number;
+  includedShareholders: number;
+  extraShareholderFee: number;
   selectedActivities: BusinessActivity[];
   selectedAddOns: AddOnOption[];
   visaOptions: VisaOption[];
@@ -51,20 +53,19 @@ function QuoteSection({
   total: string;
 }) {
   return (
-    <div className="border-t border-[#e5ebf3] px-5 py-4">
+    <div className="border-t border-[#e5ebf3] py-6">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#7b8ea8]">
+        <h3 className="text-sm font-semibold text-black">
           {title}
         </h3>
         {onEdit ? (
           <button
             type="button"
             onClick={onEdit}
-            className="inline-flex items-center gap-1 rounded-full border border-[#e5ebf3] px-3 py-1 text-xs font-semibold text-[#425d7b] transition hover:border-[#cad5e4] hover:text-[#111723]"
+            className="inline-flex items-center gap-1 rounded-full border border-[#e5ebf3] px-2 py-2 text-xs font-semibold text-[#425d7b] transition brand-gradient brand-gradient-hover hover:border-[#cad5e4] hover:text-[#111723]"
             aria-label={`Edit ${title.toLowerCase()}`}
           >
-            <Pencil size={12} />
-            Edit
+            <Pencil size={10} />
           </button>
         ) : null}
       </div>
@@ -83,7 +84,7 @@ function QuoteSection({
         ))}
       </div>
 
-      <div className="mt-4 border-t border-[#eef2f6] pt-3">
+      <div className="mt-4 pb-3">
         <div className="flex items-center justify-between gap-4 text-sm font-semibold text-[#ab8134]">
           <span>Total Cost</span>
           <span>{total}</span>
@@ -100,6 +101,8 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
       dependentVisaCount,
       durationYears,
       employeeVisaCount,
+      extraShareholderFee,
+      includedShareholders,
       investorVisaEnabled,
       leadName,
       onConfirm,
@@ -185,12 +188,45 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
       });
     }
 
+    const hasQuoteSections =
+      selectedLicense !== null ||
+      selectedActivityRows.length > 0 ||
+      visaRows.length > 0 ||
+      totalVisaApplicants > 0 ||
+      selectedAddOns.length > 0;
+
+    const additionalShareholders = Math.max(
+      0,
+      shareholderCount - includedShareholders,
+    );
+
+    const companySetupRows: SummaryRow[] = [
+      {
+        label: "License Type",
+        value: selectedLicense
+          ? selectedLicense.name.replace(" Business License", "")
+          : "",
+      },
+      {
+        label: "License Duration",
+        value: durationYears === 1 ? "1 Year" : `${durationYears} Years`,
+      },
+      { label: "Shareholders", value: String(shareholderCount) },
+    ];
+
+    if (additionalShareholders > 0) {
+      companySetupRows.push({
+        label: `Additional Shareholders (${additionalShareholders})`,
+        value: `${formatAed(extraShareholderFee)}`,
+      });
+    }
+
     const firstName = leadName.trim().split(/\s+/)[0] ?? "there";
 
     return (
       <aside
         ref={ref}
-        className="relative self-start overflow-hidden rounded-2xl border border-white/45 bg-white/90 p-6 shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] backdrop-blur-xl lg:sticky lg:top-24"
+        className="relative self-start overflow-hidden rounded-3xl border border-white/45 bg-white/90 p-6 shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] backdrop-blur-xl lg:sticky lg:top-24"
       >
         <div className="relative z-10 mb-10 space-y-1">
           <h2 className="text-2xl font-bold leading-12 capitalize text-[#0b0f17]">
@@ -200,83 +236,74 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
             Here's your total cost, based on the options you selected.
           </p>
         </div>
-        <div className="space-y-4 overflow-scroll pr-2 h-80">
-          {selectedLicense ? (
-            <QuoteSection
-              title="Company Setup"
-              onEdit={onEditCompanySetup}
-              total={formatAed(quote.companySetupTotal)}
-              rows={[
-                {
-                  label: "License Type",
-                  value: selectedLicense.name.replace(" Business License", ""),
-                },
-                {
-                  label: "License Duration",
-                  value:
-                    durationYears === 1 ? "1 Year" : `${durationYears} Years`,
-                },
-                { label: "Shareholders", value: String(shareholderCount) },
-              ]}
-            />
-          ) : null}
+        {hasQuoteSections ? (
+          <div className="h-80 overflow-auto pr-2">
+            {selectedLicense ? (
+              <QuoteSection
+                title="Company Setup"
+                onEdit={onEditCompanySetup}
+                total={formatAed(quote.companySetupTotal)}
+                rows={companySetupRows}
+              />
+            ) : null}
 
-          {selectedActivityRows.length > 0 ? (
-            <QuoteSection
-              title="Business Activities"
-              onEdit={onEditActivities}
-              total={formatAed(quote.activitiesTotal)}
-              rows={selectedActivityRows}
-            />
-          ) : null}
+            {selectedActivityRows.length > 0 ? (
+              <QuoteSection
+                title="Business Activities"
+                onEdit={onEditActivities}
+                total={formatAed(quote.activitiesTotal)}
+                rows={selectedActivityRows}
+              />
+            ) : null}
 
-          {visaRows.length > 0 ? (
-            <QuoteSection
-              title="Number of Visas"
-              onEdit={onEditVisas}
-              total={formatAed(quote.visaTotal)}
-              rows={visaRows}
-            />
-          ) : null}
+            {visaRows.length > 0 ? (
+              <QuoteSection
+                title="Number of Visas"
+                onEdit={onEditVisas}
+                total={formatAed(quote.visaTotal)}
+                rows={visaRows}
+              />
+            ) : null}
 
-          {totalVisaApplicants > 0 ? (
-            <QuoteSection
-              title="Change of Status"
-              total={formatAed(quote.changeStatusTotal)}
-              rows={[
-                {
-                  label: `Applicants Outside the UAE (${applicantsOutsideUae})`,
-                  value: formatAed(quote.outsideStatusTotal),
-                },
-                {
-                  label: `Applicants Inside the UAE (${applicantsInsideUae})`,
-                  value: formatAed(quote.insideStatusTotal),
-                },
-              ]}
-            />
-          ) : null}
+            {totalVisaApplicants > 0 ? (
+              <QuoteSection
+                title="Change of Status"
+                total={formatAed(quote.changeStatusTotal)}
+                rows={[
+                  {
+                    label: `Applicants Outside the UAE (${applicantsOutsideUae})`,
+                    value: formatAed(quote.outsideStatusTotal),
+                  },
+                  {
+                    label: `Applicants Inside the UAE (${applicantsInsideUae})`,
+                    value: formatAed(quote.insideStatusTotal),
+                  },
+                ]}
+              />
+            ) : null}
 
-          {selectedAddOns.length > 0 ? (
-            <QuoteSection
-              title="Additional Services"
-              onEdit={onEditAddOns}
-              total={formatAed(quote.addOnsTotal)}
-              rows={selectedAddOns.map((item) => ({
-                label: item.name,
-                value: formatAed(item.fee),
-              }))}
-            />
-          ) : null}
-        </div>
+            {selectedAddOns.length > 0 ? (
+              <QuoteSection
+                title="Additional Services"
+                onEdit={onEditAddOns}
+                total={formatAed(quote.addOnsTotal)}
+                rows={selectedAddOns.map((item) => ({
+                  label: item.name,
+                  value: formatAed(item.fee),
+                }))}
+              />
+            ) : null}
+          </div>
+        ) : null}
         <div className="relative mt-16">
           <div className="space-y-4">
-            <div className="rounded-[1.7rem] bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
+            <div className="relative rounded-xl bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)] z-10">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-base font-medium text-[#252b35]">
                     Grand Total
                   </p>
-                  <strong className="mt-1 block text-[2rem] font-semibold leading-none text-[#ab8134]">
+                  <strong className="mt-1 block text-xl font-semibold leading-none text-[#ab8134]">
                     {formatAed(quote.total)}
                   </strong>
                 </div>
@@ -284,7 +311,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
                 <button
                   type="button"
                   onClick={onShare}
-                  className="inline-flex min-w-[5.2rem] flex-col items-center gap-1 rounded-2xl p-3 text-[#ab8134] transition hover:bg-[#f6eee0]"
+                  className="inline-flex  min-w-[5.2rem] flex-col items-center gap-1 rounded-2xl p-3 text-[#ab8134] transition hover:bg-[#f6eee0]"
                   aria-label="Share"
                 >
                   {shareStatus === "copied" ? (
@@ -300,7 +327,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
             </div>
 
             {showSuccess ? (
-              <div className="rounded-[1.7rem] bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
+              <div className="rounded-xl z-10 relative bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
                 <div className="flex items-center gap-4">
                   <div className="grid h-16 w-16 place-items-center rounded-full bg-[linear-gradient(180deg,#f1e2c7_0%,#ffffff_100%)] text-lg font-semibold text-[#ab8134]">
                     MF
@@ -320,29 +347,17 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
               <button
                 type="button"
                 onClick={onConfirm}
-                className="brand-gradient brand-gradient-hover inline-flex w-full items-center justify-center gap-3 rounded-full border border-transparent px-6 py-4 text-base font-semibold"
+                className="brand-gradient brand-gradient-hover inline-flex w-full items-center justify-center gap-3 rounded-full border border-transparent px-6 py-4 text-base font-semibold relative z-10"
               >
                 Get Instant Quote
                 <ArrowRight size={18} />
               </button>
             )}
 
-            {submitAttempted && submissionIssues.length > 0 ? (
-              <div className="rounded-2xl border border-[#f0ced4] bg-[#fff4f6] px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#c54656]">
-                  Complete these items first
-                </p>
-                <ul className="mt-2 space-y-1.5 text-sm text-[#9f3f4a]">
-                  {submissionIssues.map((issue) => (
-                    <li key={issue}>- {issue}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
           </div>
         </div>
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[240px] rounded-[2rem] bg-[linear-gradient(0deg,rgba(187,201,219,0.78)_0%,rgba(25,116,201,0.12)_100%)]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[240px] rounded-3xl bg-[linear-gradient(0deg,rgba(187,201,219,0.78)_0%,rgba(25,116,201,0.12)_100%)]"
           aria-hidden="true"
         />
       </aside>
