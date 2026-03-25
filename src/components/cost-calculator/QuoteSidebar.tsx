@@ -118,8 +118,6 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
       shareStatus,
       showSuccess,
       shareholderCount,
-      submissionIssues,
-      submitAttempted,
       visaOptions,
     },
     ref,
