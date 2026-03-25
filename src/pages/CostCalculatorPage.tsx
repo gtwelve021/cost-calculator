@@ -259,7 +259,7 @@ function CategoryCard({
           className={cn(
             "grid h-7 w-7 place-items-center rounded-lg border text-xs",
             selected
-              ? "border-[#1473e6] bg-[#1473e6] text-white"
+              ? "border-[#ab8134] bg-[#ab8134] text-white"
               : "border-[#cfd9e6] bg-white text-transparent",
           )}
           aria-hidden="true"
@@ -1323,7 +1323,7 @@ export function CostCalculatorPage() {
                               onChange={(event) =>
                                 setActivityQuery(event.target.value)
                               }
-                              className="w-full rounded-[1rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#1473e6] focus:bg-white"
+                              className="w-full rounded-[1rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#ab8134] focus:bg-white"
                               placeholder="Search business activity group"
                               aria-label="Search activity categories"
                             />
@@ -1634,8 +1634,8 @@ export function CostCalculatorPage() {
                         className="relative scroll-mt-24"
                       >
                         <SectionHeading
-                          title="Add optional G12 services"
-                          description="Choose add-ons in grouped packages. All selections remain local-only and feed directly into the quote sidebar."
+                          title="Add-ons"
+                          description="Customise your setup with additional services to help you start and scale with confidence."
                         />
 
                         <div className="mt-6 space-y-5">
@@ -1647,13 +1647,10 @@ export function CostCalculatorPage() {
                             return (
                               <div
                                 key={group.id}
-                                className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
+                                className="overflow-hidden isolate rounded-xl border-t border-white/20 "
                               >
                                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                   <div>
-                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
-                                      {group.name}
-                                    </p>
                                     <h3 className="mt-2 text-[1.45rem] font-semibold text-[#111723]">
                                       {group.name}
                                     </h3>
@@ -1667,10 +1664,13 @@ export function CostCalculatorPage() {
                                     onClick={() =>
                                       setAddOnGroupModalId(group.id)
                                     }
-                                    className="inline-flex items-center justify-center rounded-full border border-[#d7deea] px-4 py-3 text-sm font-semibold text-[#111723] transition hover:bg-[#f5f8fc]"
+                                    className="text-xs font-medium flex items-center gap-1 p-1"
                                     aria-label={`Learn more about ${group.name}`}
                                   >
-                                    Learn More
+                                    Learn More  <ArrowRight
+                                  size={16}
+                                  className="rotate-[-27deg]"
+                                />
                                   </button>
                                 </div>
 
@@ -1687,7 +1687,7 @@ export function CostCalculatorPage() {
                                         onClick={() => toggleAddOn(item.id)}
                                         aria-pressed={selected}
                                         className={cn(
-                                          "rounded-full border px-4 py-3 text-left text-sm transition",
+                                          "rounded-full border px-4 py-3 text-left text-xs transition",
                                           selected
                                             ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
                                             : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
@@ -1696,14 +1696,6 @@ export function CostCalculatorPage() {
                                         <span className="font-semibold">
                                           {item.name}
                                         </span>
-                                        <span className="ml-2 text-slate-500">
-                                          {formatAed(item.fee)}
-                                        </span>
-                                        {item.recommended ? (
-                                          <span className="ml-2 rounded-full bg-[#e9f6e5] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5c9151]">
-                                            Recommended
-                                          </span>
-                                        ) : null}
                                       </button>
                                     );
                                   })}
@@ -1797,7 +1789,7 @@ export function CostCalculatorPage() {
                     </p>
                   ) : null}
                 </div>
-                <span className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-[#1473e6] px-6 py-3 text-[0.98rem] font-semibold text-white transition group-hover:bg-[#0f67d5]">
+                <span className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-[#ab8134] px-6 py-3 text-[0.98rem] font-semibold text-white transition group-hover:bg-[#ab8134]">
                   Learn More
                   <ArrowRight size={18} />
                 </span>
