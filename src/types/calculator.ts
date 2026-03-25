@@ -40,6 +40,7 @@ export interface BusinessActivityCategory {
   badge: string
   description: string
   accent: string
+  image?: string
 }
 
 export interface BusinessActivity {

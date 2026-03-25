@@ -30,6 +30,7 @@ import { QuoteSidebar } from "../components/cost-calculator/QuoteSidebar";
 import {
   activityCategories,
   addOnGroups,
+  changeStatusImage,
   defaultCalculatorState,
   heroImage,
 } from "../config/calculatorConfig";
@@ -223,59 +224,6 @@ function FieldError({ message }: { message?: string }) {
   );
 }
 
-function CounterField({
-  label,
-  description,
-  value,
-  onChange,
-  min = 0,
-  max = 25,
-}: {
-  label: string;
-  description: string;
-  value: number;
-  onChange: (value: number) => void;
-  min?: number;
-  max?: number;
-}) {
-  return (
-    <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="text-base font-semibold text-gray-900 leading-12">
-            {label}
-          </h3>
-          <p className="mt-1 max-w-[24rem] text-sm leading-6 text-slate-500">
-            {description}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
-          <button
-            type="button"
-            onClick={() => onChange(Math.max(min, value - 1))}
-            className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
-            aria-label={`Decrease ${label}`}
-          >
-            <Minus size={16} />
-          </button>
-          <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
-            {value}
-          </span>
-          <button
-            type="button"
-            onClick={() => onChange(Math.min(max, value + 1))}
-            className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
-            aria-label={`Increase ${label}`}
-          >
-            <Plus size={16} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function CategoryCard({
   category,
   selectedCount,
@@ -288,8 +236,18 @@ function CategoryCard({
   const selected = selectedCount > 0;
 
   return (
-    <div className="w-full snap-start rounded-2xl border border-[#e2e9f2] bg-white p-5 shadow-[0_8px_22px_rgba(71,103,136,0.08)] transition hover:shadow-[0_10px_28px_rgba(71,103,136,0.12)]">
-      <div className="flex items-start justify-between gap-3">
+    <div className="relative w-full snap-start overflow-hidden rounded-2xl border border-[#e2e9f2] bg-white p-5 shadow-[0_8px_22px_rgba(71,103,136,0.08)] transition hover:shadow-[0_10px_28px_rgba(71,103,136,0.12)]">
+      {category.image ? (
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div
+            className="absolute -right-10 -top-12 h-32 w-40 rounded-3xl bg-cover bg-center opacity-30"
+            style={{ backgroundImage: `url(${category.image})` }}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.95)_0%,rgba(255,255,255,0.86)_42%,rgba(255,255,255,0.96)_100%)]" />
+        </div>
+      ) : null}
+
+      <div className="relative flex items-start justify-between gap-3">
         <div
           className="grid h-11 w-11 place-items-center rounded-xl text-sm font-semibold text-[#2f4863]"
           style={{ backgroundColor: category.accent }}
@@ -313,7 +271,7 @@ function CategoryCard({
       <button
         type="button"
         onClick={onOpen}
-        className="mt-5 w-full text-left"
+        className="relative mt-5 w-full text-left"
       >
         <h3 className="text-sm leading-none font-semibold">
           {category.name}
@@ -482,6 +440,11 @@ export function CostCalculatorPage() {
 
   const totalVisaApplicants =
     (investorVisaEnabled ? 1 : 0) + employeeVisaCount + dependentVisaCount;
+  const applicantsOutsideUae = Math.max(
+    0,
+    totalVisaApplicants - applicantsInsideUae,
+  );
+  const changeStatusCardImage = changeStatusImage;
 
   const state = useMemo<CalculatorState>(
     () => ({
@@ -1587,15 +1550,82 @@ export function CostCalculatorPage() {
                         </div>
 
                         {totalVisaApplicants > 0 ? (
-                          <div className="mt-6">
-                            <CounterField
-                              label="Applicants Inside the UAE"
-                              description={`Only applicants inside the UAE incur the ${formatAed(pricingConfig.changeStatusInsideFee)} change-of-status fee.`}
-                              value={applicantsInsideUae}
-                              min={0}
-                              max={totalVisaApplicants}
-                              onChange={updateApplicantsInside}
-                            />
+                          <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                            <div className="w-full overflow-hidden rounded-2xl aspect-[286/128]">
+                              <img
+                                src={changeStatusCardImage}
+                                alt="Change of Status"
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+
+                            <div className="mt-5 mb-2 flex items-start justify-between gap-4">
+                              <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                Change of Status
+                              </h3>
+
+                              <a
+                                href="#cc-faq"
+                                className="text-xs font-medium flex items-center gap-1 p-1"
+                                aria-label="Learn more about Change of Status"
+                              >
+                                Learn More{" "}
+                                <ArrowRight
+                                  size={16}
+                                  className="rotate-[-27deg]"
+                                />
+                              </a>
+                            </div>
+
+                            <p className="text-xs font-normal leading-12 text-gray-600">
+                              Required for applicants currently in the UAE, so
+                              their visa can be processed locally without
+                              needing to exit and re-enter.
+                            </p>
+
+                            <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                              <p className="text-[#9aaabc] text-sm font-medium leading-6">
+                                Applicants Outside the UAE: {applicantsOutsideUae}
+                              </p>
+
+                              <div className="flex w-full items-center justify-between gap-3 md:w-auto">
+                                <p className="text-sm font-semibold text-[#111723] leading-6 whitespace-nowrap">
+                                  Applicants Inside the UAE:
+                                </p>
+                                <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      updateApplicantsInside(
+                                        Math.max(0, applicantsInsideUae - 1),
+                                      )
+                                    }
+                                    className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+                                    aria-label="Decrease Applicants Inside the UAE"
+                                  >
+                                    <Minus size={16} />
+                                  </button>
+                                  <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
+                                    {applicantsInsideUae}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      updateApplicantsInside(
+                                        Math.min(
+                                          totalVisaApplicants,
+                                          applicantsInsideUae + 1,
+                                        ),
+                                      )
+                                    }
+                                    className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
+                                    aria-label="Increase Applicants Inside the UAE"
+                                  >
+                                    <Plus size={16} />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         ) : null}
                       </div>

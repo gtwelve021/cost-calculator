@@ -1,9 +1,10 @@
-import heroBackgroundArtwork from '../assets/69aa70ff69eeb157659c4cf4_cc-hero-bg.webp'
+import heroBackgroundArtwork from '../assets/artwork/hero-bg.jpg'
 import fawriLicenseArtwork from '../assets/artwork/b2c-fawri.webp'
 import regularLicenseArtwork from '../assets/artwork/b2c-regular.webp'
 import investorVisaArtwork from '../assets/artwork/investor-visa.webp'
 import employeeVisaArtwork from '../assets/artwork/employee-visa.webp'
 import dependentVisaArtwork from '../assets/artwork/depentent-visa.webp'
+import changeStatusArtwork from '../assets/artwork/change-status.webp'
 import type {
   AddOnGroup,
   AddOnOption,
@@ -20,6 +21,7 @@ import type {
 } from '../types/calculator'
 
 export const heroImage = heroBackgroundArtwork
+export const changeStatusImage = changeStatusArtwork
 
 export const headerNavSections: HeaderNavSection[] = [
   {
@@ -342,6 +344,15 @@ export const addOnGroups: AddOnGroup[] = [
   },
 ]
 
+const activityCategoryArtwork = [
+  fawriLicenseArtwork,
+  regularLicenseArtwork,
+  investorVisaArtwork,
+  employeeVisaArtwork,
+  dependentVisaArtwork,
+  heroImage,
+]
+
 export const activityCategories: BusinessActivityCategory[] = [
   { id: 'fb-rentals', name: 'F&B, Rentals', badge: 'FR', description: 'Hospitality, food service, leasing, and short-stay operations.', accent: '#ead7bd' },
   { id: 'financial', name: 'Financial', badge: 'FI', description: 'Accounting, advisory, fintech, and financial support services.', accent: '#dbe8f4' },
@@ -360,7 +371,10 @@ export const activityCategories: BusinessActivityCategory[] = [
   { id: 'trading', name: 'Trading', badge: 'TD', description: 'General and specialized trading across goods categories.', accent: '#f0dfca' },
   { id: 'waste-collection', name: 'Waste Collection', badge: 'WC', description: 'Collection, recycling, and environmental support operations.', accent: '#dfe9e0' },
   { id: 'manufacturing', name: 'Manufacturing', badge: 'MN', description: 'Light manufacturing, assembly, and production support.', accent: '#e7dfdb' },
-]
+].map((category, index) => ({
+  ...category,
+  image: activityCategoryArtwork[index % activityCategoryArtwork.length],
+}))
 
 function createActivities(
   categoryId: string,
