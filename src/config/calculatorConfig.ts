@@ -29,7 +29,7 @@ export const headerNavSections: HeaderNavSection[] = [
     items: ['Cost Calculator', 'Company Name Check', 'Business Activities', 'Refer a Friend'],
   },
   {
-    label: 'G12 Plus',
+    label: 'kanoony Plus',
     items: ['mPlus', 'mCore', 'mAccounting', 'mAssist', 'mResidency'],
   },
   {
@@ -62,8 +62,8 @@ export const footerLinkGroups: FooterLinkGroup[] = [
     links: ['Regulations', 'Terms & Conditions', 'Referral Terms & Conditions', 'Cookie & Privacy Policy', 'Security Awareness'],
   },
   {
-    id: 'G12-plus',
-    title: 'G12 Plus',
+    id: 'kanoony-plus',
+    title: 'kanoony Plus',
     links: ['mPlus', 'mCore', 'mAccounting', 'mAssist', 'mResidency'],
   },
   {
@@ -96,7 +96,7 @@ export const chatWidgetCopy: ChatWidgetCopy = {
 export const licenseOptions: LicenseOption[] = [
   {
     id: 'fawri',
-    name: 'Fawri License',
+    name: 'Mainland',
     timeline: 'In 60 Mins',
     tagline: 'Launch quickly',
     description:
@@ -108,18 +108,18 @@ export const licenseOptions: LicenseOption[] = [
     ],
     basePrice: 11500,
     image: fawriLicenseArtwork,
-    selectLabel: 'Select Fawri License',
+    selectLabel: 'Select Mainland',
   },
   {
     id: 'regular',
-    name: 'Regular Business License',
+    name: 'Free Zone',
     timeline: '3-5 Days',
     tagline: 'Scale with flexibility',
     description:
       'A scalable license for startups and teams. Built for flexibility, partners, and long-term growth.',
     features: ['Multi-partner ready', 'Wider operating flexibility', 'Built for long-term growth'],
     modalCopy: [
-      'The regular business license is built for founders who need flexibility, scalability, and full ownership.',
+      'The Free Zone is built for founders who need flexibility, scalability, and full ownership.',
       'It supports multi-partner setups, broader operating models, and long-term expansion with a more tailored business presence in Dubai.',
     ],
     basePrice: 12500,
@@ -498,12 +498,14 @@ export const pricingConfig: PricingConfig = {
   includedActivityCount: 3,
   extraActivityFee: 1000,
   minimumActivities: 1,
+  visaAllocationFee: 2000,
   immigrationCardFee: 2000,
   changeStatusInsideFee: 1250,
 }
 
 export const defaultLeadForm: LeadFormData = {
   fullName: '',
+  residenceCountry: '',
   phone: '',
   email: '',
   consent: false,
@@ -521,3 +523,4 @@ export const defaultCalculatorState: CalculatorState = {
   dependentVisaCount: 0,
   applicantsInsideUae: 0,
 }
+

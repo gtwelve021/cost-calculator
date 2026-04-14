@@ -79,6 +79,7 @@ export interface SheetPricingData {
     includedShareholders?: number
     includedActivityCount?: number
     extraActivityFee?: number
+    visaAllocationFee?: number
     immigrationCardFee?: number
     changeStatusInsideFee?: number
   }
@@ -142,6 +143,7 @@ function mapSheetData(objects: SheetRow[]): SheetPricingData {
         else if (key.includes('includedshareholder')) config.includedShareholders = value
         else if (key.includes('includedactivity') || key.includes('activitycount')) config.includedActivityCount = value
         else if (key.includes('activityfee') || key.includes('extraactivity')) config.extraActivityFee = value
+        else if (key.includes('visaallocation')) config.visaAllocationFee = value
         else if (key.includes('immigration')) config.immigrationCardFee = value
         else if (key.includes('changestatus') || key.includes('statusfee')) config.changeStatusInsideFee = value
         break
@@ -187,6 +189,7 @@ export async function fetchSheetData(): Promise<SheetPricingData | null> {
 
 export interface QuoteSubmission {
   fullName: string
+  currentCountryOfResidence: string
   phone: string
   email: string
   licenseName: string
@@ -214,6 +217,7 @@ export async function submitQuoteToSheet(data: QuoteSubmission): Promise<boolean
       body: JSON.stringify({
         timestamp: new Date().toISOString(),
         fullName: data.fullName,
+        currentCountryOfResidence: data.currentCountryOfResidence,
         phone: data.phone,
         email: data.email,
         licenseName: data.licenseName,

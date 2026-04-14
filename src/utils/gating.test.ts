@@ -7,6 +7,7 @@ describe('isLeadFormComplete', () => {
     expect(
       isLeadFormComplete({
         fullName: '',
+        residenceCountry: '',
         phone: '',
         email: '',
         consent: false,
@@ -18,6 +19,7 @@ describe('isLeadFormComplete', () => {
     expect(
       isLeadFormComplete({
         fullName: 'Ali Khan',
+        residenceCountry: 'AE',
         phone: '+971501234567',
         email: 'ali@example.com',
         consent: true,
@@ -29,6 +31,7 @@ describe('isLeadFormComplete', () => {
     expect(
       isLeadFormComplete({
         fullName: 'Ali Khan',
+        residenceCountry: 'AE',
         phone: '123',
         email: 'ali@example.com',
         consent: true,
@@ -40,6 +43,7 @@ describe('isLeadFormComplete', () => {
     expect(
       isLeadFormComplete({
         fullName: 'Ali Khan',
+        residenceCountry: 'AE',
         phone: '+971501234567',
         email: 'asdadad',
         consent: true,
@@ -55,6 +59,7 @@ describe('getSubmissionIssues', () => {
         ...defaultCalculatorState,
         leadForm: {
           fullName: '',
+          residenceCountry: '',
           phone: '',
           email: '',
           consent: false,
@@ -75,6 +80,7 @@ describe('getSubmissionIssues', () => {
         ...defaultCalculatorState,
         leadForm: {
           fullName: 'Ali Khan',
+          residenceCountry: 'AE',
           phone: '+971501234567',
           email: 'ali@example.com',
           consent: true,

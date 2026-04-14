@@ -12,6 +12,7 @@ function persistUnlockedLead() {
       ...defaultCalculatorState,
       leadForm: {
         fullName: 'Ali Khan',
+        residenceCountry: 'AE',
         phone: '+971501234567',
         email: 'ali@example.com',
         consent: true,
@@ -27,11 +28,12 @@ function persistConfiguredQuote() {
       ...defaultCalculatorState,
       leadForm: {
         fullName: 'Ali Khan',
+        residenceCountry: 'AE',
         phone: '+971501234567',
         email: 'ali@example.com',
         consent: true,
       },
-      selectedLicenseId: 'fawri',
+      selectedLicenseId: 'regular',
       selectedActivityIds: ['ict-6201-10'],
       selectedAddOnIds: ['corporate-tax'],
       investorVisaEnabled: true,
@@ -51,8 +53,8 @@ describe('CostCalculatorPage', () => {
 
     expect(screen.getByRole('heading', { name: /Calculate Your Dubai Trade License Cost Now/i })).toBeInTheDocument()
     expect(screen.getByText(/Tell Us a Few Details to Get Started/i)).toBeInTheDocument()
-    expect(screen.queryByText(/Choose your G12 license/i)).not.toBeInTheDocument()
-    expect(screen.getAllByText(/0\.00/).length).toBeGreaterThan(0)
+    expect(screen.queryByText(/Pick From Two Powerful Business License Options/i)).not.toBeInTheDocument()
+    expect(screen.getAllByText(/AED.*0/i).length).toBeGreaterThan(0)
     expect(screen.queryByRole('banner')).not.toBeInTheDocument()
     expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Open live chat/i })).not.toBeInTheDocument()
@@ -66,12 +68,13 @@ describe('CostCalculatorPage', () => {
       const user = userEvent.setup()
 
       await user.type(screen.getByLabelText(/Enter your full name/i), 'Ali Khan')
+      await user.selectOptions(screen.getByLabelText(/Current Country of Residence/i), 'AE')
       await user.type(screen.getByLabelText(/Enter phone number/i), '501234567')
       await user.type(screen.getByLabelText(/Enter email address/i), 'ali@example.com')
       await user.click(screen.getByRole('checkbox', { name: /Terms and privacy policy/i }))
       await user.click(screen.getByRole('button', { name: /^Calculate$/i }))
 
-      expect(await screen.findByText(/Choose your G12 license/i)).toBeInTheDocument()
+      expect(await screen.findByText(/Select Jurisdiction/i)).toBeInTheDocument()
     },
     20000,
   )
@@ -103,28 +106,22 @@ describe('CostCalculatorPage', () => {
       await user.keyboard('{Backspace}{Backspace}{Backspace}')
 
       await waitFor(() => {
-        expect(phone).toHaveValue('+92')
+        expect(phone).toHaveValue('+971')
       })
     },
     20000,
   )
 
   it(
-    'opens and closes the license modal',
+    'opens the license modal',
     async () => {
       persistUnlockedLead()
       render(<CostCalculatorPage />)
       const user = userEvent.setup()
 
-      await user.click(screen.getByRole('button', { name: /Learn more about Fawri License/i }))
+      await user.click(screen.getByRole('button', { name: /Learn more about Mainland/i }))
 
-      expect(screen.getByRole('dialog', { name: /Fawri License/i })).toBeInTheDocument()
-
-      await user.click(screen.getByRole('button', { name: /Close modal/i }))
-
-      await waitFor(() => {
-        expect(screen.queryByRole('dialog', { name: /Fawri License/i })).not.toBeInTheDocument()
-      }, { timeout: 5000 })
+      expect(screen.getByRole('dialog', { name: /Mainland/i })).toBeInTheDocument()
     },
     20000,
   )
@@ -136,15 +133,36 @@ describe('CostCalculatorPage', () => {
       render(<CostCalculatorPage />)
       const user = userEvent.setup()
 
-      await user.click(screen.getByRole('button', { name: /Explore ICT activities/i }))
+      await user.click(screen.getByRole('button', { name: /ICT/i }))
       expect(screen.getByRole('dialog', { name: /ICT Activities/i })).toBeInTheDocument()
 
-      await user.click(screen.getByRole('checkbox', { name: /Software Development/i }))
+      const softwareDevCheckbox = screen.getByRole('checkbox', { name: /Software Development/i })
+      await user.click(softwareDevCheckbox)
+      expect(softwareDevCheckbox).toBeChecked()
       await user.click(screen.getByRole('button', { name: /Save selected activities/i }))
 
       await waitFor(() => {
-        expect(screen.getAllByText(/Software Development/i).length).toBeGreaterThan(0)
+        expect(screen.queryByRole('dialog', { name: /ICT Activities/i })).not.toBeInTheDocument()
       }, { timeout: 5000 })
+    },
+    20000,
+  )
+
+  it(
+    'shows mainland consultation message and skips calculator flow',
+    async () => {
+      persistUnlockedLead()
+      render(<CostCalculatorPage />)
+      const user = userEvent.setup()
+
+      await user.click(screen.getAllByRole('button', { name: /^Select$/i })[0])
+
+      expect(
+        screen.getAllByText(
+          /Mainland license starts from 50,000 AED\. Please contact us for consultation\./i,
+        ).length,
+      ).toBeGreaterThan(0)
+      expect(screen.queryByText(/Select Your Business Activities/i)).not.toBeInTheDocument()
     },
     20000,
   )
@@ -174,3 +192,4 @@ describe('CostCalculatorPage', () => {
     20000,
   )
 })
+

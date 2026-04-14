@@ -1,7 +1,7 @@
 const currencyFormatter = new Intl.NumberFormat('en-AE', {
   style: 'currency',
   currency: 'AED',
-  minimumFractionDigits: 0,
+  minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })
 

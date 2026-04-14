@@ -8,6 +8,7 @@ describe('persistence', () => {
       ...defaultCalculatorState,
       leadForm: {
         fullName: 'Ali Khan',
+        residenceCountry: 'AE',
         phone: '+971501234567',
         email: 'ali@example.com',
         consent: true,

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aiquote.g12.ae/sitemap.xml
+Sitemap: https://aiquote.kanoony.com/sitemap.xml

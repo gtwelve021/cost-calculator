@@ -164,12 +164,14 @@ a {
 
 .react-tel-input .country-list .search-box {
   border: 0px !important;
+  margin: 0px !important;
+  height: 33px !important;
 }
 
 .phone-field .search-box,
 .phone-field__search {
   width: calc(100% - 16px) !important;
-  height: 40px !important;
+  height: 35px !important;
   margin: 0 8px 8px !important;
   border: 1px solid #d8d8dc !important;
   border-radius: 8px !important;
@@ -180,6 +182,7 @@ a {
   padding: 0 14px !important;
 }
 
+
 .phone-field .country-list .country {
   padding: 0.85rem 1rem !important;
   color: #232323 !important;
@@ -189,4 +192,14 @@ a {
 .phone-field .country-list .country:hover,
 .phone-field .country-list .country.highlight {
   background: #ececef !important;
+}
+
+.select-field {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  padding-right: 2.2rem !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' width='512' height='512' x='0' y='0' viewBox='0 0 24 24' style='enable-background:new 0 0 512 512' xml:space='preserve' class=''%3e%3cg%3e%3cpath d='M12 16a1 1 0 0 1-.71-.29l-6-6a1 1 0 0 1 1.42-1.42l5.29 5.3 5.29-5.29a1 1 0 0 1 1.41 1.41l-6 6a1 1 0 0 1-.7.29z' data-name='16' fill='%23000000' opacity='1' data-original='%23000000'%3e%3c/path%3e%3c/g%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 16px 16px !important;
 }

@@ -4,6 +4,7 @@ var SHEET_NAME = 'cost-calculator';
 var HEADERS = [
   'Timestamp',
   'Full Name',
+  'Current Country of Residence',
   'Phone',
   'Email',
   'License',
@@ -74,6 +75,7 @@ function doPost(e) {
     sheet.appendRow([
       data.timestamp || new Date().toISOString(),
       data.fullName || '',
+      data.currentCountryOfResidence || '',
       data.phone || '',
       data.email || '',
       data.licenseName || '',
@@ -99,7 +101,7 @@ function doPost(e) {
 }
 
 function doGet() {
-  return ContentService.createTextOutput('G12 Cost Calculator API is running.');
+  return ContentService.createTextOutput('kanoony Cost Calculator API is running.');
 }
 
 function testSetup() {
@@ -111,3 +113,4 @@ function repairHeaders() {
   var sheet = getOrCreateSheet();
   Logger.log('Headers ensured for: ' + sheet.getName());
 }
+

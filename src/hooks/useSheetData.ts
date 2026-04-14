@@ -80,6 +80,9 @@ function mergeWithDefaults(sheetData: SheetPricingData | null): Omit<SheetConfig
     ...(sheetData.config?.extraActivityFee !== undefined
       ? { extraActivityFee: sheetData.config.extraActivityFee }
       : {}),
+    ...(sheetData.config?.visaAllocationFee !== undefined
+      ? { visaAllocationFee: sheetData.config.visaAllocationFee }
+      : {}),
     ...(sheetData.config?.immigrationCardFee !== undefined
       ? { immigrationCardFee: sheetData.config.immigrationCardFee }
       : {}),

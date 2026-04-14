@@ -32,7 +32,7 @@ function log(msg) {
 
 async function main() {
   console.log('=========================================')
-  console.log('  G12 Cost Calculator - Sheet Setup')
+  console.log('  kanoony Cost Calculator - Sheet Setup')
   console.log('=========================================')
 
   // 1. Ensure clasp is available
@@ -61,7 +61,7 @@ async function main() {
   if (!existsSync(claspJson)) {
     log('Creating Apps Script project...')
     run(
-      `npx @google/clasp create --title "G12 Cost Calculator" --type standalone --rootDir "${APPSCRIPT_DIR}"`,
+      `npx @google/clasp create --title "kanoony Cost Calculator" --type standalone --rootDir "${APPSCRIPT_DIR}"`,
       ROOT,
     )
     console.log('  OK - project created')
@@ -113,3 +113,4 @@ main().catch((err) => {
   console.error('\nSetup failed:', err.message)
   process.exit(1)
 })
+

@@ -1,5 +1,6 @@
 export interface LeadFormData {
   fullName: string
+  residenceCountry: string
   phone: string
   email: string
   consent: boolean
@@ -89,6 +90,7 @@ export interface PricingConfig {
   includedActivityCount: number
   extraActivityFee: number
   minimumActivities: number
+  visaAllocationFee: number
   immigrationCardFee: number
   changeStatusInsideFee: number
 }
@@ -125,6 +127,7 @@ export interface QuoteBreakdown {
   investorVisaTotal: number
   employeeVisaTotal: number
   dependentVisaTotal: number
+  visaAllocationFee: number
   immigrationCardFee: number
   visaTotal: number
   insideStatusTotal: number

@@ -22,18 +22,18 @@ export function DubaiMark({ className, dark = false }: BrandMarkProps) {
           Government of Dubai
         </p>
         <p className={cn('mt-1 text-xs font-semibold', dark ? 'text-white' : 'text-[#111723]')}>
-          G12 Free Zone
+          kanoony
         </p>
       </div>
     </div>
   )
 }
 
-export function G12Mark({ className, dark = false }: BrandMarkProps) {
+export function KanoonyMark({ className, dark = false }: BrandMarkProps) {
   return (
     <div className={cn('inline-flex items-center gap-1.5', className)}>
       <span className={cn('text-[1.35rem] font-semibold tracking-[-0.06em]', dark ? 'text-white' : 'text-[#111111]')}>
-        G12
+        kanoony
       </span>
       <span
         className={cn(
@@ -41,8 +41,9 @@ export function G12Mark({ className, dark = false }: BrandMarkProps) {
           dark ? 'border-white text-white' : 'border-[#111111] text-[#111111]',
         )}
       >
-        FZ
+        K
       </span>
     </div>
   )
 }
+

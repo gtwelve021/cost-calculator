@@ -3,7 +3,7 @@ import { ChevronDown, LogIn, Menu, Search, UserRound, X } from 'lucide-react'
 import { useState } from 'react'
 import type { HeaderNavSection } from '../../types/calculator'
 import { cn } from '../../utils/cn'
-import { DubaiMark, G12Mark } from './BrandMarks'
+import { DubaiMark, KanoonyMark } from './BrandMarks'
 
 interface CostCalculatorHeaderProps {
   navSections: HeaderNavSection[]
@@ -18,17 +18,17 @@ export function CostCalculatorHeader({ navSections }: CostCalculatorHeaderProps)
       <header className="sticky top-0 z-50 border-b border-white/20 bg-[#f3f4f7]/92 backdrop-blur-xl">
         <div className="mx-auto max-w-[1280px] px-4 py-3 md:px-8">
           <div className="hidden items-center justify-between lg:flex">
-            <a href="/" aria-label="G12 Free Zone home">
+            <a href="/" aria-label="kanoony home">
               <DubaiMark />
             </a>
-            <a href="/" aria-label="G12 Free Zone home">
-              <G12Mark />
+            <a href="/" aria-label="kanoony home">
+              <KanoonyMark />
             </a>
           </div>
 
           <div className="flex items-center justify-between gap-3 lg:hidden">
-            <a href="/" aria-label="G12 Free Zone home">
-              <G12Mark />
+            <a href="/" aria-label="kanoony home">
+              <KanoonyMark />
             </a>
             <div className="flex items-center gap-2">
               <button
@@ -98,7 +98,7 @@ export function CostCalculatorHeader({ navSections }: CostCalculatorHeaderProps)
             className="fixed inset-x-4 top-[4.75rem] z-[60] overflow-hidden rounded-[2rem] bg-white shadow-[0_28px_70px_rgba(15,20,34,0.22)] lg:hidden"
           >
             <div className="flex items-center justify-between border-b border-[#eef2f6] px-5 py-5">
-              <a href="/" aria-label="G12 Free Zone home">
+              <a href="/" aria-label="kanoony home">
                 <DubaiMark className="scale-[0.9] origin-left" />
               </a>
               <button
@@ -169,3 +169,4 @@ export function CostCalculatorHeader({ navSections }: CostCalculatorHeaderProps)
     </>
   )
 }
+

@@ -12,6 +12,7 @@ import { formatAed } from "../../utils/currency";
 interface QuoteSidebarProps {
   quote: QuoteBreakdown;
   selectedLicense: LicenseOption | null;
+  mainlandMessage?: string | null;
   durationYears: number;
   shareholderCount: number;
   includedShareholders: number;
@@ -115,6 +116,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
       selectedActivities,
       selectedAddOns,
       selectedLicense,
+      mainlandMessage,
       shareStatus,
       showSuccess,
       shareholderCount,
@@ -181,6 +183,10 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
 
     if (totalVisaApplicants > 0) {
       visaRows.push({
+        label: "Visa Allocation Fee",
+        value: formatAed(quote.visaAllocationFee),
+      });
+      visaRows.push({
         label: "Immigration Card Fee",
         value: formatAed(quote.immigrationCardFee),
       });
@@ -220,6 +226,25 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
     }
 
     const firstName = leadName.trim().split(/\s+/)[0] ?? "there";
+    const isMainlandMode = Boolean(mainlandMessage);
+
+    if (isMainlandMode) {
+      return (
+        <aside
+          ref={ref}
+          className="relative self-start overflow-hidden rounded-3xl border border-white/45 bg-white/90 p-6 shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] backdrop-blur-xl lg:sticky lg:top-24"
+        >
+          <div className="relative z-10 space-y-4">
+            <h2 className="text-2xl font-bold leading-12 capitalize text-[#0b0f17]">
+              Mainland Consultation
+            </h2>
+            <p className="rounded-xl border border-[#f0d6c2] bg-[#fff7f0] px-4 py-4 text-sm font-medium leading-7 text-[#6b3c18]">
+              {mainlandMessage}
+            </p>
+          </div>
+        </aside>
+      );
+    }
 
     return (
       <aside

@@ -2,7 +2,7 @@ import { Facebook, Instagram, Linkedin, Plus, Twitter, Youtube } from 'lucide-re
 import { useState } from 'react'
 import type { FooterLinkGroup } from '../../types/calculator'
 import { cn } from '../../utils/cn'
-import { DubaiMark, G12Mark } from './BrandMarks'
+import { DubaiMark, KanoonyMark } from './BrandMarks'
 
 interface CostCalculatorFooterProps {
   groups: FooterLinkGroup[]
@@ -72,17 +72,17 @@ export function CostCalculatorFooter({ groups }: CostCalculatorFooterProps) {
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-end">
             <div className="flex flex-col items-center gap-5 md:items-start">
               <div className="flex items-center gap-5">
-                <a href="/" aria-label="G12 Free Zone home">
+                <a href="/" aria-label="kanoony home">
                   <DubaiMark dark />
                 </a>
-                <a href="/" aria-label="G12 Free Zone home">
-                  <G12Mark dark />
+                <a href="/" aria-label="kanoony home">
+                  <KanoonyMark dark />
                 </a>
               </div>
 
               <div className="flex flex-col items-center gap-4 md:items-start">
                 <div className="space-y-2 text-center md:text-left">
-                  <p className="text-sm font-semibold">G12 Free Zone Corporate</p>
+                  <p className="text-sm font-semibold">kanoony Corporate</p>
                   <div className="flex items-center justify-center gap-3 md:justify-start">
                     {socialIcons.map((Icon, index) => (
                       <button
@@ -97,7 +97,7 @@ export function CostCalculatorFooter({ groups }: CostCalculatorFooterProps) {
                 </div>
 
                 <div className="space-y-2 text-center md:text-left">
-                  <p className="text-sm font-semibold">G12 Free Zone Events</p>
+                  <p className="text-sm font-semibold">kanoony Events</p>
                   <div className="flex items-center justify-center gap-3 md:justify-start">
                     {[Instagram, Linkedin].map((Icon, index) => (
                       <button
@@ -113,10 +113,11 @@ export function CostCalculatorFooter({ groups }: CostCalculatorFooterProps) {
               </div>
             </div>
 
-            <p className="text-sm text-white/60">&copy; 2026 G12 Free Zone. All rights reserved.</p>
+            <p className="text-sm text-white/60">&copy; 2026 kanoony. All rights reserved.</p>
           </div>
         </div>
       </div>
     </footer>
   )
 }
+

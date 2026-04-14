@@ -4,10 +4,11 @@ import { isValidLeadPhoneNumber } from './phone'
 
 export function isLeadFormComplete(data: LeadFormData): boolean {
   const fullNameValid = data.fullName.trim().length > 0
+  const residenceCountryValid = data.residenceCountry.trim().length > 0
   const phoneValid = isValidLeadPhoneNumber(data.phone)
   const emailValid = isValidLeadEmail(data.email)
 
-  return fullNameValid && phoneValid && emailValid && data.consent
+  return fullNameValid && residenceCountryValid && phoneValid && emailValid && data.consent
 }
 
 export function getTotalVisaApplicants(state: CalculatorState): number {

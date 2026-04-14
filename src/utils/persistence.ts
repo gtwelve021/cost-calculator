@@ -6,6 +6,7 @@ export const CALCULATOR_STATE_KEY = 'calculator_state_v4'
 const leadFormSchema = z
   .object({
     fullName: z.string(),
+    residenceCountry: z.string(),
     phone: z.string(),
     email: z.string(),
     consent: z.boolean(),

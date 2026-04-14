@@ -32,8 +32,14 @@ export function calculateQuote(
   const investorVisaTotal = state.investorVisaEnabled ? investorVisa?.fee ?? 0 : 0
   const employeeVisaTotal = state.employeeVisaCount * (employeeVisa?.fee ?? 0)
   const dependentVisaTotal = state.dependentVisaCount * (dependentVisa?.fee ?? 0)
+  const visaAllocationFee = totalVisaApplicants > 0 ? config.visaAllocationFee : 0
   const immigrationCardFee = totalVisaApplicants > 0 ? config.immigrationCardFee : 0
-  const visaTotal = investorVisaTotal + employeeVisaTotal + dependentVisaTotal + immigrationCardFee
+  const visaTotal =
+    investorVisaTotal +
+    employeeVisaTotal +
+    dependentVisaTotal +
+    visaAllocationFee +
+    immigrationCardFee
 
   const applicantsInsideUae = Math.min(state.applicantsInsideUae, totalVisaApplicants)
   const insideStatusTotal = applicantsInsideUae * config.changeStatusInsideFee
@@ -59,6 +65,7 @@ export function calculateQuote(
     investorVisaTotal: round(investorVisaTotal),
     employeeVisaTotal: round(employeeVisaTotal),
     dependentVisaTotal: round(dependentVisaTotal),
+    visaAllocationFee: round(visaAllocationFee),
     immigrationCardFee: round(immigrationCardFee),
     visaTotal: round(visaTotal),
     insideStatusTotal: round(insideStatusTotal),

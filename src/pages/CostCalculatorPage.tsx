@@ -22,6 +22,7 @@ import {
 import PhoneInput from "react-phone-input-2";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { getCountries } from "libphonenumber-js/min";
 import {
   ModalAction,
   ModalShell,
@@ -58,8 +59,24 @@ import {
 import { loadCalculatorState, saveCalculatorState } from "../utils/persistence";
 import { submitQuoteToSheet } from "../utils/sheets";
 
-const DEFAULT_PHONE_COUNTRY = "pk";
-const DEFAULT_PHONE_DIAL_CODE = "92";
+const DEFAULT_PHONE_COUNTRY = "ae";
+const DEFAULT_PHONE_DIAL_CODE = "971";
+const MAINLAND_CONSULTATION_MESSAGE =
+  "Mainland license starts from 50,000 AED. Please contact us for consultation.";
+const REGION_NAMES =
+  typeof Intl !== "undefined" && typeof Intl.DisplayNames !== "undefined"
+    ? new Intl.DisplayNames(["en"], { type: "region" })
+    : null;
+const RESIDENCE_COUNTRY_OPTIONS = (() => {
+  const options = getCountries()
+    .map((code) => ({
+      code,
+      label: REGION_NAMES?.of(code) ?? code,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  return options;
+})();
 const UNLOCK_DELAY_MS = 180;
 const informationalCards = [
   {
@@ -118,9 +135,9 @@ const nextSteps = [
 ] as const;
 const faqItems = [
   {
-    question: "What is the G12 Free Zone cost calculator?",
+    question: "What is the kanoony cost calculator?",
     answer:
-      "It is a guided estimator for planning your G12 company setup. You can model license, activity, visa, and add-on choices in one place and see the estimated total update instantly.",
+      "It is a guided estimator for planning your kanoony company setup. You can model license, activity, visa, and add-on choices in one place and see the estimated total update instantly.",
   },
   {
     question:
@@ -131,7 +148,7 @@ const faqItems = [
   {
     question: "Can I calculate license, visa, and office-related costs here?",
     answer:
-      "Yes. The calculator is structured around the main cost drivers in a G12 setup, including the license package, activity count, visa selections, and optional support services.",
+      "Yes. The calculator is structured around the main cost drivers in a kanoony setup, including the license package, activity count, visa selections, and optional support services.",
   },
   {
     question:
@@ -153,6 +170,10 @@ const faqItems = [
 
 const leadFormSchema = z.object({
   fullName: z.string().trim().min(1, "Full name is required."),
+  residenceCountry: z
+    .string()
+    .trim()
+    .min(1, "Current country of residence is required."),
   phone: z
     .string()
     .trim()
@@ -350,6 +371,15 @@ export function CostCalculatorPage() {
 
   const persistedState = useMemo(() => loadCalculatorState(), []);
   const initialState = persistedState ?? defaultCalculatorState;
+  const initialPhoneSelection = useMemo(
+    () =>
+      getPhoneSelection(
+        initialState.leadForm.phone ?? "",
+        DEFAULT_PHONE_COUNTRY,
+        DEFAULT_PHONE_DIAL_CODE,
+      ),
+    [initialState.leadForm.phone],
+  );
   const phoneFieldWrapperRef = useRef<HTMLDivElement | null>(null);
 
   const {
@@ -366,6 +396,7 @@ export function CostCalculatorPage() {
   const leadForm = useMemo<LeadFormData>(
     () => ({
       fullName: watchedLead.fullName ?? "",
+      residenceCountry: watchedLead.residenceCountry ?? "",
       phone: watchedLead.phone ?? "",
       email: watchedLead.email ?? "",
       consent: watchedLead.consent ?? false,
@@ -375,6 +406,7 @@ export function CostCalculatorPage() {
       watchedLead.email,
       watchedLead.fullName,
       watchedLead.phone,
+      watchedLead.residenceCountry,
     ],
   );
 
@@ -429,6 +461,16 @@ export function CostCalculatorPage() {
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
   const [phoneDropdownWidth, setPhoneDropdownWidth] = useState<number | null>(
     null,
+  );
+  const [isConsentExpanded, setIsConsentExpanded] = useState(false);
+  const [selectedFreeZoneLocation, setSelectedFreeZoneLocation] = useState<
+    "dubai" | "northern-emirates" | null
+  >(null);
+  const [phoneCountry, setPhoneCountry] = useState(
+    initialPhoneSelection.country || DEFAULT_PHONE_COUNTRY,
+  );
+  const [phoneDialCode, setPhoneDialCode] = useState(
+    initialPhoneSelection.dialCode || DEFAULT_PHONE_DIAL_CODE,
   );
 
   const licenseSectionRef = useRef<HTMLDivElement | null>(null);
@@ -488,6 +530,12 @@ export function CostCalculatorPage() {
   const calculatorUnlocked = quoteStarted && leadReady;
   const selectedLicense =
     licenseOptions.find((item) => item.id === selectedLicenseId) ?? null;
+  const isMainlandSelected = (selectedLicense?.name ?? "")
+    .trim()
+    .toLowerCase() === "mainland";
+  const isFreeZoneSelected = (selectedLicense?.name ?? "")
+    .trim()
+    .toLowerCase() === "free zone";
   const selectedActivitySet = useMemo(
     () => new Set(selectedActivityIds),
     [selectedActivityIds],
@@ -579,6 +627,12 @@ export function CostCalculatorPage() {
   useEffect(() => {
     setApplicantsInsideUae((current) => Math.min(current, totalVisaApplicants));
   }, [totalVisaApplicants]);
+
+  useEffect(() => {
+    if (!isFreeZoneSelected) {
+      setSelectedFreeZoneLocation(null);
+    }
+  }, [isFreeZoneSelected]);
 
   useEffect(() => {
     return () => {
@@ -692,6 +746,11 @@ export function CostCalculatorPage() {
   };
 
   const handleConfirmQuote = async () => {
+    if (isMainlandSelected) {
+      scrollToRef(quoteSidebarRef);
+      return;
+    }
+
     setLeadValidationAttempted(true);
     setSubmitAttempted(true);
     const validLead = await trigger();
@@ -707,6 +766,10 @@ export function CostCalculatorPage() {
 
     void submitQuoteToSheet({
       fullName: leadForm.fullName,
+      currentCountryOfResidence:
+        RESIDENCE_COUNTRY_OPTIONS.find(
+          (item) => item.code === leadForm.residenceCountry,
+        )?.label ?? leadForm.residenceCountry,
       phone: leadForm.phone,
       email: leadForm.email,
       licenseName: selectedLicense?.name ?? "",
@@ -726,12 +789,12 @@ export function CostCalculatorPage() {
   };
 
   const handleShare = async () => {
-    const shareText = `G12 estimate: ${formatAed(quote.total)}`;
+    const shareText = `kanoony estimate: ${formatAed(quote.total)}`;
 
     try {
       if (typeof navigator.share === "function") {
         await navigator.share({
-          title: "G12 Cost Calculator",
+          title: "kanoony Cost Calculator",
           text: shareText,
           url: window.location.href,
         });
@@ -856,6 +919,8 @@ export function CostCalculatorPage() {
                         )}
                       />
 
+
+
                       <Controller
                         control={control}
                         name="phone"
@@ -879,18 +944,16 @@ export function CostCalculatorPage() {
                             {(() => {
                               const phoneSelection = getPhoneSelection(
                                 field.value ?? "",
-                                DEFAULT_PHONE_COUNTRY,
-                                DEFAULT_PHONE_DIAL_CODE,
+                                phoneCountry,
+                                phoneDialCode,
                               );
-                              const dialCode =
-                                phoneSelection.dialCode ||
-                                DEFAULT_PHONE_DIAL_CODE;
+                              const dialCode = phoneSelection.dialCode || phoneDialCode;
 
                               return (
                                 <PhoneInput
                                   country={
                                     phoneSelection.country ||
-                                    DEFAULT_PHONE_COUNTRY
+                                    phoneCountry
                                   }
                                   value={getPhoneInputValue(
                                     field.value ?? "",
@@ -898,8 +961,38 @@ export function CostCalculatorPage() {
                                   )}
                                   onBlur={field.onBlur}
                                   onChange={(value, country) => {
+                                    const countryData =
+                                      (typeof country === "object" &&
+                                      country !== null
+                                        ? (country as {
+                                            countryCode?: string;
+                                            dialCode?: string;
+                                          })
+                                        : undefined);
+                                    const selectedCountry =
+                                      typeof countryData?.countryCode === "string"
+                                        ? countryData.countryCode.toLowerCase()
+                                        : phoneCountry;
+                                    const selectedDialCode =
+                                      typeof countryData?.dialCode === "string"
+                                        ? countryData.dialCode
+                                        : phoneDialCode;
+
+                                    setPhoneCountry(selectedCountry || DEFAULT_PHONE_COUNTRY);
+                                    setPhoneDialCode(
+                                      selectedDialCode || DEFAULT_PHONE_DIAL_CODE,
+                                    );
+
+                                    const normalized = normalizePhoneNumber(
+                                      value,
+                                      countryData,
+                                    );
+
                                     field.onChange(
-                                      normalizePhoneNumber(value, country),
+                                      normalized ||
+                                        (selectedDialCode
+                                          ? `+${selectedDialCode}`
+                                          : ""),
                                     );
                                   }}
                                   enableSearch
@@ -972,7 +1065,45 @@ export function CostCalculatorPage() {
                           </div>
                         )}
                       />
-
+                      <Controller
+                        control={control}
+                        name="residenceCountry"
+                        render={({ field }) => (
+                          <div>
+                            <label
+                              htmlFor="lead-residence-country"
+                              className="mb-3 block text-sm font-semibold text-black"
+                            >
+                              Current Country of Residence *
+                            </label>
+                            <select
+                              id="lead-residence-country"
+                              value={field.value}
+                              onBlur={field.onBlur}
+                              onChange={(event) =>
+                                field.onChange(event.target.value)
+                              }
+                              className={cn(
+                                "select-field w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#343434] outline-none transition focus:bg-transparent",
+                                errors.residenceCountry
+                                  ? "border-[#f15b43] focus:border-[#f15b43]"
+                                  : "border-[#d8d8dc] focus:border-[#111111]",
+                              )}
+                              aria-label="Current Country of Residence"
+                            >
+                              <option value="">Select country</option>
+                              {RESIDENCE_COUNTRY_OPTIONS.map((item) => (
+                                <option key={item.code} value={item.code}>
+                                  {item.label}
+                                </option>
+                              ))}
+                            </select>
+                            <FieldError
+                              message={errors.residenceCountry?.message}
+                            />
+                          </div>
+                        )}
+                      />
                       <Controller
                         control={control}
                         name="consent"
@@ -989,8 +1120,7 @@ export function CostCalculatorPage() {
                                 aria-label="Terms and privacy policy"
                               />
                               <span className="consent-text">
-                                I confirm that I have read and understood Meydan
-                                Free Zone's{" "}
+                                I confirm that I have read and understood kanoony's{" "}
                                 <a
                                   href="https://meydanfz.ae/terms-and-conditions"
                                   target="_blank"
@@ -1010,17 +1140,36 @@ export function CostCalculatorPage() {
                                 data for the purposes of communication and
                                 service delivery. I agree to be contacted via
                                 email, phone, or WhatsApp. I acknowledge that
-                                Meydan Free Zone operates 24/7 and that contact
+                                kanoony operates 24/7 and that contact
                                 may occur outside standard business hours,
                                 including after 6:00 PM UAE time.
-                                <br />
-                                <br />I further acknowledge that Meydan Free
-                                Zone will never request passwords, one-time
-                                passcodes (OTPs), or payments to personal or
-                                unknown bank accounts and that I should verify
-                                any suspicious or unexpected communication by
-                                calling <strong>800 FZ1 (800 391)</strong>{" "}
-                                before taking any action.
+                                {isConsentExpanded ? (
+                                  <>
+                                    <br />
+                                    <br />
+                                    I further acknowledge that kanoony will
+                                    never request passwords, one-time passcodes
+                                    (OTPs), or payments to personal or unknown
+                                    bank accounts and that I should verify any
+                                    suspicious or unexpected communication by
+                                    calling{" "}
+                                    <strong>800 FZ1 (800 391)</strong> before
+                                    taking any action.
+                                  </>
+                                ) : (
+                                  "..."
+                                )}
+                                <button
+                                  type="button"
+                                  className="ml-1 text-[#0b63ce] underline underline-offset-2"
+                                  onClick={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    setIsConsentExpanded((current) => !current);
+                                  }}
+                                >
+                                  {isConsentExpanded ? "Read less" : "Read more"}
+                                </button>
                               </span>
                             </label>
                             <FieldError message={errors.consent?.message} />
@@ -1065,8 +1214,8 @@ export function CostCalculatorPage() {
                         className="relative scroll-mt-24"
                       >
                         <SectionHeading
-                          title="Pick From Two Powerful Business License Options"
-                          description="Choose the setup that aligns with your goals."
+                          title="Select Jurisdiction"
+                          description="Where do you want to open the business?"
                         />
 
                         <div className="mt-6 grid gap-5 xl:grid-cols-2">
@@ -1166,6 +1315,50 @@ export function CostCalculatorPage() {
                           })}
                         </div>
 
+                        {isMainlandSelected ? (
+                          <div className="mt-6 rounded-xl border border-[#f0d6c2] bg-[#fff7f0] px-5 py-4 text-sm font-medium leading-7 text-[#6b3c18]">
+                            {MAINLAND_CONSULTATION_MESSAGE}
+                          </div>
+                        ) : (
+                        <>
+                        {isFreeZoneSelected ? (
+                          <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                            <h3 className="text-base font-semibold text-gray-900 leading-12">
+                              Select Location
+                            </h3>
+                            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedFreeZoneLocation("dubai")}
+                                className={cn(
+                                  "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
+                                  selectedFreeZoneLocation === "dubai"
+                                    ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                    : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                )}
+                              >
+                                Dubai
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSelectedFreeZoneLocation(
+                                    "northern-emirates",
+                                  )
+                                }
+                                className={cn(
+                                  "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
+                                  selectedFreeZoneLocation ===
+                                    "northern-emirates"
+                                    ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                    : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                )}
+                              >
+                                Northern Emirates
+                              </button>
+                            </div>
+                          </div>
+                        ) : null}
                         <div className="mt-6 grid gap-5 xl:grid-cols-2">
                           <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
                             <h3 className="text-base font-semibold text-gray-900 leading-12">
@@ -1286,7 +1479,10 @@ export function CostCalculatorPage() {
                             </p>
                           </div>
                         </div>
+                        </>
+                        )}
                       </div>
+                      {!isMainlandSelected ? (
                       <div
                         ref={activitiesSectionRef}
                         className="relative scroll-mt-24 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
@@ -1354,6 +1550,8 @@ export function CostCalculatorPage() {
                           </div>
                         </div>
                       </div>
+                      ) : null}
+                      {!isMainlandSelected ? (
                       <div
                         ref={visasSectionRef}
                         className="relative scroll-mt-24"
@@ -1629,6 +1827,8 @@ export function CostCalculatorPage() {
                           </div>
                         ) : null}
                       </div>
+                      ) : null}
+                      {!isMainlandSelected ? (
                       <div
                         ref={addOnsSectionRef}
                         className="relative scroll-mt-24"
@@ -1705,6 +1905,7 @@ export function CostCalculatorPage() {
                           })}
                         </div>
                       </div>
+                      ) : null}
                     </>
                   ) : null}
                 </div>
@@ -1713,6 +1914,9 @@ export function CostCalculatorPage() {
                   ref={quoteSidebarRef}
                   quote={quote}
                   selectedLicense={selectedLicense}
+                  mainlandMessage={
+                    isMainlandSelected ? MAINLAND_CONSULTATION_MESSAGE : null
+                  }
                   durationYears={durationYears}
                   shareholderCount={shareholderCount}
                   includedShareholders={pricingConfig.includedShareholders}
@@ -1745,7 +1949,7 @@ export function CostCalculatorPage() {
           </div>
         </section>
 
-        <section className="overflow-hidden p-0 text-center">
+        <section className="hidden overflow-hidden p-0 text-center">
           <div className="mx-auto max-w-[1280px]">
             <div className="mx-auto max-w-xl space-y-6">
               <h2 className="text-4xl font-semibold leading-14">
@@ -1799,13 +2003,13 @@ export function CostCalculatorPage() {
           <div className="mx-auto max-w-[1280px] px-4 pb-10 pt-8 md:px-6 md:pb-16 md:pt-16">
             <p className="mx-auto max-w-4xl leading-6 text-base">
               Use this calculator to get a realistic estimate for setting up a
-              company in G12 Free Zone, based on how business models are
+              company in kanoony, based on how business models are
               actually evaluated and approved.
             </p>
           </div>
         </section>
 
-        <div className="mx-auto max-w-[1280px] space-y-10 px-4 py-10 md:px-6 md:py-16">
+        <div className="hidden mx-auto max-w-[1280px] space-y-10 px-4 py-10 md:px-6 md:py-16">
           <section className="relative grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
             <div className="rounded-[2rem] bg-white px-6 py-7 shadow-[0_22px_58px_rgba(60,91,125,0.09)] md:px-8">
               <h2 className=" text-[1.85rem] font-semibold leading-tight text-[#111723] md:text-[2.35rem]">
@@ -1912,7 +2116,7 @@ export function CostCalculatorPage() {
                 How Accurate Is This Cost Estimate?
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-500 md:text-base">
-                The estimate you receive reflects current G12 Free Zone pricing,
+                The estimate you receive reflects current kanoony pricing,
                 standard visa structures, and typical approval scenarios, so you
                 can plan with confidence.
               </p>
@@ -1996,20 +2200,30 @@ export function CostCalculatorPage() {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#d9e2ed] bg-white/92 px-4 py-3 backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7b8ea8]">
-              Grand Total
-            </p>
-            <p className="text-lg font-semibold text-[#111111]">
-              {formatAed(quote.total)}
-            </p>
+            {isMainlandSelected ? (
+              <p className="text-xs font-semibold leading-5 text-[#6b3c18]">
+                {MAINLAND_CONSULTATION_MESSAGE}
+              </p>
+            ) : (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7b8ea8]">
+                  Grand Total
+                </p>
+                <p className="text-lg font-semibold text-[#111111]">
+                  {formatAed(quote.total)}
+                </p>
+              </>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={() => scrollToRef(quoteSidebarRef)}
-            className="brand-gradient brand-gradient-hover inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
-          >
-            View Estimate
-          </button>
+          {!isMainlandSelected ? (
+            <button
+              type="button"
+              onClick={() => scrollToRef(quoteSidebarRef)}
+              className="brand-gradient brand-gradient-hover inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
+            >
+              View Estimate
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -2163,3 +2377,4 @@ export function CostCalculatorPage() {
     </>
   );
 }
+
