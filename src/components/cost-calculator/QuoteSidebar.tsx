@@ -85,7 +85,7 @@ function QuoteSection({
       </div>
 
       <div className="mt-4 pb-3">
-        <div className="flex items-center justify-between gap-4 text-sm font-semibold text-[#ab8134]">
+        <div className="flex items-center justify-between gap-4 text-sm font-semibold text-[#111111]">
           <span>Total Cost</span>
           <span>{total}</span>
         </div>
@@ -301,7 +301,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
                   <p className="text-base font-medium text-[#252b35]">
                     Grand Total
                   </p>
-                  <strong className="mt-1 block text-xl font-semibold leading-none text-[#ab8134]">
+                  <strong className="mt-1 block text-xl font-semibold leading-none text-[#111111]">
                     {formatAed(quote.total)}
                   </strong>
                 </div>
@@ -309,7 +309,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
                 <button
                   type="button"
                   onClick={onShare}
-                  className="inline-flex  min-w-[5.2rem] flex-col items-center gap-1 rounded-2xl p-3 text-[#ab8134] transition hover:bg-[#f6eee0]"
+                  className="inline-flex  min-w-[5.2rem] flex-col items-center gap-1 rounded-2xl p-3 text-[#111111] transition hover:bg-[#f3f3f3]"
                   aria-label="Share"
                 >
                   {shareStatus === "copied" ? (
@@ -327,11 +327,11 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
             {showSuccess ? (
               <div className="rounded-xl z-10 relative bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
                 <div className="flex items-center gap-4">
-                  <div className="grid h-16 w-16 place-items-center rounded-full bg-[linear-gradient(180deg,#f1e2c7_0%,#ffffff_100%)] text-lg font-semibold text-[#ab8134]">
+                  <div className="grid h-16 w-16 place-items-center rounded-full bg-[linear-gradient(180deg,#e8e8e8_0%,#ffffff_100%)] text-lg font-semibold text-[#111111]">
                     MF
                   </div>
                   <div>
-                    <h3 className="text-[1.55rem] font-semibold text-[#73a55d]">
+                    <h3 className="text-[1.55rem] font-semibold text-[#111111]">
                       Thank You, {firstName}!
                     </h3>
                     <p className="mt-1 max-w-[18rem] text-sm leading-6 text-slate-500">
@@ -355,7 +355,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
           </div>
         </div>
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[240px] rounded-3xl bg-[linear-gradient(0deg,rgba(187,201,219,0.78)_0%,rgba(25,116,201,0.12)_100%)]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[240px] rounded-3xl bg-[linear-gradient(0deg,rgba(24,24,24,0.14)_0%,rgba(24,24,24,0)_100%)]"
           aria-hidden="true"
         />
       </aside>

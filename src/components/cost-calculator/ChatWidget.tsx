@@ -66,21 +66,21 @@ export function ChatWidget({ copy }: ChatWidgetProps) {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Enter your name (required)"
-                className="w-full rounded-2xl border border-[#e3e7ef] bg-[#f7f8fb] px-4 py-3 text-sm outline-none transition focus:border-[#ab8134]"
+                className="w-full rounded-2xl border border-[#e3e7ef] bg-[#f7f8fb] px-4 py-3 text-sm outline-none transition focus:border-[#111111]"
                 aria-label="Enter your name"
               />
               <input
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="Enter your Email address (required)"
-                className="w-full rounded-2xl border border-[#e3e7ef] bg-[#f7f8fb] px-4 py-3 text-sm outline-none transition focus:border-[#ab8134]"
+                className="w-full rounded-2xl border border-[#e3e7ef] bg-[#f7f8fb] px-4 py-3 text-sm outline-none transition focus:border-[#111111]"
                 aria-label="Enter your Email address"
               />
               <input
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
                 placeholder="Enter your phone number (required)"
-                className="w-full rounded-2xl border border-[#e3e7ef] bg-[#f7f8fb] px-4 py-3 text-sm outline-none transition focus:border-[#ab8134]"
+                className="w-full rounded-2xl border border-[#e3e7ef] bg-[#f7f8fb] px-4 py-3 text-sm outline-none transition focus:border-[#111111]"
                 aria-label="Enter your phone number"
               />
               <textarea
@@ -88,7 +88,7 @@ export function ChatWidget({ copy }: ChatWidgetProps) {
                 onChange={(event) => setMessage(event.target.value)}
                 placeholder="Type your message and hit 'Enter'"
                 rows={5}
-                className="w-full rounded-2xl border border-[#e3e7ef] bg-[#f7f8fb] px-4 py-3 text-sm outline-none transition focus:border-[#ab8134]"
+                className="w-full rounded-2xl border border-[#e3e7ef] bg-[#f7f8fb] px-4 py-3 text-sm outline-none transition focus:border-[#111111]"
                 aria-label="Type your message and hit 'Enter'"
               />
 

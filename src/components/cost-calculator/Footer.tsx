@@ -88,7 +88,7 @@ export function CostCalculatorFooter({ groups }: CostCalculatorFooterProps) {
                       <button
                         key={`corporate-${index}`}
                         type="button"
-                        className="grid h-9 w-9 place-items-center rounded-full border border-white/12 text-white/65 transition hover:border-[#d6a456]/60 hover:text-[#f6d197]"
+                        className="grid h-9 w-9 place-items-center rounded-full border border-white/12 text-white/65 transition hover:border-white/60 hover:text-white"
                       >
                         <Icon size={16} />
                       </button>
@@ -103,7 +103,7 @@ export function CostCalculatorFooter({ groups }: CostCalculatorFooterProps) {
                       <button
                         key={`events-${index}`}
                         type="button"
-                        className="grid h-9 w-9 place-items-center rounded-full border border-white/12 text-white/65 transition hover:border-[#d6a456]/60 hover:text-[#f6d197]"
+                        className="grid h-9 w-9 place-items-center rounded-full border border-white/12 text-white/65 transition hover:border-white/60 hover:text-white"
                       >
                         <Icon size={16} />
                       </button>

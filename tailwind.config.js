@@ -13,7 +13,7 @@ export default {
       colors: {
         ink: '#10131a',
         slate: '#626b7b',
-        primary: '#d6a456',
+        primary: '#111111',
       },
     },
   },

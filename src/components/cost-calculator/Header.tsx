@@ -40,7 +40,7 @@ export function CostCalculatorHeader({ navSections }: CostCalculatorHeaderProps)
               </button>
               <button
                 type="button"
-                className="brand-gradient brand-gradient-hover grid h-11 w-11 place-items-center rounded-full shadow-[0_10px_24px_rgba(171,129,52,0.24)]"
+                className="brand-gradient brand-gradient-hover grid h-11 w-11 place-items-center rounded-full shadow-[0_10px_24px_rgba(0,0,0,0.24)]"
                 onClick={() => setMobileMenuOpen((current) => !current)}
                 aria-label={mobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
               >

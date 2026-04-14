@@ -67,7 +67,7 @@ const informationalCards = [
     titleTop: "How Much It Will",
     titleAccent: "Actually",
     titleBottom: "Cost?",
-    accentClassName: "text-[#49b8c8]",
+    accentClassName: "text-[#111111]",
     Icon: WalletCards,
   },
   {
@@ -75,7 +75,7 @@ const informationalCards = [
     titleTop: "What Is Included",
     titleAccent: "In That Cost?",
     titleBottom: "",
-    accentClassName: "text-[#7a53a3]",
+    accentClassName: "text-[#3b3b3b]",
     Icon: ReceiptText,
   },
   {
@@ -83,7 +83,7 @@ const informationalCards = [
     titleTop: "Whether The Cost",
     titleAccent: "Will Change",
     titleBottom: "Later?",
-    accentClassName: "text-[#5e97a9]",
+    accentClassName: "text-[#555555]",
     Icon: ScanSearch,
   },
 ] as const;
@@ -259,7 +259,7 @@ function CategoryCard({
           className={cn(
             "grid h-7 w-7 place-items-center rounded-lg border text-xs",
             selected
-              ? "border-[#ab8134] bg-[#ab8134] text-white"
+              ? "border-[#111111] bg-[#111111] text-white"
               : "border-[#cfd9e6] bg-white text-transparent",
           )}
           aria-hidden="true"
@@ -325,7 +325,7 @@ function FaqAccordionItem({
         <span className="text-base font-semibold text-[#111723] md:text-lg">
           {question}
         </span>
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f6eee0] text-[#ab8134]">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f3f3f3] text-[#111111]">
           {isOpen ? <Minus size={16} /> : <Plus size={16} />}
         </span>
       </button>
@@ -846,7 +846,7 @@ export function CostCalculatorPage() {
                                 "w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#343434] outline-none transition placeholder:text-[#9b9b9b] focus:bg-transparent",
                                 errors.fullName
                                   ? "border-[#f15b43] ring-1 ring-[#f15b43]/15"
-                                  : "border-[#d8d8dc] focus:border-[#ab8134]",
+                                  : "border-[#d8d8dc] focus:border-[#111111]",
                               )}
                               placeholder="Your name"
                               aria-label="Enter your full name"
@@ -963,7 +963,7 @@ export function CostCalculatorPage() {
                                 "w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#343434] outline-none transition placeholder:text-[#9b9b9b] focus:bg-transparent",
                                 errors.email
                                   ? "border-[#f15b43] ring-1 ring-[#f15b43]/15"
-                                  : "border-[#d8d8dc] focus:border-[#ab8134]",
+                                  : "border-[#d8d8dc] focus:border-[#111111]",
                               )}
                               placeholder="Email address"
                               aria-label="Enter email address"
@@ -985,7 +985,7 @@ export function CostCalculatorPage() {
                                 onChange={(event) =>
                                   field.onChange(event.target.checked)
                                 }
-                                className="mt-0.5 h-4 w-4 rounded border-[#b9c7d7] text-[#ab8134]"
+                                className="mt-0.5 h-4 w-4 rounded border-[#b9c7d7] text-[#111111]"
                                 aria-label="Terms and privacy policy"
                               />
                               <span className="consent-text">
@@ -1095,9 +1095,9 @@ export function CostCalculatorPage() {
                                   }
                                 }}
                                 className={cn(
-                                  "cursor-pointer overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#eddcbf] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                  "cursor-pointer overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                   selected
-                                    ? "border-[#ab8134] ring-2 ring-[#eddcbf]"
+                                    ? "border-[#111111] ring-2 ring-[#d9d9d9]"
                                     : "border-[#e6ebf2]",
                                 )}
                               >
@@ -1323,7 +1323,7 @@ export function CostCalculatorPage() {
                               onChange={(event) =>
                                 setActivityQuery(event.target.value)
                               }
-                              className="w-full rounded-[1rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#ab8134] focus:bg-white"
+                              className="w-full rounded-[1rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
                               placeholder="Search business activity group"
                               aria-label="Search activity categories"
                             />
@@ -1378,7 +1378,7 @@ export function CostCalculatorPage() {
                             return (
                               <div
                                 key={visa.id}
-                                className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#eddcbf] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] border-[#e6ebf2]"
+                                className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] border-[#e6ebf2]"
                               >
                                 <div className="w-full overflow-hidden rounded-2xl">
                                   <img
@@ -1689,7 +1689,7 @@ export function CostCalculatorPage() {
                                         className={cn(
                                           "rounded-full border px-4 py-3 text-left text-xs transition",
                                           selected
-                                            ? "border-[#ab8134] bg-[#f6eee0] text-[#ab8134]"
+                                            ? "border-[#111111] bg-[#f3f3f3] text-[#111111]"
                                             : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
                                         )}
                                       >
@@ -1789,7 +1789,7 @@ export function CostCalculatorPage() {
                     </p>
                   ) : null}
                 </div>
-                <span className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-[#ab8134] px-6 py-3 text-[0.98rem] font-semibold text-white transition group-hover:bg-[#ab8134]">
+                <span className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-[#111111] px-6 py-3 text-[0.98rem] font-semibold text-white transition group-hover:bg-[#111111]">
                   Learn More
                   <ArrowRight size={18} />
                 </span>
@@ -1827,7 +1827,7 @@ export function CostCalculatorPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-[#d8e3ef] bg-[linear-gradient(42deg,#d6a456_0%,#ab8134_70%)] px-6 py-7 text-white shadow-[0_28px_65px_rgba(171,129,52,0.28)] md:px-8">
+            <div className="rounded-[2rem] border border-[#d8e3ef] bg-[linear-gradient(135deg,#1f1f1f_0%,#000000_70%)] px-6 py-7 text-white shadow-[0_28px_65px_rgba(0,0,0,0.22)] md:px-8">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
                 Ready to estimate
               </p>
@@ -1835,7 +1835,7 @@ export function CostCalculatorPage() {
                 Already know your business activity and visa requirements? Get
                 your estimate now. Instant results, no waiting.
               </p>
-              <CalculateNowLink className="mt-8 border-white/25 bg-white text-[#ab8134] hover:border-white hover:bg-[#fbf4e9]" />
+              <CalculateNowLink className="mt-8 border-white/25 bg-white text-[#111111] hover:border-white hover:bg-[#f3f3f3]" />
             </div>
           </section>
 
@@ -1856,7 +1856,7 @@ export function CostCalculatorPage() {
               </div>
 
               <div className="rounded-[1.9rem] border border-[#d8e3ef] bg-[linear-gradient(160deg,#f6f9fd_0%,#e7f0fb_100%)] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ab8134]">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#111111]">
                   The cost calculator covers
                 </p>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -1884,7 +1884,7 @@ export function CostCalculatorPage() {
               </p>
 
               <div className="mt-5 rounded-[1.6rem] bg-[#f8fbfe] px-5 py-5">
-                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#ab8134]">
+                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#111111]">
                   Your estimate will change based on:
                 </p>
                 <ul className="mt-4 grid gap-3 text-sm leading-7 text-slate-600 md:grid-cols-2 md:text-[0.98rem]">
@@ -1944,7 +1944,7 @@ export function CostCalculatorPage() {
                   key={item}
                   className="rounded-[1.7rem] border border-[#dfe7f0] bg-[linear-gradient(180deg,#fbfdff_0%,#f1f6fb_100%)] px-5 py-5"
                 >
-                  <div className="text-[2rem] font-semibold leading-none text-[#ab8134]">
+                  <div className="text-[2rem] font-semibold leading-none text-[#111111]">
                     {String(index + 1).padStart(2, "0")}
                   </div>
                   <p className="mt-4 text-sm leading-7 text-slate-600 md:text-[0.98rem]">
@@ -1999,7 +1999,7 @@ export function CostCalculatorPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7b8ea8]">
               Grand Total
             </p>
-            <p className="text-lg font-semibold text-[#ab8134]">
+            <p className="text-lg font-semibold text-[#111111]">
               {formatAed(quote.total)}
             </p>
           </div>
@@ -2101,7 +2101,7 @@ export function CostCalculatorPage() {
                   onChange={(event) =>
                     setActivityModalQuery(event.target.value)
                   }
-                  className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#ab8134] focus:bg-white"
+                  className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
                   placeholder="Search within this activity group"
                   aria-label="Search activities"
                 />
@@ -2118,7 +2118,7 @@ export function CostCalculatorPage() {
                     className={cn(
                       "flex cursor-pointer items-start gap-4 rounded-[1.4rem] border px-4 py-4 transition",
                       selected
-                        ? "border-[#ab8134] bg-[#f6eee0]"
+                        ? "border-[#111111] bg-[#f3f3f3]"
                         : "border-[#e5ebf3] bg-[#fbfcfe]",
                     )}
                   >
@@ -2126,7 +2126,7 @@ export function CostCalculatorPage() {
                       type="checkbox"
                       checked={selected}
                       onChange={() => toggleActivity(activity.id)}
-                      className="mt-1 h-4 w-4 rounded border-[#b9c7d7] text-[#ab8134]"
+                      className="mt-1 h-4 w-4 rounded border-[#b9c7d7] text-[#111111]"
                       aria-label={activity.name}
                     />
                     <div className="space-y-1">
@@ -2138,7 +2138,7 @@ export function CostCalculatorPage() {
                           {activity.code}
                         </span>
                         {activity.preApproval ? (
-                          <span className="rounded-full bg-[#fff1d8] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a77b35]">
+                          <span className="rounded-full bg-[#f1f1f1] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#3b3b3b]">
                             Pre-approval
                           </span>
                         ) : null}
