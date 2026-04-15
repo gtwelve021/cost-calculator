@@ -3,6 +3,8 @@ import {
   ArrowRight,
   Check,
   CheckCheck,
+  ChevronLeft,
+  ChevronRight,
   CircleAlert,
   Minus,
   Plus,
@@ -36,6 +38,7 @@ import {
   defaultCalculatorState,
   heroImage,
 } from "../config/calculatorConfig";
+import rentalsIcon from "../assets/activities/rentals.svg";
 import { useSheetData } from "../hooks/useSheetData";
 import type {
   BusinessActivityCategory,
@@ -263,31 +266,23 @@ function CategoryCard({
   const selected = selectedCount > 0;
 
   return (
-    <div className="relative w-full snap-start overflow-hidden rounded-2xl border border-[#e2e9f2] bg-white p-5 shadow-[0_8px_22px_rgba(71,103,136,0.08)] transition hover:shadow-[0_10px_28px_rgba(71,103,136,0.12)]">
-      {category.image ? (
-        <div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden="true"
-        >
-          <div
-            className="absolute -right-10 -top-12 h-32 w-40 rounded-3xl bg-cover bg-center opacity-30"
-            style={{ backgroundImage: `url(${category.image})` }}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.95)_0%,rgba(255,255,255,0.86)_42%,rgba(255,255,255,0.96)_100%)]" />
-        </div>
-      ) : null}
-
-      <div className="relative flex items-start justify-between gap-3">
-        <div
-          className="grid h-11 w-11 place-items-center rounded-xl text-sm font-semibold text-[#2f4863]"
-          style={{ backgroundColor: category.accent }}
-        >
-          {category.badge}
-        </div>
-
+    <button
+      type="button"
+      onClick={onOpen}
+      className="relative w-full snap-start overflow-hidden rounded-lg p-4 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] transition hover:shadow-none hover:bg-white hover:border-white/70  cursor-pointer text-left"
+      aria-label={`Open ${category.name} activities`}
+    >
+      <div className="relative flex items-start justify-between gap-1">
+        {selectedCount > 0 ? (
+          <span className="text-xs font-semibold">
+            Selected Activities: {selectedCount}
+          </span>
+        ) : (
+          <span />
+        )}
         <div
           className={cn(
-            "grid h-7 w-7 place-items-center rounded-lg border text-xs",
+            "grid h-4 w-4 place-items-center rounded-md border text-xs",
             selected
               ? "border-[#111111] bg-[#111111] text-white"
               : "border-[#cfd9e6] bg-white text-transparent",
@@ -297,21 +292,19 @@ function CategoryCard({
           ✓
         </div>
       </div>
-
-      <button
-        type="button"
-        onClick={onOpen}
-        className="relative mt-5 w-full text-left"
-      >
+      <div className="relative mt-5">
+        <img className="w-9 invert-[1]" src={rentalsIcon} alt="F&B, Rentals Icon" />
+      </div>
+      <div className="relative mt-2 w-full text-left">
         <h3 className="text-sm leading-none font-semibold">{category.name}</h3>
-        <div className="mt-3 flex items-center justify-between text-sm text-[#4f5f72]">
-          <span>
-            {selected ? `${selectedCount} selected` : "Select your activity"}
+        <div className="mt-2 flex items-center justify-between text-sm text-[#4f5f72]">
+          <span className="text-xs text-black">
+            {selected ? `Select more activities ` : "Select your activity"}
           </span>
-          <ArrowRight size={16} className="rotate-[-27deg] text-[#111723]" />
+          <ArrowRight size={16} className="rotate-[-39deg] text-[#111723]" />
         </div>
-      </button>
-    </div>
+      </div>
+    </button>
   );
 }
 
@@ -484,6 +477,7 @@ export function CostCalculatorPage() {
   const visasSectionRef = useRef<HTMLDivElement | null>(null);
   const addOnsSectionRef = useRef<HTMLDivElement | null>(null);
   const quoteSidebarRef = useRef<HTMLDivElement | null>(null);
+  const activityCategoriesScrollerRef = useRef<HTMLDivElement | null>(null);
   const shareResetRef = useRef<number | null>(null);
 
   const totalVisaApplicants =
@@ -682,6 +676,19 @@ export function CostCalculatorPage() {
 
   const scrollToRef = (ref: RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const scrollActivityCategories = (direction: "left" | "right") => {
+    const container = activityCategoriesScrollerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    container.scrollBy({
+      left: direction === "left" ? -240 : 240,
+      behavior: "smooth",
+    });
   };
 
   const handlePhoneInputKeyDown = (
@@ -1267,7 +1274,7 @@ export function CostCalculatorPage() {
                                     : "border-[#e6ebf2]",
                                 )}
                               >
-                                <div className="w-full overflow-hidden rounded-2xl aspect-[286/386]">
+                                <div className="w-full overflow-hidden rounded-lg aspect-[286/386]">
                                   <img
                                     src={license.image}
                                     alt={license.name}
@@ -1380,137 +1387,142 @@ export function CostCalculatorPage() {
                             ) : null}
                             {canShowPostLocationSections ? (
                               <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                              <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                                <h3 className="text-base font-semibold text-gray-900 leading-12">
-                                  Duration of Business License
-                                </h3>
-                                <div className="mt-5 flex flex-wrap gap-3">
-                                  {[1, 2, 3, 4, 5, 6].map((year) => {
-                                    const selected = durationYears === year;
+                                <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                                  <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                    Duration of Business License
+                                  </h3>
+                                  <div className="mt-5 flex flex-wrap gap-3">
+                                    {[1, 2, 3, 4, 5, 6].map((year) => {
+                                      const selected = durationYears === year;
 
-                                    return (
-                                      <button
-                                        key={year}
-                                        type="button"
-                                        onClick={() => {
-                                          setShowSuccess(false);
-                                          setDurationYears(year);
-                                        }}
-                                        className={cn(
-                                          "rounded-full border px-5 py-3 text-left transition shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                          selected
-                                            ? "  brand-gradient brand-gradient-hover text-white"
-                                            : " bg-[#fbfcfe] text-[#111723] ",
-                                        )}
-                                      >
-                                        <span className="block text-sm font-semibold transition">
-                                          {selected
-                                            ? year === 1
-                                              ? "1 Year"
-                                              : `${year} Years`
-                                            : year}
-                                        </span>
-                                      </button>
-                                    );
-                                  })}
+                                      return (
+                                        <button
+                                          key={year}
+                                          type="button"
+                                          onClick={() => {
+                                            setShowSuccess(false);
+                                            setDurationYears(year);
+                                          }}
+                                          className={cn(
+                                            "rounded-full border px-5 py-3 text-left transition shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                            selected
+                                              ? "  brand-gradient brand-gradient-hover text-white"
+                                              : " bg-[#fbfcfe] text-[#111723] ",
+                                          )}
+                                        >
+                                          <span className="block text-sm font-semibold transition">
+                                            {selected
+                                              ? year === 1
+                                                ? "1 Year"
+                                                : `${year} Years`
+                                              : year}
+                                          </span>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+
+                                  <p className="mt-7 text-xs leading-4 text-gray-400">
+                                    * Discounts available on multi-year licenses
+                                  </p>
                                 </div>
 
-                                <p className="mt-7 text-xs leading-4 text-gray-400">
-                                  * Discounts available on multi-year licenses
-                                </p>
-                              </div>
+                                <div className="overflow-hidden isolate rounded-xl px-5 py-4 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                                  <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                    Number of Shareholders
+                                  </h3>
 
-                              <div className="overflow-hidden isolate rounded-xl px-5 py-4 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                                <h3 className="text-base font-semibold text-gray-900 leading-12">
-                                  Number of Shareholders
-                                </h3>
-
-                                <div
-                                  className={cn(
-                                    "mt-5 flex items-center gap-3",
-                                    shareholderCounterSelected
-                                      ? "justify-between"
-                                      : "justify-end",
-                                  )}
-                                >
-                                  {shareholderCounterSelected ? (
-                                    <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setShowSuccess(false);
-                                          setShareholderCount(
-                                            Math.max(1, shareholderCount - 1),
-                                          );
-                                        }}
-                                        className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
-                                        aria-label="Decrease Shareholders"
-                                      >
-                                        <Minus size={16} />
-                                      </button>
-                                      <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
-                                        {shareholderCount}
-                                      </span>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setShowSuccess(false);
-                                          setShareholderCount(
-                                            Math.min(15, shareholderCount + 1),
-                                          );
-                                        }}
-                                        className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
-                                        aria-label="Increase Shareholders"
-                                      >
-                                        <Plus size={16} />
-                                      </button>
-                                    </div>
-                                  ) : null}
-
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setShowSuccess(false);
-                                      setShareholderCounterSelected(
-                                        (current) => {
-                                          const next = !current;
-                                          if (!next) {
-                                            setShareholderCount(1);
-                                          }
-                                          return next;
-                                        },
-                                      );
-                                    }}
-                                    aria-label="Select Shareholders"
+                                  <div
                                     className={cn(
-                                      "px-6 py-3 rounded-full inline-flex items-center gap-2",
+                                      "mt-5 flex items-center gap-3",
                                       shareholderCounterSelected
-                                        ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                        : "  text-black border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                        ? "justify-between"
+                                        : "justify-end",
                                     )}
                                   >
                                     {shareholderCounterSelected ? (
-                                      <>
-                                        <CheckCheck
-                                          size={16}
-                                          aria-hidden="true"
-                                        />
-                                        Selected
-                                      </>
-                                    ) : (
-                                      "Select"
-                                    )}
-                                  </button>
-                                </div>
+                                      <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setShowSuccess(false);
+                                            setShareholderCount(
+                                              Math.max(1, shareholderCount - 1),
+                                            );
+                                          }}
+                                          className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+                                          aria-label="Decrease Shareholders"
+                                        >
+                                          <Minus size={16} />
+                                        </button>
+                                        <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
+                                          {shareholderCount}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setShowSuccess(false);
+                                            setShareholderCount(
+                                              Math.min(
+                                                15,
+                                                shareholderCount + 1,
+                                              ),
+                                            );
+                                          }}
+                                          className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
+                                          aria-label="Increase Shareholders"
+                                        >
+                                          <Plus size={16} />
+                                        </button>
+                                      </div>
+                                    ) : null}
 
-                                <p className="mt-7 text-xs leading-4 text-gray-400">
-                                  * Includes{" "}
-                                  {pricingConfig.includedShareholders}{" "}
-                                  shareholders;{" "}
-                                  {formatAed(pricingConfig.extraShareholderFee)}{" "}
-                                  for each additional.
-                                </p>
-                              </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setShowSuccess(false);
+                                        setShareholderCounterSelected(
+                                          (current) => {
+                                            const next = !current;
+                                            if (!next) {
+                                              setShareholderCount(1);
+                                            }
+                                            return next;
+                                          },
+                                        );
+                                      }}
+                                      aria-label="Select Shareholders"
+                                      className={cn(
+                                        "px-6 py-3 rounded-full inline-flex items-center gap-2",
+                                        shareholderCounterSelected
+                                          ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                          : "  text-black border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                      )}
+                                    >
+                                      {shareholderCounterSelected ? (
+                                        <>
+                                          <CheckCheck
+                                            size={16}
+                                            aria-hidden="true"
+                                          />
+                                          Selected
+                                        </>
+                                      ) : (
+                                        "Select"
+                                      )}
+                                    </button>
+                                  </div>
+
+                                  <p className="mt-7 text-xs leading-4 text-gray-400">
+                                    * Includes{" "}
+                                    {pricingConfig.includedShareholders}{" "}
+                                    shareholders;{" "}
+                                    {formatAed(
+                                      pricingConfig.extraShareholderFee,
+                                    )}{" "}
+                                    for each additional.
+                                  </p>
+                                </div>
                               </div>
                             ) : null}
                           </>
@@ -1535,7 +1547,7 @@ export function CostCalculatorPage() {
                               will incur a charge of AED 1,000 each.
                             </p>
                           </div>
-                          <div className="mt-6 shadow-[0_8px_22px_rgba(71,103,136,0.08)]">
+                          <div className="mt-4 mb-4 shadow-[0_8px_22px_rgba(71,103,136,0.08)]">
                             <div className="relative">
                               <Search
                                 size={18}
@@ -1554,8 +1566,27 @@ export function CostCalculatorPage() {
                             </div>
                           </div>
 
-                          <div className="mt-6 rounded-2xl border border-[#dbe6f3] bg-[#eaf3fb] p-2">
-                            <div className="grid grid-flow-col grid-rows-2 auto-cols-[12rem] gap-2 overflow-x-auto pb-2 pr-2">
+                          <div className="relative rounded-lg border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_7px_5px_20px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255,255,255)] p-3">
+                            <button
+                              type="button"
+                              onClick={() => scrollActivityCategories("left")}
+                              className="absolute -left-5 top-1/2 z-10 -translate-y-1/2 rounded-full border border-[#d8e3ef] bg-white/95 p-2 text-[#111111] shadow-[0_8px_18px_rgba(39,67,103,0.2)] transition hover:bg-white"
+                              aria-label="Scroll activity categories left"
+                            >
+                              <ChevronLeft size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => scrollActivityCategories("right")}
+                              className="absolute -right-5 top-1/2 z-10 -translate-y-1/2 rounded-full border border-[#d8e3ef] bg-white/95 p-2 text-[#111111] shadow-[0_8px_18px_rgba(39,67,103,0.2)] transition hover:bg-white"
+                              aria-label="Scroll activity categories right"
+                            >
+                              <ChevronRight size={16} />
+                            </button>
+                            <div
+                              ref={activityCategoriesScrollerRef}
+                              className="activity-categories-scroller grid grid-flow-col grid-rows-2 auto-cols-[12rem] gap-3 overflow-x-auto  pb-2"
+                            >
                               {filteredCategories.map((category) => {
                                 const categorySelections =
                                   selectedActivities.filter(
@@ -1606,7 +1637,7 @@ export function CostCalculatorPage() {
                                   key={visa.id}
                                   className="overflow-hidden isolate rounded-xl  p-4  transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
                                 >
-                                  <div className="w-full overflow-hidden rounded-2xl">
+                                  <div className="w-full overflow-hidden rounded-lg">
                                     <img
                                       src={visa.image}
                                       alt={visa.name}
@@ -1777,7 +1808,7 @@ export function CostCalculatorPage() {
 
                           {totalVisaApplicants > 0 ? (
                             <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                              <div className="w-full overflow-hidden rounded-2xl aspect-[286/128]">
+                              <div className="w-full overflow-hidden rounded-lg aspect-[286/128]">
                                 <img
                                   src={changeStatusCardImage}
                                   alt="Change of Status"
@@ -1879,7 +1910,7 @@ export function CostCalculatorPage() {
                               return (
                                 <div
                                   key={group.id}
-                                  className="overflow-hidden isolate rounded-xl border-t border-white/20 "
+                                  className="overflow-hidden isolate border-t border-black/5"
                                 >
                                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                     <div>
