@@ -234,13 +234,47 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
           ref={ref}
           className="relative self-start overflow-hidden rounded-3xl border border-white/45 bg-white/90 p-6 shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] backdrop-blur-xl lg:sticky lg:top-24"
         >
-          <div className="relative z-10 space-y-4">
+          <div className="relative z-10 space-y-5">
             <h2 className="text-2xl font-bold leading-12 capitalize text-[#0b0f17]">
               Mainland Consultation
             </h2>
+            <p className="text-sm font-normal leading-relaxed text-gray-600">
+              Share your details to request a consultation and receive a
+              tailored mainland setup estimate.
+            </p>
             <p className="rounded-xl border border-[#f0d6c2] bg-[#fff7f0] px-4 py-4 text-sm font-medium leading-7 text-[#6b3c18]">
               {mainlandMessage}
             </p>
+
+            {showSuccess ? (
+              <div className="rounded-xl z-10 relative bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
+                <div className="flex items-center gap-4">
+                  <div className="grid h-16 w-16 place-items-center rounded-full bg-[linear-gradient(180deg,#e8e8e8_0%,#ffffff_100%)] text-lg font-semibold text-[#111111]">
+                    MF
+                  </div>
+                  <div>
+                    <h3 className="text-[1.55rem] font-semibold text-[#111111]">
+                      Thank You, {firstName}!
+                    </h3>
+                    <p className="mt-1 max-w-[18rem] text-sm leading-6 text-slate-500">
+                      A member of our team will contact you within 60 minutes to
+                      get you started.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={onConfirm}
+                className="instant-quote-btn brand-gradient brand-gradient-hover inline-flex w-full items-center justify-center gap-3 rounded-full border border-transparent px-6 py-4 text-base font-semibold relative z-10"
+              >
+                Request Consultation
+                <span className="instant-quote-btn__icon" aria-hidden="true">
+                  <ArrowRight size={18} />
+                </span>
+              </button>
+            )}
           </div>
         </aside>
       );
@@ -281,7 +315,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
 
             {visaRows.length > 0 ? (
               <QuoteSection
-                title="Number of Visas"
+                title="Visa Selection & Fees"
                 onEdit={onEditVisas}
                 total={formatAed(quote.visaTotal)}
                 rows={visaRows}
@@ -320,13 +354,13 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
         ) : null}
         <div className="relative mt-16">
           <div className="space-y-4">
-            <div className="relative rounded-xl bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)] z-10">
-              <div className="flex items-center justify-between gap-4">
+            <div className="relative rounded-xl bg-white px-5 py-4 shadow-[0_20px_50px_rgba(60,91,125,0.14)] z-10">
+              <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-base font-medium text-[#252b35]">
+                  <p className="text-sm font-medium text-[#252b35]">
                     Grand Total
                   </p>
-                  <strong className="mt-1 block text-xl font-semibold leading-none text-[#111111]">
+                  <strong className="mt-1 block text-lg font-semibold leading-none text-[#111111]">
                     {formatAed(quote.total)}
                   </strong>
                 </div>
@@ -334,7 +368,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
                 <button
                   type="button"
                   onClick={onShare}
-                  className="inline-flex  min-w-[5.2rem] flex-col items-center gap-1 rounded-2xl p-3 text-[#111111] transition hover:bg-[#f3f3f3]"
+                  className="inline-flex  min-w-[3.4rem] flex-col items-center gap-0 rounded-lg p-3 text-[#111111] transition hover:bg-[#f3f3f3]"
                   aria-label="Share"
                 >
                   {shareStatus === "copied" ? (
@@ -342,7 +376,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
                   ) : (
                     <Share2 size={22} />
                   )}
-                  <span className="text-sm font-medium text-slate-500">
+                  <span className="text-xs font-medium text-slate-500">
                     {shareStatus === "copied" ? "Copied" : "Share"}
                   </span>
                 </button>
@@ -370,10 +404,12 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
               <button
                 type="button"
                 onClick={onConfirm}
-                className="brand-gradient brand-gradient-hover inline-flex w-full items-center justify-center gap-3 rounded-full border border-transparent px-6 py-4 text-base font-semibold relative z-10"
+                className="instant-quote-btn brand-gradient brand-gradient-hover inline-flex w-full items-center justify-center gap-3 rounded-full border border-transparent px-6 py-3 text-base font-semibold relative z-10"
               >
                 Get Instant Quote
-                <ArrowRight size={18} />
+                <span className="instant-quote-btn__icon" aria-hidden="true">
+                  <ArrowRight size={18} />
+                </span>
               </button>
             )}
 

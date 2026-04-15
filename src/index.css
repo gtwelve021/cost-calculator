@@ -78,6 +78,31 @@ a {
   filter: brightness(0.96);
 }
 
+.instant-quote-btn {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.instant-quote-btn__icon {
+  display: inline-flex;
+  transition: transform 180ms ease;
+}
+
+.instant-quote-btn:hover,
+.instant-quote-btn:focus-visible {
+  background: white;
+  border-color: #111111;
+  color: #111111;
+  filter: none;
+}
+
+.instant-quote-btn:hover .instant-quote-btn__icon,
+.instant-quote-btn:focus-visible .instant-quote-btn__icon {
+  transform: translateX(4px);
+}
+
 .phone-field {
   position: relative;
   width: 100%;

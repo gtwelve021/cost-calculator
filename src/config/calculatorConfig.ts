@@ -97,10 +97,10 @@ export const licenseOptions: LicenseOption[] = [
   {
     id: 'fawri',
     name: 'Mainland',
-    timeline: 'In 60 Mins',
-    tagline: 'Launch quickly',
+    timeline: 'Consultation Required',
+    tagline: 'Consultation-led setup',
     description:
-      "Start fast with a solo-friendly instant license that's designed to evolve with your business.",
+      'Mainland setup is tailored to your activity and structure. Submit your details to receive a consultation-based estimate.',
     features: ['Solo-friendly launch path', 'Digital onboarding', 'Visa-ready structure'],
     modalCopy: [
       'Fawri is designed for founders who want to get started fast without sacrificing credibility.',
@@ -124,7 +124,7 @@ export const licenseOptions: LicenseOption[] = [
     ],
     basePrice: 12500,
     image: regularLicenseArtwork,
-    selectLabel: 'Select Regular License',
+    selectLabel: 'Select Free Zone',
   },
 ]
 

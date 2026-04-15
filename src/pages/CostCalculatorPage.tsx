@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,
+  Check,
   CheckCheck,
   CircleAlert,
   Minus,
@@ -62,7 +63,7 @@ import { submitQuoteToSheet } from "../utils/sheets";
 const DEFAULT_PHONE_COUNTRY = "ae";
 const DEFAULT_PHONE_DIAL_CODE = "971";
 const MAINLAND_CONSULTATION_MESSAGE =
-  "Mainland license starts from 50,000 AED. Please contact us for consultation.";
+  "Mainland license pricing starts from AED 50,000. Submit your details for a consultation.";
 const REGION_NAMES =
   typeof Intl !== "undefined" && typeof Intl.DisplayNames !== "undefined"
     ? new Intl.DisplayNames(["en"], { type: "region" })
@@ -259,7 +260,10 @@ function CategoryCard({
   return (
     <div className="relative w-full snap-start overflow-hidden rounded-2xl border border-[#e2e9f2] bg-white p-5 shadow-[0_8px_22px_rgba(71,103,136,0.08)] transition hover:shadow-[0_10px_28px_rgba(71,103,136,0.12)]">
       {category.image ? (
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div
+          className="pointer-events-none absolute inset-0"
+          aria-hidden="true"
+        >
           <div
             className="absolute -right-10 -top-12 h-32 w-40 rounded-3xl bg-cover bg-center opacity-30"
             style={{ backgroundImage: `url(${category.image})` }}
@@ -294,14 +298,10 @@ function CategoryCard({
         onClick={onOpen}
         className="relative mt-5 w-full text-left"
       >
-        <h3 className="text-sm leading-none font-semibold">
-          {category.name}
-        </h3>
+        <h3 className="text-sm leading-none font-semibold">{category.name}</h3>
         <div className="mt-3 flex items-center justify-between text-sm text-[#4f5f72]">
           <span>
-            {selected
-              ? `${selectedCount} selected`
-              : "Select your activity"}
+            {selected ? `${selectedCount} selected` : "Select your activity"}
           </span>
           <ArrowRight size={16} className="rotate-[-27deg] text-[#111723]" />
         </div>
@@ -530,12 +530,10 @@ export function CostCalculatorPage() {
   const calculatorUnlocked = quoteStarted && leadReady;
   const selectedLicense =
     licenseOptions.find((item) => item.id === selectedLicenseId) ?? null;
-  const isMainlandSelected = (selectedLicense?.name ?? "")
-    .trim()
-    .toLowerCase() === "mainland";
-  const isFreeZoneSelected = (selectedLicense?.name ?? "")
-    .trim()
-    .toLowerCase() === "free zone";
+  const isMainlandSelected =
+    (selectedLicense?.name ?? "").trim().toLowerCase() === "mainland";
+  const isFreeZoneSelected =
+    (selectedLicense?.name ?? "").trim().toLowerCase() === "free zone";
   const selectedActivitySet = useMemo(
     () => new Set(selectedActivityIds),
     [selectedActivityIds],
@@ -909,7 +907,7 @@ export function CostCalculatorPage() {
                                 "w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#343434] outline-none transition placeholder:text-[#9b9b9b] focus:bg-transparent",
                                 errors.fullName
                                   ? "border-[#f15b43] ring-1 ring-[#f15b43]/15"
-                                  : "border-[#d8d8dc] focus:border-[#111111]",
+                                  : "border-[#EDEDED] focus:border-[#111111]",
                               )}
                               placeholder="Your name"
                               aria-label="Enter your full name"
@@ -918,8 +916,6 @@ export function CostCalculatorPage() {
                           </div>
                         )}
                       />
-
-
 
                       <Controller
                         control={control}
@@ -947,13 +943,13 @@ export function CostCalculatorPage() {
                                 phoneCountry,
                                 phoneDialCode,
                               );
-                              const dialCode = phoneSelection.dialCode || phoneDialCode;
+                              const dialCode =
+                                phoneSelection.dialCode || phoneDialCode;
 
                               return (
                                 <PhoneInput
                                   country={
-                                    phoneSelection.country ||
-                                    phoneCountry
+                                    phoneSelection.country || phoneCountry
                                   }
                                   value={getPhoneInputValue(
                                     field.value ?? "",
@@ -962,15 +958,16 @@ export function CostCalculatorPage() {
                                   onBlur={field.onBlur}
                                   onChange={(value, country) => {
                                     const countryData =
-                                      (typeof country === "object" &&
+                                      typeof country === "object" &&
                                       country !== null
                                         ? (country as {
                                             countryCode?: string;
                                             dialCode?: string;
                                           })
-                                        : undefined);
+                                        : undefined;
                                     const selectedCountry =
-                                      typeof countryData?.countryCode === "string"
+                                      typeof countryData?.countryCode ===
+                                      "string"
                                         ? countryData.countryCode.toLowerCase()
                                         : phoneCountry;
                                     const selectedDialCode =
@@ -978,9 +975,12 @@ export function CostCalculatorPage() {
                                         ? countryData.dialCode
                                         : phoneDialCode;
 
-                                    setPhoneCountry(selectedCountry || DEFAULT_PHONE_COUNTRY);
+                                    setPhoneCountry(
+                                      selectedCountry || DEFAULT_PHONE_COUNTRY,
+                                    );
                                     setPhoneDialCode(
-                                      selectedDialCode || DEFAULT_PHONE_DIAL_CODE,
+                                      selectedDialCode ||
+                                        DEFAULT_PHONE_DIAL_CODE,
                                     );
 
                                     const normalized = normalizePhoneNumber(
@@ -1056,7 +1056,7 @@ export function CostCalculatorPage() {
                                 "w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#343434] outline-none transition placeholder:text-[#9b9b9b] focus:bg-transparent",
                                 errors.email
                                   ? "border-[#f15b43] ring-1 ring-[#f15b43]/15"
-                                  : "border-[#d8d8dc] focus:border-[#111111]",
+                                  : "border-[#EDEDED] focus:border-[#111111]",
                               )}
                               placeholder="Email address"
                               aria-label="Enter email address"
@@ -1087,7 +1087,7 @@ export function CostCalculatorPage() {
                                 "select-field w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#343434] outline-none transition focus:bg-transparent",
                                 errors.residenceCountry
                                   ? "border-[#f15b43] focus:border-[#f15b43]"
-                                  : "border-[#d8d8dc] focus:border-[#111111]",
+                                  : "border-[#EDEDED] focus:border-[#111111]",
                               )}
                               aria-label="Current Country of Residence"
                             >
@@ -1120,9 +1120,10 @@ export function CostCalculatorPage() {
                                 aria-label="Terms and privacy policy"
                               />
                               <span className="consent-text">
-                                I confirm that I have read and understood kanoony's{" "}
+                                I confirm that I have read and understood
+                                kanoony's{" "}
                                 <a
-                                  href="https://meydanfz.ae/terms-and-conditions"
+                                  href="https://kanoony.com/terms-and-conditions"
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
@@ -1130,7 +1131,7 @@ export function CostCalculatorPage() {
                                 </a>{" "}
                                 and{" "}
                                 <a
-                                  href="https://meydanfz.ae/privacy-policy"
+                                  href="https://kanoony.com/privacy-policy"
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
@@ -1140,19 +1141,18 @@ export function CostCalculatorPage() {
                                 data for the purposes of communication and
                                 service delivery. I agree to be contacted via
                                 email, phone, or WhatsApp. I acknowledge that
-                                kanoony operates 24/7 and that contact
-                                may occur outside standard business hours,
-                                including after 6:00 PM UAE time.
+                                kanoony operates 24/7 and that contact may occur
+                                outside standard business hours, including after
+                                6:00 PM UAE time.
                                 {isConsentExpanded ? (
                                   <>
                                     <br />
-                                    <br />
-                                    I further acknowledge that kanoony will
-                                    never request passwords, one-time passcodes
-                                    (OTPs), or payments to personal or unknown
-                                    bank accounts and that I should verify any
-                                    suspicious or unexpected communication by
-                                    calling{" "}
+                                    <br />I further acknowledge that kanoony
+                                    will never request passwords, one-time
+                                    passcodes (OTPs), or payments to personal or
+                                    unknown bank accounts and that I should
+                                    verify any suspicious or unexpected
+                                    communication by calling{" "}
                                     <strong>800 FZ1 (800 391)</strong> before
                                     taking any action.
                                   </>
@@ -1168,7 +1168,9 @@ export function CostCalculatorPage() {
                                     setIsConsentExpanded((current) => !current);
                                   }}
                                 >
-                                  {isConsentExpanded ? "Read less" : "Read more"}
+                                  {isConsentExpanded
+                                    ? "Read less"
+                                    : "Read more"}
                                 </button>
                               </span>
                             </label>
@@ -1189,22 +1191,25 @@ export function CostCalculatorPage() {
                     <button
                       type="submit"
                       disabled={isUnlocking}
-                      className="brand-gradient brand-gradient-hover gap-3 inline-flex items-center justify-center rounded-full px-6 py-3 text-base font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+                      className="instant-quote-btn brand-gradient brand-gradient-hover gap-3 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isUnlocking ? "Unlocking calculator..." : "Calculate"}{" "}
-                      <ArrowRight size={18} />
+                      <span
+                        className="instant-quote-btn__icon"
+                        aria-hidden="true"
+                      >
+                        <ArrowRight size={18} />
+                      </span>
                     </button>
 
-                    <p
-                      className={cn(
-                        "text-sm",
-                        calculatorUnlocked ? "text-green-600" : "text-gray-600",
-                      )}
-                    >
-                      {calculatorUnlocked
-                        ? "You're all set. Let's explore your business setup options."
-                        : "This is a required step to calculate your business setup cost."}
-                    </p>
+                    {calculatorUnlocked ? (
+                      <div className="bg-[#ECFDF5] w-full border-l-4 border-green-600 px-4 py-2 rounded-lg">
+                        <p className="text-sm text-green-600 font-normal flex items-center gap-2">
+                          <span className="bg-green-600 rounded-full"><Check size={18} className="text-white p-[2px]" /></span> You're all set. Let's explore your business setup
+                          options.
+                        </p>
+                      </div>
+                    ) : null}
                   </form>
 
                   {calculatorUnlocked ? (
@@ -1320,591 +1325,599 @@ export function CostCalculatorPage() {
                             {MAINLAND_CONSULTATION_MESSAGE}
                           </div>
                         ) : (
-                        <>
-                        {isFreeZoneSelected ? (
-                          <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                            <h3 className="text-base font-semibold text-gray-900 leading-12">
-                              Select Location
-                            </h3>
-                            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                              <button
-                                type="button"
-                                onClick={() => setSelectedFreeZoneLocation("dubai")}
-                                className={cn(
-                                  "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
-                                  selectedFreeZoneLocation === "dubai"
-                                    ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                    : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                )}
-                              >
-                                Dubai
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setSelectedFreeZoneLocation(
-                                    "northern-emirates",
-                                  )
-                                }
-                                className={cn(
-                                  "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
-                                  selectedFreeZoneLocation ===
-                                    "northern-emirates"
-                                    ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                    : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                )}
-                              >
-                                Northern Emirates
-                              </button>
-                            </div>
-                          </div>
-                        ) : null}
-                        <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                          <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                            <h3 className="text-base font-semibold text-gray-900 leading-12">
-                              Duration of Business License
-                            </h3>
-                            <div className="mt-5 flex flex-wrap gap-3">
-                              {[1, 2, 3, 4, 5, 6].map((year) => {
-                                const selected = durationYears === year;
-
-                                return (
+                          <>
+                            {isFreeZoneSelected ? (
+                              <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                                <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                  Select Location
+                                </h3>
+                                <div className="mt-5 grid gap-3 sm:grid-cols-2">
                                   <button
-                                    key={year}
                                     type="button"
-                                    onClick={() => {
-                                      setShowSuccess(false);
-                                      setDurationYears(year);
-                                    }}
+                                    onClick={() =>
+                                      setSelectedFreeZoneLocation("dubai")
+                                    }
                                     className={cn(
-                                      "rounded-full border px-5 py-3 text-left transition shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                      selected
-                                        ? "  brand-gradient brand-gradient-hover text-white"
-                                        : " bg-[#fbfcfe] text-[#111723] ",
+                                      "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
+                                      selectedFreeZoneLocation === "dubai"
+                                        ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                        : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                     )}
                                   >
-                                    <span className="block text-sm font-semibold transition">
-                                      {selected
-                                        ? year === 1
-                                          ? "1 Year"
-                                          : `${year} Years`
-                                        : year}
-                                    </span>
+                                    Dubai
                                   </button>
-                                );
-                              })}
-                            </div>
-
-                            <p className="mt-7 text-xs leading-4 text-gray-400">
-                              * Discounts available on multi-year licenses
-                            </p>
-                          </div>
-
-                          <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                            <h3 className="text-base font-semibold text-gray-900 leading-12">
-                              Number of Shareholders
-                            </h3>
-
-                            <div
-                              className={cn(
-                                "mt-5 flex items-center gap-3",
-                                shareholderCounterSelected
-                                  ? "justify-between"
-                                  : "justify-end",
-                              )}
-                            >
-                              {shareholderCounterSelected ? (
-                                <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setShowSuccess(false);
-                                      setShareholderCount(
-                                        Math.max(1, shareholderCount - 1),
-                                      );
-                                    }}
-                                    className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
-                                    aria-label="Decrease Shareholders"
-                                  >
-                                    <Minus size={16} />
-                                  </button>
-                                  <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
-                                    {shareholderCount}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setShowSuccess(false);
-                                      setShareholderCount(
-                                        Math.min(15, shareholderCount + 1),
-                                      );
-                                    }}
-                                    className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
-                                    aria-label="Increase Shareholders"
-                                  >
-                                    <Plus size={16} />
-                                  </button>
-                                </div>
-                              ) : null}
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setShowSuccess(false);
-                                  setShareholderCounterSelected(true);
-                                }}
-                                className={cn(
-                                  "px-6 py-3 rounded-full inline-flex items-center gap-2",
-                                  shareholderCounterSelected
-                                    ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                    : " bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                )}
-                              >
-                                {shareholderCounterSelected ? (
-                                  <>
-                                    <CheckCheck size={16} aria-hidden="true" />
-                                    Selected
-                                  </>
-                                ) : (
-                                  "Select"
-                                )}
-                              </button>
-                            </div>
-
-                            <p className="mt-7 text-xs leading-4 text-gray-400">
-                              * Includes {pricingConfig.includedShareholders}{" "}
-                              shareholders;{" "}
-                              {formatAed(pricingConfig.extraShareholderFee)} for
-                              each additional.
-                            </p>
-                          </div>
-                        </div>
-                        </>
-                        )}
-                      </div>
-                      {!isMainlandSelected ? (
-                      <div
-                        ref={activitiesSectionRef}
-                        className="relative scroll-mt-24 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
-                      >
-                        <SectionHeading
-                          title="Select Your Business Activities"
-                          description={`Choose business activities from 2,500+ options.`}
-                        />
-                        <div className="mt-8 flex items-start gap-3 rounded-xl border border-[#d9e8f8] bg-[#eaf4ff] px-4 py-3 text-[#2d68a6]">
-                          <span className="mt-0.5 rounded-lg bg-[#2a4bcf] p-1.5 text-white">
-                            <CircleAlert size={14} />
-                          </span>
-                          <p className="text-xs font-semibold leading-6">
-                            You get 3 business activity groups included with
-                            your license at no cost. Any additional activities
-                            will incur a charge of AED 1,000 each.
-                          </p>
-                        </div>
-                        <div className="mt-6 rounded-xl border border-[#e1e8f1] bg-white px-5 py-4 shadow-[0_8px_22px_rgba(71,103,136,0.08)]">
-                          <label
-                            htmlFor="activity-search"
-                            className="mb-2 block text-sm font-medium text-[#28394c]"
-                          >
-                            Search business activity group
-                          </label>
-                          <div className="relative">
-                            <Search
-                              size={18}
-                              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                            />
-                            <input
-                              id="activity-search"
-                              value={activityQuery}
-                              onChange={(event) =>
-                                setActivityQuery(event.target.value)
-                              }
-                              className="w-full rounded-[1rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
-                              placeholder="Search business activity group"
-                              aria-label="Search activity categories"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mt-6 rounded-2xl border border-[#dbe6f3] bg-[#eaf3fb] p-2">
-                          <div className="grid grid-flow-col grid-rows-2 auto-cols-[12rem] gap-2 overflow-x-auto pb-2 pr-2">
-                          {filteredCategories.map((category) => {
-                            const categorySelections =
-                              selectedActivities.filter(
-                                (activity) =>
-                                  activity.categoryId === category.id,
-                              );
-
-                            return (
-                              <CategoryCard
-                                key={category.id}
-                                category={category}
-                                selectedCount={categorySelections.length}
-                                onOpen={() => {
-                                  setActivityModalQuery("");
-                                  setActivityCategoryModalId(category.id);
-                                }}
-                              />
-                            );
-                          })}
-                          </div>
-                        </div>
-                      </div>
-                      ) : null}
-                      {!isMainlandSelected ? (
-                      <div
-                        ref={visasSectionRef}
-                        className="relative scroll-mt-24"
-                      >
-                        <SectionHeading
-                          title="Please Select Your Visa Type"
-                          description="Choose the visa types you need, for yourself, your team, or your dependents."
-                        />
-
-                        <div className="mt-6 grid gap-5 xl:grid-cols-2">
-                          {visaOptions.map((visa) => {
-                            const isInvestor = visa.id === "investor-visa";
-                            const count =
-                              visa.id === "employee-visa"
-                                ? employeeVisaCount
-                                : visa.id === "dependent-visa"
-                                  ? dependentVisaCount
-                                  : investorVisaEnabled
-                                    ? 1
-                                    : 0;
-
-                            return (
-                              <div
-                                key={visa.id}
-                                className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] border-[#e6ebf2]"
-                              >
-                                <div className="w-full overflow-hidden rounded-2xl">
-                                  <img
-                                    src={visa.image}
-                                    alt={visa.name}
-                                    className="h-full w-full object-cover"
-                                  />
-                                </div>
-
-                                <div className="mt-5 mb-2 flex items-start justify-between gap-4">
-                                  <h3 className="text-base font-semibold text-gray-900 leading-12">
-                                    {visa.name}
-                                  </h3>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => setVisaModalId(visa.id)}
-                                    className="text-xs font-medium flex items-center gap-1 p-1"
-                                    aria-label={`Learn more about ${visa.name}`}
-                                  >
-                                    Learn More{" "}
-                                    <ArrowRight
-                                      size={16}
-                                      className="rotate-[-27deg]"
-                                    />
-                                  </button>
-                                </div>
-                                <p className="text-xs font-normal leading-12 text-gray-600">
-                                  {visa.description}
-                                </p>
-                                <div className="mt-6 flex items-center justify-end gap-4">
-                                  {isInvestor ? (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setShowSuccess(false);
-                                        setInvestorVisaEnabled(
-                                          (current) => !current,
-                                        );
-                                      }}
-                                      className={cn(
-                                        "inline-flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                        investorVisaEnabled
-                                          ? "shadow-[0_10px_24px_rgba(20,115,230,0.18)]"
-                                          : "hover:bg-white",
-                                      )}
-                                      aria-label="Toggle Investor Visa"
-                                    >
-                                      <span className="">
-                                        {investorVisaEnabled ? "Yes" : "No"}
-                                      </span>
-                                      <span
-                                        className={cn(
-                                          "relative grid h-7 w-[3.2rem] place-items-center rounded-full transition ",
-                                          investorVisaEnabled
-                                            ? "brand-gradient brand-gradient-hover"
-                                            : "bg-white",
-                                        )}
-                                      >
-                                        <span
-                                          className={cn(
-                                            "h-5 w-5 rounded-full bg-white shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] transition-transform",
-                                            investorVisaEnabled
-                                              ? "translate-x-[0.7rem]"
-                                              : "-translate-x-[0.7rem]",
-                                          )}
-                                        />
-                                      </span>
-                                    </button>
-                                  ) : (
-                                    <div
-                                      className={cn(
-                                        "flex w-full items-center gap-3",
-                                        count > 0
-                                          ? "justify-between"
-                                          : "justify-end",
-                                      )}
-                                    >
-                                      {count > 0 ? (
-                                        <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              visa.id === "employee-visa"
-                                                ? updateEmployeeCount(
-                                                    Math.max(
-                                                      0,
-                                                      employeeVisaCount - 1,
-                                                    ),
-                                                  )
-                                                : updateDependentCount(
-                                                    Math.max(
-                                                      0,
-                                                      dependentVisaCount - 1,
-                                                    ),
-                                                  )
-                                            }
-                                            className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
-                                            aria-label={`Decrease ${visa.name}`}
-                                          >
-                                            <Minus size={16} />
-                                          </button>
-                                          <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
-                                            {count}
-                                          </span>
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              visa.id === "employee-visa"
-                                                ? updateEmployeeCount(
-                                                    employeeVisaCount + 1,
-                                                  )
-                                                : updateDependentCount(
-                                                    dependentVisaCount + 1,
-                                                  )
-                                            }
-                                            className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
-                                            aria-label={`Increase ${visa.name}`}
-                                          >
-                                            <Plus size={16} />
-                                          </button>
-                                        </div>
-                                      ) : null}
-
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setShowSuccess(false);
-                                          if (visa.id === "employee-visa") {
-                                            updateEmployeeCount(
-                                              count > 0 ? 0 : 1,
-                                            );
-                                          } else {
-                                            updateDependentCount(
-                                              count > 0 ? 0 : 1,
-                                            );
-                                          }
-                                        }}
-                                        className={cn(
-                                          "px-6 py-3 rounded-full inline-flex items-center gap-2",
-                                          count > 0
-                                            ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                            : " bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                        )}
-                                        aria-label={
-                                          count > 0
-                                            ? `Select ${visa.name}`
-                                            : `Select ${visa.name}`
-                                        }
-                                      >
-                                        {count > 0 ? (
-                                          <>
-                                            <CheckCheck
-                                              size={16}
-                                              aria-hidden="true"
-                                            />
-                                            Selected
-                                          </>
-                                        ) : (
-                                          "Select"
-                                        )}
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {totalVisaApplicants > 0 ? (
-                          <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                            <div className="w-full overflow-hidden rounded-2xl aspect-[286/128]">
-                              <img
-                                src={changeStatusCardImage}
-                                alt="Change of Status"
-                                className="h-full w-full object-cover"
-                              />
-                            </div>
-
-                            <div className="mt-5 mb-2 flex items-start justify-between gap-4">
-                              <h3 className="text-base font-semibold text-gray-900 leading-12">
-                                Change of Status
-                              </h3>
-
-                              <a
-                                href="#cc-faq"
-                                className="text-xs font-medium flex items-center gap-1 p-1"
-                                aria-label="Learn more about Change of Status"
-                              >
-                                Learn More{" "}
-                                <ArrowRight
-                                  size={16}
-                                  className="rotate-[-27deg]"
-                                />
-                              </a>
-                            </div>
-
-                            <p className="text-xs font-normal leading-12 text-gray-600">
-                              Required for applicants currently in the UAE, so
-                              their visa can be processed locally without
-                              needing to exit and re-enter.
-                            </p>
-
-                            <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                              <p className="text-[#9aaabc] text-sm font-medium leading-6">
-                                Applicants Outside the UAE: {applicantsOutsideUae}
-                              </p>
-
-                              <div className="flex w-full items-center justify-between gap-3 md:w-auto">
-                                <p className="text-sm font-semibold text-[#111723] leading-6 whitespace-nowrap">
-                                  Applicants Inside the UAE:
-                                </p>
-                                <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
                                   <button
                                     type="button"
                                     onClick={() =>
-                                      updateApplicantsInside(
-                                        Math.max(0, applicantsInsideUae - 1),
+                                      setSelectedFreeZoneLocation(
+                                        "northern-emirates",
                                       )
                                     }
-                                    className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
-                                    aria-label="Decrease Applicants Inside the UAE"
+                                    className={cn(
+                                      "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
+                                      selectedFreeZoneLocation ===
+                                        "northern-emirates"
+                                        ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                        : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                    )}
                                   >
-                                    <Minus size={16} />
-                                  </button>
-                                  <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
-                                    {applicantsInsideUae}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      updateApplicantsInside(
-                                        Math.min(
-                                          totalVisaApplicants,
-                                          applicantsInsideUae + 1,
-                                        ),
-                                      )
-                                    }
-                                    className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
-                                    aria-label="Increase Applicants Inside the UAE"
-                                  >
-                                    <Plus size={16} />
+                                    Northern Emirates
                                   </button>
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-                      ) : null}
-                      {!isMainlandSelected ? (
-                      <div
-                        ref={addOnsSectionRef}
-                        className="relative scroll-mt-24"
-                      >
-                        <SectionHeading
-                          title="Add-ons"
-                          description="Customise your setup with additional services to help you start and scale with confidence."
-                        />
-
-                        <div className="mt-6 space-y-5">
-                          {addOnGroups.map((group) => {
-                            const groupItems = addOnOptions.filter(
-                              (item) => item.groupId === group.id,
-                            );
-
-                            return (
-                              <div
-                                key={group.id}
-                                className="overflow-hidden isolate rounded-xl border-t border-white/20 "
-                              >
-                                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                                  <div>
-                                    <h3 className="mt-2 text-[1.45rem] font-semibold text-[#111723]">
-                                      {group.name}
-                                    </h3>
-                                    <p className="mt-2 max-w-[42rem] text-sm leading-7 text-slate-500">
-                                      {group.description}
-                                    </p>
-                                  </div>
-
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setAddOnGroupModalId(group.id)
-                                    }
-                                    className="text-xs font-medium flex items-center gap-1 p-1"
-                                    aria-label={`Learn more about ${group.name}`}
-                                  >
-                                    Learn More  <ArrowRight
-                                  size={16}
-                                  className="rotate-[-27deg]"
-                                />
-                                  </button>
-                                </div>
-
+                            ) : null}
+                            <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                              <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                                <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                  Duration of Business License
+                                </h3>
                                 <div className="mt-5 flex flex-wrap gap-3">
-                                  {groupItems.map((item) => {
-                                    const selected = selectedAddOnSet.has(
-                                      item.id,
-                                    );
+                                  {[1, 2, 3, 4, 5, 6].map((year) => {
+                                    const selected = durationYears === year;
 
                                     return (
                                       <button
-                                        key={item.id}
+                                        key={year}
                                         type="button"
-                                        onClick={() => toggleAddOn(item.id)}
-                                        aria-pressed={selected}
+                                        onClick={() => {
+                                          setShowSuccess(false);
+                                          setDurationYears(year);
+                                        }}
                                         className={cn(
-                                          "rounded-full border px-4 py-3 text-left text-xs transition",
+                                          "rounded-full border px-5 py-3 text-left transition shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                           selected
-                                            ? "border-[#111111] bg-[#f3f3f3] text-[#111111]"
-                                            : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
+                                            ? "  brand-gradient brand-gradient-hover text-white"
+                                            : " bg-[#fbfcfe] text-[#111723] ",
                                         )}
                                       >
-                                        <span className="font-semibold">
-                                          {item.name}
+                                        <span className="block text-sm font-semibold transition">
+                                          {selected
+                                            ? year === 1
+                                              ? "1 Year"
+                                              : `${year} Years`
+                                            : year}
                                         </span>
                                       </button>
                                     );
                                   })}
                                 </div>
+
+                                <p className="mt-7 text-xs leading-4 text-gray-400">
+                                  * Discounts available on multi-year licenses
+                                </p>
                               </div>
-                            );
-                          })}
-                        </div>
+
+                              <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                                <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                  Number of Shareholders
+                                </h3>
+
+                                <div
+                                  className={cn(
+                                    "mt-5 flex items-center gap-3",
+                                    shareholderCounterSelected
+                                      ? "justify-between"
+                                      : "justify-end",
+                                  )}
+                                >
+                                  {shareholderCounterSelected ? (
+                                    <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowSuccess(false);
+                                          setShareholderCount(
+                                            Math.max(1, shareholderCount - 1),
+                                          );
+                                        }}
+                                        className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+                                        aria-label="Decrease Shareholders"
+                                      >
+                                        <Minus size={16} />
+                                      </button>
+                                      <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
+                                        {shareholderCount}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowSuccess(false);
+                                          setShareholderCount(
+                                            Math.min(15, shareholderCount + 1),
+                                          );
+                                        }}
+                                        className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
+                                        aria-label="Increase Shareholders"
+                                      >
+                                        <Plus size={16} />
+                                      </button>
+                                    </div>
+                                  ) : null}
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowSuccess(false);
+                                      setShareholderCounterSelected(true);
+                                    }}
+                                    className={cn(
+                                      "px-6 py-3 rounded-full inline-flex items-center gap-2",
+                                      shareholderCounterSelected
+                                        ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                        : " bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                    )}
+                                  >
+                                    {shareholderCounterSelected ? (
+                                      <>
+                                        <CheckCheck
+                                          size={16}
+                                          aria-hidden="true"
+                                        />
+                                        Selected
+                                      </>
+                                    ) : (
+                                      "Select"
+                                    )}
+                                  </button>
+                                </div>
+
+                                <p className="mt-7 text-xs leading-4 text-gray-400">
+                                  * Includes{" "}
+                                  {pricingConfig.includedShareholders}{" "}
+                                  shareholders;{" "}
+                                  {formatAed(pricingConfig.extraShareholderFee)}{" "}
+                                  for each additional.
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </div>
+                      {!isMainlandSelected ? (
+                        <div
+                          ref={activitiesSectionRef}
+                          className="relative scroll-mt-24 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
+                        >
+                          <SectionHeading
+                            title="Select Your Business Activities"
+                            description={`Choose business activities from 2,500+ options.`}
+                          />
+                          <div className="mt-8 flex items-start gap-3 rounded-xl border border-[#d9e8f8] bg-[#eaf4ff] px-4 py-3 text-[#2d68a6]">
+                            <span className="mt-0.5 rounded-lg bg-[#2a4bcf] p-1.5 text-white">
+                              <CircleAlert size={14} />
+                            </span>
+                            <p className="text-xs font-semibold leading-6">
+                              You get 3 business activity groups included with
+                              your license at no cost. Any additional activities
+                              will incur a charge of AED 1,000 each.
+                            </p>
+                          </div>
+                          <div className="mt-6 rounded-xl border border-[#e1e8f1] bg-white px-5 py-4 shadow-[0_8px_22px_rgba(71,103,136,0.08)]">
+                            <label
+                              htmlFor="activity-search"
+                              className="mb-2 block text-sm font-medium text-[#28394c]"
+                            >
+                              Search business activity group
+                            </label>
+                            <div className="relative">
+                              <Search
+                                size={18}
+                                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                              />
+                              <input
+                                id="activity-search"
+                                value={activityQuery}
+                                onChange={(event) =>
+                                  setActivityQuery(event.target.value)
+                                }
+                                className="w-full rounded-[1rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
+                                placeholder="Search business activity group"
+                                aria-label="Search activity categories"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="mt-6 rounded-2xl border border-[#dbe6f3] bg-[#eaf3fb] p-2">
+                            <div className="grid grid-flow-col grid-rows-2 auto-cols-[12rem] gap-2 overflow-x-auto pb-2 pr-2">
+                              {filteredCategories.map((category) => {
+                                const categorySelections =
+                                  selectedActivities.filter(
+                                    (activity) =>
+                                      activity.categoryId === category.id,
+                                  );
+
+                                return (
+                                  <CategoryCard
+                                    key={category.id}
+                                    category={category}
+                                    selectedCount={categorySelections.length}
+                                    onOpen={() => {
+                                      setActivityModalQuery("");
+                                      setActivityCategoryModalId(category.id);
+                                    }}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                      {!isMainlandSelected ? (
+                        <div
+                          ref={visasSectionRef}
+                          className="relative scroll-mt-24"
+                        >
+                          <SectionHeading
+                            title="Select Visa Types"
+                            description="Choose visa types for yourself, your team, and your dependents."
+                          />
+
+                          <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                            {visaOptions.map((visa) => {
+                              const isInvestor = visa.id === "investor-visa";
+                              const count =
+                                visa.id === "employee-visa"
+                                  ? employeeVisaCount
+                                  : visa.id === "dependent-visa"
+                                    ? dependentVisaCount
+                                    : investorVisaEnabled
+                                      ? 1
+                                      : 0;
+
+                              return (
+                                <div
+                                  key={visa.id}
+                                  className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] border-[#e6ebf2]"
+                                >
+                                  <div className="w-full overflow-hidden rounded-2xl">
+                                    <img
+                                      src={visa.image}
+                                      alt={visa.name}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  </div>
+
+                                  <div className="mt-5 mb-2 flex items-start justify-between gap-4">
+                                    <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                      {visa.name}
+                                    </h3>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => setVisaModalId(visa.id)}
+                                      className="text-xs font-medium flex items-center gap-1 p-1"
+                                      aria-label={`Learn more about ${visa.name}`}
+                                    >
+                                      Learn More{" "}
+                                      <ArrowRight
+                                        size={16}
+                                        className="rotate-[-27deg]"
+                                      />
+                                    </button>
+                                  </div>
+                                  <p className="text-xs font-normal leading-12 text-gray-600">
+                                    {visa.description}
+                                  </p>
+                                  <div className="mt-6 flex items-center justify-end gap-4">
+                                    {isInvestor ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowSuccess(false);
+                                          setInvestorVisaEnabled(
+                                            (current) => !current,
+                                          );
+                                        }}
+                                        className={cn(
+                                          "inline-flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                          investorVisaEnabled
+                                            ? "shadow-[0_10px_24px_rgba(20,115,230,0.18)]"
+                                            : "hover:bg-white",
+                                        )}
+                                        aria-label="Toggle Investor Visa"
+                                      >
+                                        <span className="">
+                                          {investorVisaEnabled ? "Yes" : "No"}
+                                        </span>
+                                        <span
+                                          className={cn(
+                                            "relative grid h-7 w-[3.2rem] place-items-center rounded-full transition ",
+                                            investorVisaEnabled
+                                              ? "brand-gradient brand-gradient-hover"
+                                              : "bg-white",
+                                          )}
+                                        >
+                                          <span
+                                            className={cn(
+                                              "h-5 w-5 rounded-full bg-white shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] transition-transform",
+                                              investorVisaEnabled
+                                                ? "translate-x-[0.7rem]"
+                                                : "-translate-x-[0.7rem]",
+                                            )}
+                                          />
+                                        </span>
+                                      </button>
+                                    ) : (
+                                      <div
+                                        className={cn(
+                                          "flex w-full items-center gap-3",
+                                          count > 0
+                                            ? "justify-between"
+                                            : "justify-end",
+                                        )}
+                                      >
+                                        {count > 0 ? (
+                                          <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                visa.id === "employee-visa"
+                                                  ? updateEmployeeCount(
+                                                      Math.max(
+                                                        0,
+                                                        employeeVisaCount - 1,
+                                                      ),
+                                                    )
+                                                  : updateDependentCount(
+                                                      Math.max(
+                                                        0,
+                                                        dependentVisaCount - 1,
+                                                      ),
+                                                    )
+                                              }
+                                              className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+                                              aria-label={`Decrease ${visa.name}`}
+                                            >
+                                              <Minus size={16} />
+                                            </button>
+                                            <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
+                                              {count}
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                visa.id === "employee-visa"
+                                                  ? updateEmployeeCount(
+                                                      employeeVisaCount + 1,
+                                                    )
+                                                  : updateDependentCount(
+                                                      dependentVisaCount + 1,
+                                                    )
+                                              }
+                                              className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
+                                              aria-label={`Increase ${visa.name}`}
+                                            >
+                                              <Plus size={16} />
+                                            </button>
+                                          </div>
+                                        ) : null}
+
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setShowSuccess(false);
+                                            if (visa.id === "employee-visa") {
+                                              updateEmployeeCount(
+                                                count > 0 ? 0 : 1,
+                                              );
+                                            } else {
+                                              updateDependentCount(
+                                                count > 0 ? 0 : 1,
+                                              );
+                                            }
+                                          }}
+                                          className={cn(
+                                            "px-6 py-3 rounded-full inline-flex items-center gap-2",
+                                            count > 0
+                                              ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                              : " bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                          )}
+                                          aria-label={
+                                            count > 0
+                                              ? `Select ${visa.name}`
+                                              : `Select ${visa.name}`
+                                          }
+                                        >
+                                          {count > 0 ? (
+                                            <>
+                                              <CheckCheck
+                                                size={16}
+                                                aria-hidden="true"
+                                              />
+                                              Selected
+                                            </>
+                                          ) : (
+                                            "Select"
+                                          )}
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {totalVisaApplicants > 0 ? (
+                            <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                              <div className="w-full overflow-hidden rounded-2xl aspect-[286/128]">
+                                <img
+                                  src={changeStatusCardImage}
+                                  alt="Change of Status"
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+
+                              <div className="mt-5 mb-2 flex items-start justify-between gap-4">
+                                <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                  Change of Status
+                                </h3>
+
+                                <a
+                                  href="#cc-faq"
+                                  className="text-xs font-medium flex items-center gap-1 p-1"
+                                  aria-label="Learn more about Change of Status"
+                                >
+                                  Learn More{" "}
+                                  <ArrowRight
+                                    size={16}
+                                    className="rotate-[-27deg]"
+                                  />
+                                </a>
+                              </div>
+
+                              <p className="text-xs font-normal leading-12 text-gray-600">
+                                Required for applicants currently in the UAE, so
+                                their visa can be processed locally without
+                                needing to exit and re-enter.
+                              </p>
+
+                              <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <p className="text-[#9aaabc] text-sm font-medium leading-6">
+                                  Applicants Outside the UAE:{" "}
+                                  {applicantsOutsideUae}
+                                </p>
+
+                                <div className="flex w-full items-center justify-between gap-3 md:w-auto">
+                                  <p className="text-sm font-semibold text-[#111723] leading-6 whitespace-nowrap">
+                                    Applicants Inside the UAE:
+                                  </p>
+                                  <div className="flex items-center gap-3 rounded-full border border-[#e5ebf3] bg-[#fbfcfe] px-2 py-2">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        updateApplicantsInside(
+                                          Math.max(0, applicantsInsideUae - 1),
+                                        )
+                                      }
+                                      className="grid h-8 w-8 place-items-center rounded-full text-[#425d7b] transition hover:bg-white"
+                                      aria-label="Decrease Applicants Inside the UAE"
+                                    >
+                                      <Minus size={16} />
+                                    </button>
+                                    <span className="min-w-[2ch] text-center text-base font-semibold text-gray-900 leading-12">
+                                      {applicantsInsideUae}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        updateApplicantsInside(
+                                          Math.min(
+                                            totalVisaApplicants,
+                                            applicantsInsideUae + 1,
+                                          ),
+                                        )
+                                      }
+                                      className="brand-gradient brand-gradient-hover grid h-8 w-8 place-items-center rounded-full"
+                                      aria-label="Increase Applicants Inside the UAE"
+                                    >
+                                      <Plus size={16} />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : null}
+                      {!isMainlandSelected ? (
+                        <div
+                          ref={addOnsSectionRef}
+                          className="relative scroll-mt-24"
+                        >
+                          <SectionHeading
+                            title="Add-ons"
+                            description="Customise your setup with additional services to help you start and scale with confidence."
+                          />
+
+                          <div className="mt-6 space-y-5">
+                            {addOnGroups.map((group) => {
+                              const groupItems = addOnOptions.filter(
+                                (item) => item.groupId === group.id,
+                              );
+
+                              return (
+                                <div
+                                  key={group.id}
+                                  className="overflow-hidden isolate rounded-xl border-t border-white/20 "
+                                >
+                                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                    <div>
+                                      <h3 className="mt-2 text-[1.45rem] font-semibold text-[#111723]">
+                                        {group.name}
+                                      </h3>
+                                      <p className="mt-2 max-w-[42rem] text-sm leading-7 text-slate-500">
+                                        {group.description}
+                                      </p>
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setAddOnGroupModalId(group.id)
+                                      }
+                                      className="text-xs font-medium flex items-center gap-1 p-1"
+                                      aria-label={`Learn more about ${group.name}`}
+                                    >
+                                      Learn More{" "}
+                                      <ArrowRight
+                                        size={16}
+                                        className="rotate-[-27deg]"
+                                      />
+                                    </button>
+                                  </div>
+
+                                  <div className="mt-5 flex flex-wrap gap-3">
+                                    {groupItems.map((item) => {
+                                      const selected = selectedAddOnSet.has(
+                                        item.id,
+                                      );
+
+                                      return (
+                                        <button
+                                          key={item.id}
+                                          type="button"
+                                          onClick={() => toggleAddOn(item.id)}
+                                          aria-pressed={selected}
+                                          className={cn(
+                                            "rounded-full border px-4 py-3 text-left text-xs transition",
+                                            selected
+                                              ? "border-[#111111] bg-[#f3f3f3] text-[#111111]"
+                                              : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
+                                          )}
+                                        >
+                                          <span className="font-semibold">
+                                            {item.name}
+                                          </span>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       ) : null}
                     </>
                   ) : null}
@@ -2003,8 +2016,8 @@ export function CostCalculatorPage() {
           <div className="mx-auto max-w-[1280px] px-4 pb-10 pt-8 md:px-6 md:pb-16 md:pt-16">
             <p className="mx-auto max-w-4xl leading-6 text-base">
               Use this calculator to get a realistic estimate for setting up a
-              company in kanoony, based on how business models are
-              actually evaluated and approved.
+              company in kanoony, based on how business models are actually
+              evaluated and approved.
             </p>
           </div>
         </section>
@@ -2377,4 +2390,3 @@ export function CostCalculatorPage() {
     </>
   );
 }
-
