@@ -440,6 +440,8 @@ export function CostCalculatorPage() {
   );
   const [activityQuery, setActivityQuery] = useState("");
   const [activityModalQuery, setActivityModalQuery] = useState("");
+  const [activityModalCategoryFilter, setActivityModalCategoryFilter] =
+    useState<string>("all");
   const [quoteStarted, setQuoteStarted] = useState(() =>
     isLeadFormComplete(initialState.leadForm),
   );
@@ -606,7 +608,10 @@ export function CostCalculatorPage() {
     const query = activityModalQuery.trim().toLowerCase();
 
     return businessActivities.filter((activity) => {
-      if (activity.categoryId !== activeActivityCategory.id) {
+      if (
+        activityModalCategoryFilter !== "all" &&
+        activity.categoryId !== activityModalCategoryFilter
+      ) {
         return false;
       }
 
@@ -619,7 +624,7 @@ export function CostCalculatorPage() {
         .toLowerCase()
         .includes(query);
     });
-  }, [activeActivityCategory, activityModalQuery]);
+  }, [activeActivityCategory, activityModalCategoryFilter, activityModalQuery]);
 
   useEffect(() => {
     saveCalculatorState(state);
@@ -1601,6 +1606,9 @@ export function CostCalculatorPage() {
                                     selectedCount={categorySelections.length}
                                     onOpen={() => {
                                       setActivityModalQuery("");
+                                      setActivityModalCategoryFilter(
+                                        category.id,
+                                      );
                                       setActivityCategoryModalId(category.id);
                                     }}
                                   />
@@ -2374,42 +2382,80 @@ export function CostCalculatorPage() {
       {activeActivityCategory ? (
         <ModalShell
           isOpen
-          title={`${activeActivityCategory.name} Activities`}
-          onClose={() => setActivityCategoryModalId(null)}
+          title="Explore The Full Business Activity List"
+          subtitle="Any additional activities will incur a charge of AED 1,000 each."
+          bodyClassName="px-6 pb-6 pt-2"
+          onClose={() => {
+            setActivityCategoryModalId(null);
+            setActivityModalCategoryFilter("all");
+          }}
           footer={
             <ModalAction
               label="Save selected activities"
-              onClick={() => setActivityCategoryModalId(null)}
+              onClick={() => {
+                setActivityCategoryModalId(null);
+                setActivityModalCategoryFilter("all");
+              }}
             />
           }
         >
           <div className="space-y-5">
-            <div>
-              <label
-                htmlFor="activity-modal-search"
-                className="mb-2 block text-sm font-medium text-[#28394c]"
-              >
-                Search activities
-              </label>
-              <div className="relative">
-                <Search
-                  size={18}
-                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-                <input
-                  id="activity-modal-search"
-                  value={activityModalQuery}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="activity-modal-category"
+                  className="mb-2 block text-sm font-medium text-[#28394c]"
+                >
+                  Selected Group/ Category:
+                </label>
+                <select
+                  id="activity-modal-category"
+                  value={activityModalCategoryFilter}
                   onChange={(event) =>
-                    setActivityModalQuery(event.target.value)
+                    setActivityModalCategoryFilter(event.target.value)
                   }
-                  className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
-                  placeholder="Search within this activity group"
-                  aria-label="Search activities"
-                />
+                  className="select-field w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-4 pr-10 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
+                  aria-label="Select activity category"
+                >
+                  <option value="all">All Categories</option>
+                  {activityCategories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="activity-modal-search"
+                  className="mb-2 block text-sm font-medium text-[#28394c]"
+                >
+                  Search activities
+                </label>
+                <div className="relative">
+                  <Search
+                    size={18}
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+                  <input
+                    id="activity-modal-search"
+                    value={activityModalQuery}
+                    onChange={(event) =>
+                      setActivityModalQuery(event.target.value)
+                    }
+                    className="w-full rounded-[1.2rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
+                    placeholder={
+                      activityModalCategoryFilter === "all"
+                        ? "Search across all activities"
+                        : "Search within selected category"
+                    }
+                    aria-label="Search activities"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="max-h-[44vh] space-y-3 overflow-y-auto rounded-[1.2rem] border border-[#e6edf5] bg-[#fbfdff] p-3">
               {modalActivities.map((activity) => {
                 const selected = selectedActivitySet.has(activity.id);
 
@@ -2454,7 +2500,7 @@ export function CostCalculatorPage() {
 
               {!modalActivities.length ? (
                 <div className="rounded-[1.4rem] border border-dashed border-[#d7deea] px-4 py-5 text-sm text-slate-500">
-                  No activities matched your search inside this category.
+                  No activities matched your selected category or search.
                 </div>
               ) : null}
             </div>
@@ -2464,3 +2510,4 @@ export function CostCalculatorPage() {
     </>
   );
 }
+

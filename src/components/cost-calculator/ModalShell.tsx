@@ -5,10 +5,12 @@ import { ArrowRight, X } from "lucide-react";
 interface ModalShellProps extends PropsWithChildren {
   isOpen: boolean;
   title: string;
+  subtitle?: string;
   onClose: () => void;
   imageSrc?: string;
   imageAlt?: string;
   footer?: ReactNode;
+  bodyClassName?: string;
 }
 
 export function ModalShell({
@@ -18,7 +20,9 @@ export function ModalShell({
   imageSrc,
   isOpen,
   onClose,
+  subtitle,
   title,
+  bodyClassName,
 }: ModalShellProps) {
   return (
     <AnimatePresence>
@@ -49,20 +53,22 @@ export function ModalShell({
                 <X size={18} />
               </button>
             </div>
-
-            <div className="max-h-[72vh] overflow-y-auto px-6 pb-10 pt-4">
-              {imageSrc ? (
+            {imageSrc ? (
+              <div className="max-h-[72vh] overflow-y-auto px-6 pb-10 pt-4">
                 <img
                   src={imageSrc}
                   alt={imageAlt ?? title}
                   className="h-60 w-full rounded-[1.5rem] border border-[#edf1f7] object-cover"
                 />
-              ) : null}
-            </div>
-            <h2 className="px-6 pb-2 text-xl font-semibold">
-              {title}
-            </h2>
-            <div className="px-6 pb-6 pt-2 overflow-auto h-36">
+              </div>
+            ) : null}
+            <h2 className="px-6 pb-2 text-xl font-semibold">{title}</h2>
+            {subtitle ? (
+              <p className="px-6 text-sm leading-6 text-slate-600">
+                {subtitle}
+              </p>
+            ) : null}
+            <div className={bodyClassName ?? "px-6 pb-6 pt-2 overflow-auto h-36"}>
               <div className="space-y-4 text-sm leading-6 font-normal text-slate-600">
                 {children}
               </div>
