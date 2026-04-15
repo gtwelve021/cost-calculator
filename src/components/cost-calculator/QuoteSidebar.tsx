@@ -12,6 +12,8 @@ import { formatAed } from "../../utils/currency";
 interface QuoteSidebarProps {
   quote: QuoteBreakdown;
   selectedLicense: LicenseOption | null;
+  showCompanySetupSection?: boolean;
+  showPricing?: boolean;
   mainlandMessage?: string | null;
   durationYears: number;
   shareholderCount: number;
@@ -63,7 +65,7 @@ function QuoteSection({
           <button
             type="button"
             onClick={onEdit}
-            className="inline-flex items-center gap-1 rounded-full border border-[#e5ebf3] px-2 py-2 text-xs font-semibold text-[#425d7b] transition brand-gradient brand-gradient-hover hover:border-[#cad5e4] hover:text-[#111723]"
+            className="inline-flex items-center gap-1 rounded-full border border-[#e5ebf3] px-2 py-2 text-xs font-semibold text-[#425d7b] transition brand-gradient brand-gradient-hover hover:border-[#cad5e4] hover:text-white"
             aria-label={`Edit ${title.toLowerCase()}`}
           >
             <Pencil size={10} />
@@ -116,6 +118,8 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
       selectedActivities,
       selectedAddOns,
       selectedLicense,
+      showCompanySetupSection = true,
+      showPricing = true,
       mainlandMessage,
       shareStatus,
       showSuccess,
@@ -193,7 +197,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
     }
 
     const hasQuoteSections =
-      selectedLicense !== null ||
+      (showPricing && showCompanySetupSection && selectedLicense !== null) ||
       selectedActivityRows.length > 0 ||
       visaRows.length > 0 ||
       totalVisaApplicants > 0 ||
@@ -290,12 +294,14 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
             Your Business Setup Estimate
           </h2>
           <p className="text-sm font-normal leading-relaxed text-gray-600">
-            Here's your total cost, based on the options you selected.
+            {showPricing
+              ? "Here's your total cost, based on the options you selected."
+              : "Select a Free Zone location to view pricing and company setup details."}
           </p>
         </div>
-        {hasQuoteSections ? (
+        {showPricing && hasQuoteSections ? (
           <div className="h-80 overflow-auto pr-2">
-            {selectedLicense ? (
+            {showCompanySetupSection && selectedLicense ? (
               <QuoteSection
                 title="Company Setup"
                 onEdit={onEditCompanySetup}
@@ -361,25 +367,29 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
                     Grand Total
                   </p>
                   <strong className="mt-1 block text-lg font-semibold leading-none text-[#111111]">
-                    {formatAed(quote.total)}
+                    {showPricing
+                      ? formatAed(quote.total)
+                      : "Select Location"}
                   </strong>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={onShare}
-                  className="inline-flex  min-w-[3.4rem] flex-col items-center gap-0 rounded-lg p-3 text-[#111111] transition hover:bg-[#f3f3f3]"
-                  aria-label="Share"
-                >
-                  {shareStatus === "copied" ? (
-                    <Copy size={22} />
-                  ) : (
-                    <Share2 size={22} />
-                  )}
-                  <span className="text-xs font-medium text-slate-500">
-                    {shareStatus === "copied" ? "Copied" : "Share"}
-                  </span>
-                </button>
+                {showPricing ? (
+                  <button
+                    type="button"
+                    onClick={onShare}
+                    className="inline-flex  min-w-[3.4rem] flex-col items-center gap-0 rounded-lg p-3 text-[#111111] transition hover:bg-[#f3f3f3]"
+                    aria-label="Share"
+                  >
+                    {shareStatus === "copied" ? (
+                      <Copy size={22} />
+                    ) : (
+                      <Share2 size={22} />
+                    )}
+                    <span className="text-xs font-medium text-slate-500">
+                      {shareStatus === "copied" ? "Copied" : "Share"}
+                    </span>
+                  </button>
+                ) : null}
               </div>
             </div>
 

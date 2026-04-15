@@ -34,7 +34,7 @@ export function ModalShell({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.97 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-[0_28px_70px_rgba(15,20,34,0.28)]"
+            className="w-[650px] max-w-full max-h-[85vh] overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
             role="dialog"
             aria-modal="true"
             aria-label={title}
@@ -43,7 +43,7 @@ export function ModalShell({
               <button
                 type="button"
                 onClick={onClose}
-                className="grid h-10 w-10 place-items-center rounded-full border border-[#e4e8ef] text-slate-500 transition hover:border-[#cad2de] hover:text-[#111723]"
+                className="grid h-10 w-10 place-items-center rounded-full border border-[#e4e8ef] text-slate-500 transition hover:border-[#cad2de] hover:text-[#111723] shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
                 aria-label="Close modal"
               >
                 <X size={18} />

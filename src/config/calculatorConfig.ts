@@ -30,7 +30,7 @@ export const headerNavSections: HeaderNavSection[] = [
   },
   {
     label: 'kanoony Plus',
-    items: ['mPlus', 'mCore', 'mAccounting', 'mAssist', 'mResidency'],
+    items: ['mPlus', 'mCore', 'mAccounting', 'mAssist'],
   },
   {
     label: 'Eco System',
@@ -64,7 +64,7 @@ export const footerLinkGroups: FooterLinkGroup[] = [
   {
     id: 'kanoony-plus',
     title: 'kanoony Plus',
-    links: ['mPlus', 'mCore', 'mAccounting', 'mAssist', 'mResidency'],
+    links: ['mPlus', 'mCore', 'mAccounting', 'mAssist'],
   },
   {
     id: 'partners',
@@ -200,20 +200,6 @@ export const addOnOptions: AddOnOption[] = [
     fee: 1450,
   },
   {
-    id: 'medical-emirates-id',
-    groupId: 'mresidency',
-    name: 'Medical & Emirates ID',
-    description: 'Residency medical test and Emirates ID support.',
-    fee: 1280,
-  },
-  {
-    id: 'medical-insurance',
-    groupId: 'mresidency',
-    name: 'Medical Insurance',
-    description: 'Entry-level medical insurance guidance.',
-    fee: 980,
-  },
-  {
     id: 'melite',
     groupId: 'massist',
     name: 'mElite',
@@ -311,16 +297,6 @@ export const addOnGroups: AddOnGroup[] = [
       'It covers foundational setup support such as banking, identity materials, and e-commerce readiness.',
     ],
     itemIds: ['bank-account', 'business-card', 'company-stamp', 'ecommerce-starter'],
-  },
-  {
-    id: 'mresidency',
-    name: 'mResidency',
-    description: 'Simplified residency services for you, your employees, or your family.',
-    modalCopy: [
-      'mResidency focuses on the post-license steps needed to complete residency formalities smoothly.',
-      'It is useful for founders who want one place to estimate medical, ID, and insurance support.',
-    ],
-    itemIds: ['medical-emirates-id', 'medical-insurance'],
   },
   {
     id: 'massist',

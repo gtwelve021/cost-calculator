@@ -64,6 +64,11 @@ const DEFAULT_PHONE_COUNTRY = "ae";
 const DEFAULT_PHONE_DIAL_CODE = "971";
 const MAINLAND_CONSULTATION_MESSAGE =
   "Mainland license pricing starts from AED 50,000. Submit your details for a consultation.";
+const CHANGE_STATUS_MODAL_COPY = [
+  "Change of Status is the in-country visa transition process for applicants already inside the UAE.",
+  "It allows visa processing without exiting and re-entering the country, depending on your selected visa allocations.",
+  "The calculator estimates this cost based on how many applicants you set as inside the UAE.",
+] as const;
 const REGION_NAMES =
   typeof Intl !== "undefined" && typeof Intl.DisplayNames !== "undefined"
     ? new Intl.DisplayNames(["en"], { type: "region" })
@@ -452,6 +457,7 @@ export function CostCalculatorPage() {
   const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
   const [licenseModalId, setLicenseModalId] = useState<string | null>(null);
   const [visaModalId, setVisaModalId] = useState<string | null>(null);
+  const [isChangeStatusModalOpen, setIsChangeStatusModalOpen] = useState(false);
   const [addOnGroupModalId, setAddOnGroupModalId] = useState<string | null>(
     null,
   );
@@ -534,6 +540,9 @@ export function CostCalculatorPage() {
     (selectedLicense?.name ?? "").trim().toLowerCase() === "mainland";
   const isFreeZoneSelected =
     (selectedLicense?.name ?? "").trim().toLowerCase() === "free zone";
+  const canShowFreeZonePricing =
+    !isFreeZoneSelected || selectedFreeZoneLocation !== null;
+  const canShowPostLocationSections = canShowFreeZonePricing;
   const selectedActivitySet = useMemo(
     () => new Set(selectedActivityIds),
     [selectedActivityIds],
@@ -1205,7 +1214,10 @@ export function CostCalculatorPage() {
                     {calculatorUnlocked ? (
                       <div className="bg-[#ECFDF5] w-full border-l-4 border-green-600 px-4 py-2 rounded-lg">
                         <p className="text-sm text-green-600 font-normal flex items-center gap-2">
-                          <span className="bg-green-600 rounded-full"><Check size={18} className="text-white p-[2px]" /></span> You're all set. Let's explore your business setup
+                          <span className="bg-green-600 rounded-full">
+                            <Check size={18} className="text-white p-[2px]" />
+                          </span>{" "}
+                          You're all set. Let's explore your business setup
                           options.
                         </p>
                       </div>
@@ -1249,7 +1261,7 @@ export function CostCalculatorPage() {
                                   }
                                 }}
                                 className={cn(
-                                  "cursor-pointer overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                  "cursor-pointer overflow-hidden isolate rounded-xl p-4 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                   selected
                                     ? "border-[#111111] ring-2 ring-[#d9d9d9]"
                                     : "border-[#e6ebf2]",
@@ -1366,7 +1378,8 @@ export function CostCalculatorPage() {
                                 </div>
                               </div>
                             ) : null}
-                            <div className="mt-6 grid gap-5 xl:grid-cols-2">
+                            {canShowPostLocationSections ? (
+                              <div className="mt-6 grid gap-5 xl:grid-cols-2">
                               <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
                                 <h3 className="text-base font-semibold text-gray-900 leading-12">
                                   Duration of Business License
@@ -1407,7 +1420,7 @@ export function CostCalculatorPage() {
                                 </p>
                               </div>
 
-                              <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                              <div className="overflow-hidden isolate rounded-xl px-5 py-4 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
                                 <h3 className="text-base font-semibold text-gray-900 leading-12">
                                   Number of Shareholders
                                 </h3>
@@ -1458,13 +1471,22 @@ export function CostCalculatorPage() {
                                     type="button"
                                     onClick={() => {
                                       setShowSuccess(false);
-                                      setShareholderCounterSelected(true);
+                                      setShareholderCounterSelected(
+                                        (current) => {
+                                          const next = !current;
+                                          if (!next) {
+                                            setShareholderCount(1);
+                                          }
+                                          return next;
+                                        },
+                                      );
                                     }}
+                                    aria-label="Select Shareholders"
                                     className={cn(
                                       "px-6 py-3 rounded-full inline-flex items-center gap-2",
                                       shareholderCounterSelected
                                         ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                        : " bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                        : "  text-black border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                     )}
                                   >
                                     {shareholderCounterSelected ? (
@@ -1489,36 +1511,31 @@ export function CostCalculatorPage() {
                                   for each additional.
                                 </p>
                               </div>
-                            </div>
+                              </div>
+                            ) : null}
                           </>
                         )}
                       </div>
-                      {!isMainlandSelected ? (
+                      {!isMainlandSelected && canShowPostLocationSections ? (
                         <div
                           ref={activitiesSectionRef}
-                          className="relative scroll-mt-24 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
+                          className="relative scroll-mt-24 overflow-hidden isolate rounded-xl p-6 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
                         >
                           <SectionHeading
                             title="Select Your Business Activities"
                             description={`Choose business activities from 2,500+ options.`}
                           />
-                          <div className="mt-8 flex items-start gap-3 rounded-xl border border-[#d9e8f8] bg-[#eaf4ff] px-4 py-3 text-[#2d68a6]">
-                            <span className="mt-0.5 rounded-lg bg-[#2a4bcf] p-1.5 text-white">
-                              <CircleAlert size={14} />
+                          <div className="mt-8 flex items-center gap-3 rounded-xl bg-[#eaf4ff] px-4 py-3 text-[#2d68a6]">
+                            <span className="mt-0.5 rounded-lg bg-[#2a4bcf] p-1 text-white">
+                              <CircleAlert size={12} />
                             </span>
-                            <p className="text-xs font-semibold leading-6">
+                            <p className="text-xs font-normal leading-4">
                               You get 3 business activity groups included with
                               your license at no cost. Any additional activities
                               will incur a charge of AED 1,000 each.
                             </p>
                           </div>
-                          <div className="mt-6 rounded-xl border border-[#e1e8f1] bg-white px-5 py-4 shadow-[0_8px_22px_rgba(71,103,136,0.08)]">
-                            <label
-                              htmlFor="activity-search"
-                              className="mb-2 block text-sm font-medium text-[#28394c]"
-                            >
-                              Search business activity group
-                            </label>
+                          <div className="mt-6 shadow-[0_8px_22px_rgba(71,103,136,0.08)]">
                             <div className="relative">
                               <Search
                                 size={18}
@@ -1530,7 +1547,7 @@ export function CostCalculatorPage() {
                                 onChange={(event) =>
                                   setActivityQuery(event.target.value)
                                 }
-                                className="w-full rounded-[1rem] border border-[#d7deea] bg-[#f8fafc] py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
+                                className="w-full rounded-lg border border-[#E0E0E0] bg-white py-3 pl-12 pr-4 text-sm outline-none transition focus:border-[#111111] focus:bg-white"
                                 placeholder="Search business activity group"
                                 aria-label="Search activity categories"
                               />
@@ -1562,7 +1579,7 @@ export function CostCalculatorPage() {
                           </div>
                         </div>
                       ) : null}
-                      {!isMainlandSelected ? (
+                      {!isMainlandSelected && canShowPostLocationSections ? (
                         <div
                           ref={visasSectionRef}
                           className="relative scroll-mt-24"
@@ -1587,7 +1604,7 @@ export function CostCalculatorPage() {
                               return (
                                 <div
                                   key={visa.id}
-                                  className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-4 backdrop-blur-[40px] backdrop-saturate-[80%] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)] border-[#e6ebf2]"
+                                  className="overflow-hidden isolate rounded-xl  p-4  transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9d9d9] focus-visible:ring-offset-2 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
                                 >
                                   <div className="w-full overflow-hidden rounded-2xl">
                                     <img
@@ -1631,7 +1648,7 @@ export function CostCalculatorPage() {
                                         className={cn(
                                           "inline-flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                           investorVisaEnabled
-                                            ? "shadow-[0_10px_24px_rgba(20,115,230,0.18)]"
+                                            ? "bg-white"
                                             : "hover:bg-white",
                                         )}
                                         aria-label="Toggle Investor Visa"
@@ -1730,7 +1747,7 @@ export function CostCalculatorPage() {
                                             "px-6 py-3 rounded-full inline-flex items-center gap-2",
                                             count > 0
                                               ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                              : " bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                              : "  text-black border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
                                           )}
                                           aria-label={
                                             count > 0
@@ -1773,8 +1790,11 @@ export function CostCalculatorPage() {
                                   Change of Status
                                 </h3>
 
-                                <a
-                                  href="#cc-faq"
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setIsChangeStatusModalOpen(true)
+                                  }
                                   className="text-xs font-medium flex items-center gap-1 p-1"
                                   aria-label="Learn more about Change of Status"
                                 >
@@ -1783,7 +1803,7 @@ export function CostCalculatorPage() {
                                     size={16}
                                     className="rotate-[-27deg]"
                                   />
-                                </a>
+                                </button>
                               </div>
 
                               <p className="text-xs font-normal leading-12 text-gray-600">
@@ -1840,7 +1860,7 @@ export function CostCalculatorPage() {
                           ) : null}
                         </div>
                       ) : null}
-                      {!isMainlandSelected ? (
+                      {!isMainlandSelected && canShowPostLocationSections ? (
                         <div
                           ref={addOnsSectionRef}
                           className="relative scroll-mt-24"
@@ -1850,7 +1870,7 @@ export function CostCalculatorPage() {
                             description="Customise your setup with additional services to help you start and scale with confidence."
                           />
 
-                          <div className="mt-6 space-y-5">
+                          <div className="mt-6 space-y-5 p-6 rounded-xl border border-white/50 bg-white/60 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
                             {addOnGroups.map((group) => {
                               const groupItems = addOnOptions.filter(
                                 (item) => item.groupId === group.id,
@@ -1927,6 +1947,8 @@ export function CostCalculatorPage() {
                   ref={quoteSidebarRef}
                   quote={quote}
                   selectedLicense={selectedLicense}
+                  showCompanySetupSection={canShowFreeZonePricing}
+                  showPricing={canShowFreeZonePricing}
                   mainlandMessage={
                     isMainlandSelected ? MAINLAND_CONSULTATION_MESSAGE : null
                   }
@@ -2223,7 +2245,9 @@ export function CostCalculatorPage() {
                   Grand Total
                 </p>
                 <p className="text-lg font-semibold text-[#111111]">
-                  {formatAed(quote.total)}
+                  {canShowFreeZonePricing
+                    ? formatAed(quote.total)
+                    : "Select Location"}
                 </p>
               </>
             )}
@@ -2274,6 +2298,25 @@ export function CostCalculatorPage() {
           }
         >
           {activeVisaModal.modalCopy.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </ModalShell>
+      ) : null}
+
+      {isChangeStatusModalOpen ? (
+        <ModalShell
+          isOpen
+          title="Change of Status"
+          imageSrc={changeStatusCardImage}
+          onClose={() => setIsChangeStatusModalOpen(false)}
+          footer={
+            <ModalAction
+              label="Close"
+              onClick={() => setIsChangeStatusModalOpen(false)}
+            />
+          }
+        >
+          {CHANGE_STATUS_MODAL_COPY.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </ModalShell>
