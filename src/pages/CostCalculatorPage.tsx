@@ -1345,50 +1345,92 @@ export function CostCalculatorPage() {
                         </div>
 
                         {isMainlandSelected ? (
-                          <div className="mt-6 rounded-xl border border-[#f0d6c2] bg-[#fff7f0] px-5 py-4 text-sm font-medium leading-7 text-[#6b3c18]">
-                            {MAINLAND_CONSULTATION_MESSAGE}
-                          </div>
+                          <>
+                            <div className="mt-6 rounded-xl border border-[#f0d6c2] bg-[#fff7f0] px-5 py-4 text-sm font-medium leading-7 text-[#6b3c18]">
+                              {MAINLAND_CONSULTATION_MESSAGE}
+                            </div>
+                            <div className="mt-4 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                              <h3 className="text-base font-semibold text-gray-900 leading-12 mb-3">
+                                Mainland Benefits
+                              </h3>
+                              <ul className="text-sm text-gray-700 space-y-2">
+                                <li className="flex items-start gap-2">
+                                  <span className="text-[#111723] font-bold mt-0.5">•</span>
+                                  <span>Solo-friendly launch path for entrepreneurs</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-[#111723] font-bold mt-0.5">•</span>
+                                  <span>Digital onboarding process</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-[#111723] font-bold mt-0.5">•</span>
+                                  <span>Tailored to your activity and structure</span>
+                                </li>
+                              </ul>
+                            </div>
+                          </>
                         ) : (
                           <>
                             {isFreeZoneSelected ? (
-                              <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                                <h3 className="text-base font-semibold text-gray-900 leading-12">
-                                  Select Location
-                                </h3>
-                                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setSelectedFreeZoneLocation("dubai")
-                                    }
-                                    className={cn(
-                                      "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
-                                      selectedFreeZoneLocation === "dubai"
-                                        ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                        : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                    )}
-                                  >
-                                    Dubai
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setSelectedFreeZoneLocation(
-                                        "northern-emirates",
-                                      )
-                                    }
-                                    className={cn(
-                                      "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
-                                      selectedFreeZoneLocation ===
-                                        "northern-emirates"
-                                        ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
-                                        : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
-                                    )}
-                                  >
-                                    Northern Emirates
-                                  </button>
+                              <>
+                                <div className="mt-6 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                                  <h3 className="text-base font-semibold text-gray-900 leading-12">
+                                    Select Location
+                                  </h3>
+                                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setSelectedFreeZoneLocation("dubai")
+                                      }
+                                      className={cn(
+                                        "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
+                                        selectedFreeZoneLocation === "dubai"
+                                          ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                          : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                      )}
+                                    >
+                                      Dubai
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setSelectedFreeZoneLocation(
+                                          "northern-emirates",
+                                        )
+                                      }
+                                      className={cn(
+                                        "px-6 py-3 rounded-full inline-flex items-center justify-center gap-2",
+                                        selectedFreeZoneLocation ===
+                                          "northern-emirates"
+                                          ? "rounded-full inline-flex items-center gap-2 bg-[#111723] text-white brand-gradient brand-gradient-hover"
+                                          : "bg-white/10 border border-gray-200 backdrop-blur-[22px] backdrop-saturate-[180%] text-black shadow-[inset_3px_3px_10px_#ccdbe870,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]",
+                                      )}
+                                    >
+                                      Northern Emirates
+                                    </button>
+                                  </div>
                                 </div>
-                              </div>
+                                <div className="mt-4 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
+                                  <h3 className="text-base font-semibold text-gray-900 leading-12 mb-3">
+                                    Free Zone Benefits
+                                  </h3>
+                                  <ul className="text-sm text-gray-700 space-y-2">
+                                    <li className="flex items-start gap-2">
+                                      <span className="text-[#111723] font-bold mt-0.5">•</span>
+                                      <span>Multi-partner ready structure</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                      <span className="text-[#111723] font-bold mt-0.5">•</span>
+                                      <span>Wider operating flexibility</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                      <span className="text-[#111723] font-bold mt-0.5">•</span>
+                                      <span>Built for long-term growth and scaling</span>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </>
                             ) : null}
                             {canShowPostLocationSections ? (
                               <div className="mt-6 grid gap-5 xl:grid-cols-2">
@@ -2455,7 +2497,7 @@ export function CostCalculatorPage() {
               </div>
             </div>
 
-            <div className="max-h-[44vh] space-y-3 overflow-y-auto rounded-[1.2rem] border border-[#e6edf5] bg-[#fbfdff] p-3">
+            <div className="max-h-[30vh] space-y-3 overflow-y-auto">
               {modalActivities.map((activity) => {
                 const selected = selectedActivitySet.has(activity.id);
 
@@ -2463,10 +2505,10 @@ export function CostCalculatorPage() {
                   <label
                     key={activity.id}
                     className={cn(
-                      "flex cursor-pointer items-start gap-4 rounded-[1.4rem] border px-4 py-4 transition",
+                      "flex cursor-pointer items-start gap-4 border-b-2 px-4 py-4 transition",
                       selected
-                        ? "border-[#111111] bg-[#f3f3f3]"
-                        : "border-[#e5ebf3] bg-[#fbfcfe]",
+                        ? "border-[#111111] bg-transparent"
+                        : "border-[#e5ebf3] bg-transparent",
                     )}
                   >
                     <input
@@ -2490,9 +2532,6 @@ export function CostCalculatorPage() {
                           </span>
                         ) : null}
                       </div>
-                      <p className="text-sm leading-6 text-slate-500">
-                        {activity.description}
-                      </p>
                     </div>
                   </label>
                 );
