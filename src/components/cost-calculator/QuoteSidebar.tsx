@@ -257,10 +257,10 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
                     MF
                   </div>
                   <div>
-                    <h3 className="text-[1.55rem] font-semibold text-[#111111]">
+                    <h3 className="text-base font-semibold text-[#111111]">
                       Thank You, {firstName}!
                     </h3>
-                    <p className="mt-1 max-w-[18rem] text-sm leading-6 text-slate-500">
+                    <p className="mt-1 max-w-[18rem] text-xs leading-2 text-slate-500">
                       A member of our team will contact you within 60 minutes to
                       get you started.
                     </p>
@@ -400,10 +400,10 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
                     MF
                   </div>
                   <div>
-                    <h3 className="text-[1.55rem] font-semibold text-[#111111]">
+                    <h3 className="text-base font-semibold text-[#111111]">
                       Thank You, {firstName}!
                     </h3>
-                    <p className="mt-1 max-w-[18rem] text-sm leading-6 text-slate-500">
+                    <p className="mt-1 max-w-[18rem] text-xs leading-2 text-slate-500">
                       A member of our team will contact you within 60 minutes to
                       get you started.
                     </p>

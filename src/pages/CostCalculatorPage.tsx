@@ -467,6 +467,9 @@ export function CostCalculatorPage() {
   const [selectedFreeZoneLocation, setSelectedFreeZoneLocation] = useState<
     "dubai" | "northern-emirates" | null
   >(null);
+  const [hasSelectedJurisdiction, setHasSelectedJurisdiction] = useState(
+    initialState.selectedLicenseId !== null,
+  );
   const [phoneCountry, setPhoneCountry] = useState(
     initialPhoneSelection.country || DEFAULT_PHONE_COUNTRY,
   );
@@ -538,7 +541,9 @@ export function CostCalculatorPage() {
     (selectedLicense?.name ?? "").trim().toLowerCase() === "free zone";
   const canShowFreeZonePricing =
     !isFreeZoneSelected || selectedFreeZoneLocation !== null;
-  const canShowPostLocationSections = canShowFreeZonePricing;
+  const canShowPostLocationSections = !isMainlandSelected;
+  const canShowPostJurisdictionSections =
+    hasSelectedJurisdiction && canShowPostLocationSections;
   const selectedActivitySet = useMemo(
     () => new Set(selectedActivityIds),
     [selectedActivityIds],
@@ -758,10 +763,17 @@ export function CostCalculatorPage() {
       window.setTimeout(resolve, UNLOCK_DELAY_MS);
     });
     setQuoteStarted(true);
+    setHasSelectedJurisdiction(false);
     setIsUnlocking(false);
     window.setTimeout(() => {
       scrollToRef(licenseSectionRef);
     }, 40);
+  };
+
+  const handleSelectJurisdiction = (licenseId: string) => {
+    setShowSuccess(false);
+    setSelectedLicenseId(licenseId);
+    setHasSelectedJurisdiction(true);
   };
 
   const handleConfirmQuote = async () => {
@@ -1257,8 +1269,7 @@ export function CostCalculatorPage() {
                                 role="button"
                                 tabIndex={0}
                                 onClick={() => {
-                                  setShowSuccess(false);
-                                  setSelectedLicenseId(license.id);
+                                  handleSelectJurisdiction(license.id);
                                 }}
                                 onKeyDown={(
                                   event: ReactKeyboardEvent<HTMLDivElement>,
@@ -1268,8 +1279,7 @@ export function CostCalculatorPage() {
                                     event.key === " "
                                   ) {
                                     event.preventDefault();
-                                    setShowSuccess(false);
-                                    setSelectedLicenseId(license.id);
+                                    handleSelectJurisdiction(license.id);
                                   }
                                 }}
                                 className={cn(
@@ -1315,8 +1325,7 @@ export function CostCalculatorPage() {
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        setShowSuccess(false);
-                                        setSelectedLicenseId(license.id);
+                                        handleSelectJurisdiction(license.id);
                                       }}
                                       className={cn(
                                         "px-6 py-3 rounded-full inline-flex items-center gap-2",
@@ -1348,25 +1357,6 @@ export function CostCalculatorPage() {
                           <>
                             <div className="mt-6 rounded-xl border border-[#f0d6c2] bg-[#fff7f0] px-5 py-4 text-sm font-medium leading-7 text-[#6b3c18]">
                               {MAINLAND_CONSULTATION_MESSAGE}
-                            </div>
-                            <div className="mt-4 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                              <h3 className="text-base font-semibold text-gray-900 leading-12 mb-3">
-                                Mainland Benefits
-                              </h3>
-                              <ul className="text-sm text-gray-700 space-y-2">
-                                <li className="flex items-start gap-2">
-                                  <span className="text-[#111723] font-bold mt-0.5">•</span>
-                                  <span>Solo-friendly launch path for entrepreneurs</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                  <span className="text-[#111723] font-bold mt-0.5">•</span>
-                                  <span>Digital onboarding process</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                  <span className="text-[#111723] font-bold mt-0.5">•</span>
-                                  <span>Tailored to your activity and structure</span>
-                                </li>
-                              </ul>
                             </div>
                           </>
                         ) : (
@@ -1411,28 +1401,9 @@ export function CostCalculatorPage() {
                                     </button>
                                   </div>
                                 </div>
-                                <div className="mt-4 overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                                  <h3 className="text-base font-semibold text-gray-900 leading-12 mb-3">
-                                    Free Zone Benefits
-                                  </h3>
-                                  <ul className="text-sm text-gray-700 space-y-2">
-                                    <li className="flex items-start gap-2">
-                                      <span className="text-[#111723] font-bold mt-0.5">•</span>
-                                      <span>Multi-partner ready structure</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                      <span className="text-[#111723] font-bold mt-0.5">•</span>
-                                      <span>Wider operating flexibility</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                      <span className="text-[#111723] font-bold mt-0.5">•</span>
-                                      <span>Built for long-term growth and scaling</span>
-                                    </li>
-                                  </ul>
-                                </div>
                               </>
                             ) : null}
-                            {canShowPostLocationSections ? (
+                            {canShowPostJurisdictionSections ? (
                               <div className="mt-6 grid gap-5 xl:grid-cols-2">
                                 <div className="overflow-hidden isolate rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-[40px] backdrop-saturate-[80%] shadow-[inset_3px_3px_50px_#ccdbe845,inset_-3px_-3px_20px_0px_rgb(255_255_255/18%),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
                                   <h3 className="text-base font-semibold text-gray-900 leading-12">
@@ -1575,7 +1546,8 @@ export function CostCalculatorPage() {
                           </>
                         )}
                       </div>
-                      {!isMainlandSelected && canShowPostLocationSections ? (
+                      {!isMainlandSelected &&
+                      canShowPostJurisdictionSections ? (
                         <div
                           ref={activitiesSectionRef}
                           className="relative scroll-mt-24 overflow-hidden isolate rounded-xl p-6 border border-white/50 bg-white/10 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]"
@@ -1660,7 +1632,8 @@ export function CostCalculatorPage() {
                           </div>
                         </div>
                       ) : null}
-                      {!isMainlandSelected && canShowPostLocationSections ? (
+                      {!isMainlandSelected &&
+                      canShowPostJurisdictionSections ? (
                         <div
                           ref={visasSectionRef}
                           className="relative scroll-mt-24"
@@ -1941,7 +1914,8 @@ export function CostCalculatorPage() {
                           ) : null}
                         </div>
                       ) : null}
-                      {!isMainlandSelected && canShowPostLocationSections ? (
+                      {!isMainlandSelected &&
+                      canShowPostJurisdictionSections ? (
                         <div
                           ref={addOnsSectionRef}
                           className="relative scroll-mt-24"
@@ -2313,37 +2287,39 @@ export function CostCalculatorPage() {
         </div>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#d9e2ed] bg-white/92 px-4 py-3 backdrop-blur-xl lg:hidden">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4">
-          <div>
-            {isMainlandSelected ? (
-              <p className="text-xs font-semibold leading-5 text-[#6b3c18]">
-                {MAINLAND_CONSULTATION_MESSAGE}
-              </p>
-            ) : (
-              <>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7b8ea8]">
-                  Grand Total
+      {hasSelectedJurisdiction ? (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#d9e2ed] bg-white/92 px-4 py-3 backdrop-blur-xl lg:hidden">
+          <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4">
+            <div>
+              {isMainlandSelected ? (
+                <p className="text-xs font-semibold leading-5 text-[#6b3c18]">
+                  {MAINLAND_CONSULTATION_MESSAGE}
                 </p>
-                <p className="text-lg font-semibold text-[#111111]">
-                  {canShowFreeZonePricing
-                    ? formatAed(quote.total)
-                    : "Select Location"}
-                </p>
-              </>
-            )}
+              ) : (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7b8ea8]">
+                    Grand Total
+                  </p>
+                  <p className="text-lg font-semibold text-[#111111]">
+                    {canShowFreeZonePricing
+                      ? formatAed(quote.total)
+                      : "Select Location"}
+                  </p>
+                </>
+              )}
+            </div>
+            {!isMainlandSelected ? (
+              <button
+                type="button"
+                onClick={() => scrollToRef(quoteSidebarRef)}
+                className="brand-gradient brand-gradient-hover inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
+              >
+                View Estimate
+              </button>
+            ) : null}
           </div>
-          {!isMainlandSelected ? (
-            <button
-              type="button"
-              onClick={() => scrollToRef(quoteSidebarRef)}
-              className="brand-gradient brand-gradient-hover inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
-            >
-              View Estimate
-            </button>
-          ) : null}
         </div>
-      </div>
+      ) : null}
 
       {activeLicenseModal ? (
         <ModalShell
@@ -2355,8 +2331,7 @@ export function CostCalculatorPage() {
             <ModalAction
               label={activeLicenseModal.selectLabel}
               onClick={() => {
-                setShowSuccess(false);
-                setSelectedLicenseId(activeLicenseModal.id);
+                handleSelectJurisdiction(activeLicenseModal.id);
                 setLicenseModalId(null);
               }}
             />

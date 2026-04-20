@@ -53,7 +53,7 @@ describe('isLeadFormComplete', () => {
 })
 
 describe('getSubmissionIssues', () => {
-  it('flags missing requirements', () => {
+  it('flags only lead form requirement', () => {
     const issues = getSubmissionIssues(
       {
         ...defaultCalculatorState,
@@ -69,9 +69,7 @@ describe('getSubmissionIssues', () => {
     )
 
     expect(issues).toContain('Lead form is incomplete.')
-    expect(issues).toContain('Choose one business license package.')
-    expect(issues).toContain('Pick at least 1 business activity.')
-    expect(issues).toContain('Select at least one visa requirement.')
+    expect(issues).toHaveLength(1)
   })
 
   it('returns no issues for a complete state', () => {
