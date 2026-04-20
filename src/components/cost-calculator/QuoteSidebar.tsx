@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { ArrowRight, Copy, Pencil, Share2 } from "lucide-react";
+import { ArrowRight, Copy, Download, Pencil, Share2 } from "lucide-react";
 import type {
   AddOnOption,
   BusinessActivity,
@@ -33,6 +33,7 @@ interface QuoteSidebarProps {
   shareStatus: "idle" | "copied";
   onShare: () => void;
   onConfirm: () => void;
+  onDownloadPdf?: () => void;
   onEditCompanySetup?: () => void;
   onEditActivities?: () => void;
   onEditVisas?: () => void;
@@ -109,6 +110,7 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
       investorVisaEnabled,
       leadName,
       onConfirm,
+      onDownloadPdf,
       onEditActivities,
       onEditAddOns,
       onEditCompanySetup,
@@ -251,21 +253,33 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
             </p>
 
             {showSuccess ? (
-              <div className="rounded-xl z-10 relative bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
-                <div className="flex items-center gap-4">
-                  <div className="grid h-16 w-16 place-items-center rounded-full bg-[linear-gradient(180deg,#e8e8e8_0%,#ffffff_100%)] text-lg font-semibold text-[#111111]">
-                    MF
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-[#111111]">
-                      Thank You, {firstName}!
-                    </h3>
-                    <p className="mt-1 max-w-[18rem] text-xs leading-2 text-slate-500">
-                      A member of our team will contact you within 60 minutes to
-                      get you started.
-                    </p>
+              <div className="space-y-3">
+                <div className="rounded-xl z-10 relative bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
+                  <div className="flex items-center gap-4">
+                    <div className="grid h-16 w-16 place-items-center rounded-full bg-[linear-gradient(180deg,#e8e8e8_0%,#ffffff_100%)] text-lg font-semibold text-[#111111]">
+                      MF
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-[#111111]">
+                        Thank You, {firstName}!
+                      </h3>
+                      <p className="mt-1 max-w-[18rem] text-xs leading-2 text-slate-500">
+                        A member of our team will contact you within 60 minutes to
+                        get you started.
+                      </p>
+                    </div>
                   </div>
                 </div>
+                {onDownloadPdf ? (
+                  <button
+                    type="button"
+                    onClick={onDownloadPdf}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#d7deea] bg-white px-5 py-3 text-sm font-semibold text-[#111111] transition hover:border-[#bfd0e3] hover:bg-[#f5f8fc]"
+                  >
+                    Download PDF Form
+                    <Download size={16} />
+                  </button>
+                ) : null}
               </div>
             ) : (
               <button
@@ -394,21 +408,33 @@ export const QuoteSidebar = forwardRef<HTMLDivElement, QuoteSidebarProps>(
             </div>
 
             {showSuccess ? (
-              <div className="rounded-xl z-10 relative bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
-                <div className="flex items-center gap-4">
-                  <div className="grid h-16 w-16 place-items-center rounded-full bg-[linear-gradient(180deg,#e8e8e8_0%,#ffffff_100%)] text-lg font-semibold text-[#111111]">
-                    MF
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-[#111111]">
-                      Thank You, {firstName}!
-                    </h3>
-                    <p className="mt-1 max-w-[18rem] text-xs leading-2 text-slate-500">
-                      A member of our team will contact you within 60 minutes to
-                      get you started.
-                    </p>
+              <div className="space-y-3">
+                <div className="rounded-xl z-10 relative bg-white px-5 py-5 shadow-[0_20px_50px_rgba(60,91,125,0.14)]">
+                  <div className="flex items-center gap-4">
+                    <div className="grid h-16 w-16 place-items-center rounded-full bg-[linear-gradient(180deg,#e8e8e8_0%,#ffffff_100%)] text-lg font-semibold text-[#111111]">
+                      MF
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-[#111111]">
+                        Thank You, {firstName}!
+                      </h3>
+                      <p className="mt-1 max-w-[18rem] text-xs leading-2 text-slate-500">
+                        A member of our team will contact you within 60 minutes to
+                        get you started.
+                      </p>
+                    </div>
                   </div>
                 </div>
+                {onDownloadPdf ? (
+                  <button
+                    type="button"
+                    onClick={onDownloadPdf}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#d7deea] bg-white px-5 py-3 text-sm font-semibold text-[#111111] transition hover:border-[#bfd0e3] hover:bg-[#f5f8fc]"
+                  >
+                    Download PDF Form
+                    <Download size={16} />
+                  </button>
+                ) : null}
               </div>
             ) : (
               <button

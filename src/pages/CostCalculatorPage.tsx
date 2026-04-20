@@ -60,6 +60,7 @@ import {
   shouldClearPhoneInput,
   shouldPreventPhonePrefixEdit,
 } from "../utils/phone";
+import { downloadQuotePdf } from "../utils/pdf";
 import { loadCalculatorState, saveCalculatorState } from "../utils/persistence";
 import { submitQuoteToSheet } from "../utils/sheets";
 
@@ -847,6 +848,31 @@ export function CostCalculatorPage() {
     } catch {
       setShareStatus("idle");
     }
+  };
+
+  const handleDownloadPdf = () => {
+    const residenceCountryLabel =
+      RESIDENCE_COUNTRY_OPTIONS.find(
+        (item) => item.code === leadForm.residenceCountry,
+      )?.label ?? leadForm.residenceCountry;
+
+    downloadQuotePdf({
+      leadName: leadForm.fullName,
+      email: leadForm.email,
+      phone: leadForm.phone,
+      residenceCountry: residenceCountryLabel,
+      licenseName: selectedLicense?.name ?? "",
+      durationYears,
+      shareholderCount,
+      activities: selectedActivities.map((item) => item.name),
+      investorVisa: investorVisaEnabled,
+      employeeVisas: employeeVisaCount,
+      dependentVisas: dependentVisaCount,
+      applicantsInsideUae,
+      addOns: selectedAddOns.map((item) => item.name),
+      totalAed: quote.total,
+      isMainland: isMainlandSelected,
+    });
   };
 
   const toggleActivity = (activityId: string) => {
@@ -1926,7 +1952,7 @@ export function CostCalculatorPage() {
                           />
 
                           <div className="mt-6 space-y-5 p-6 rounded-xl border border-white/50 bg-white/60 backdrop-blur-[22px] backdrop-saturate-[180%] shadow-[inset_6px_4px_20px_0px_#cad4dd3d,inset_-3px_-3px_10px_1px_rgb(255_255_255),11.845px_9.871px_30.993px_0_rgba(39,67,103,0.13)]">
-                            {addOnGroups.map((group) => {
+                            {addOnGroups.map((group, index) => {
                               const groupItems = addOnOptions.filter(
                                 (item) => item.groupId === group.id,
                               );
@@ -1934,7 +1960,10 @@ export function CostCalculatorPage() {
                               return (
                                 <div
                                   key={group.id}
-                                  className="overflow-hidden isolate border-t border-black/5"
+                                  className={cn(
+                                    "overflow-hidden isolate",
+                                    index > 0 ? "border-t border-black/5 pt-5" : "",
+                                  )}
                                 >
                                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                     <div>
@@ -1951,7 +1980,7 @@ export function CostCalculatorPage() {
                                       onClick={() =>
                                         setAddOnGroupModalId(group.id)
                                       }
-                                      className="text-xs font-medium flex items-center gap-1 p-1"
+                                      className="flex shrink-0 items-center gap-1 whitespace-nowrap p-1 text-xs font-medium"
                                       aria-label={`Learn more about ${group.name}`}
                                     >
                                       Learn More{" "}
@@ -1975,7 +2004,7 @@ export function CostCalculatorPage() {
                                           onClick={() => toggleAddOn(item.id)}
                                           aria-pressed={selected}
                                           className={cn(
-                                            "rounded-full border px-4 py-3 text-left text-xs transition",
+                                            "rounded-full border px-3 py-2 text-left text-xs transition ",
                                             selected
                                               ? "border-[#111111] bg-[#f3f3f3] text-[#111111]"
                                               : "border-[#d7deea] bg-[#fbfcfe] text-[#28394c] hover:border-[#bfd0e3]",
@@ -2029,6 +2058,7 @@ export function CostCalculatorPage() {
                   onConfirm={() => {
                     void handleConfirmQuote();
                   }}
+                  onDownloadPdf={handleDownloadPdf}
                   onEditCompanySetup={() => scrollToRef(licenseSectionRef)}
                   onEditActivities={() => scrollToRef(activitiesSectionRef)}
                   onEditVisas={() => scrollToRef(visasSectionRef)}
